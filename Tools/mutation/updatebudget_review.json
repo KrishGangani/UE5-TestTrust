@@ -1,0 +1,18 @@
+{
+	"fbd237213c": {
+		"verdict": "equivalent",
+		"reason": "Tie-break A < B becomes A <= B. Client indices are unique, so the two differ only when the sort compares an element with itself, which Algo::IntroSort never does: its selection sort compares distinct positions (Core/Public/Algo/IntroSort.h:70) and its partition loops exclude the pivot (:98-99); heap-sort comparisons are between distinct nodes [inferred]."
+	},
+	"0072839e65": {
+		"verdict": "real gap",
+		"reason": "Deadline < NextFrameTime becomes <=: no test has a deadline exactly equal to the next frame time, so whether such a client is mandatory is untested."
+	},
+	"84989a4f35": {
+		"verdict": "real gap",
+		"reason": "SpentMs + Predicted > BudgetMs becomes >=: no test has an update that exactly fills the remaining budget, so the cut-off boundary is untested."
+	},
+	"60ff682b30": {
+		"verdict": "real gap",
+		"reason": "bOverBudget = SpentMs > BudgetMs becomes >=: no test spends exactly the budget, so 'exactly on budget is not over budget' is untested."
+	}
+}

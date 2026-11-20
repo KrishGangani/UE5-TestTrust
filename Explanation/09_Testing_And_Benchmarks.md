@@ -141,3 +141,34 @@ The prediction was committed (`c18936d`) before the run.
 1. The batch succeeded, but the queue driver then crashed while **printing** the report: the Windows console's cp1252 can't encode `→`. The summary file had been written (UTF-8). Fixed: `sys.stdout.reconfigure(encoding="utf-8", errors="replace")` in `main()`; the report was regenerated without UE.
 2. While the batch ran, its manifest already said `stopped: all mutants have a fate`, because the reason was set before the loop. Fixed: the reason is `None` while running and set when the loop ends.
 3. Expected but now measured: the first launch on a fresh snapshot pays a one-time asset-registry scan (≈ 25 s here).
+
+## Phase 5 · S6: UE5-UpdateBudget "before" (M-P1, 2026-11-21)
+
+**Order note:** S6–S8 need only the runner, so they were queued at the start of Phase 5, while S1 was being written, to use the machine's queue time; their order relative to S1–S5 doesn't affect any result. S6 was captured **before** any new test existed (`03` rule: baselines before the new thing).
+
+**The run.** Campaign `2026-11-21_025734_mut-updatebudget`: UE5-UpdateBudget at **`b890bc6`** (its step S4: `FUpdateBudgetScheduler` and 8 automation tests), `UpdateBudget\`, mutating only `Plugins/UpdateBudgetCore/Source/UpdateBudgetCore/Private/UpdateBudgetScheduler.cpp`, filter `StartsWith:UpdateBudget.Scheduler`. Config `Tools\mutation\updatebudget.json`. **One queue job**, `20261121_025744_764736`: **ok, exit 0, 687.9 s** for the baseline and 39 mutants. UE5-UpdateBudget's repository was only read (`git rev-parse`, `git archive` on the commit).
+
+**Baseline:** cold build 36.7 s; 8 tests, 0 failed, test launch 17.1 s.
+
+**Fates:** 24 killed, **11 crash**, 4 survived, 0 stillborn, 0 timeout, **0 error**.
+- **Every crash is a genuine detection, not infrastructure:** 9 engine-log `Assertion failed: (Index >= 0) & (Index < ArrayNum)` (`Core/Public/Containers/Array.h:1339`) and 2 `EXCEPTION_ACCESS_VIOLATION`, all from off-by-one loop bounds (`<` → `<=` on lines 31, 47, 52), a deleted initialisation (lines 17, 30, 33) or an inverted loop condition. A test run that crashes has failed, so crashes count as killed (`02` §9).
+
+**Survivors and review** (`Tools\mutation\updatebudget_review.json`):
+
+| Id | Line | Change | Verdict |
+|---|---|---|---|
+| `fbd237213c` | 42 | tie-break `A < B` → `A <= B` | **equivalent**: indices are unique, so the two differ only when the sort compares an element with itself, which `Algo::IntroSort` never does (selection sort compares distinct positions, `Core/Public/Algo/IntroSort.h:70`; the partition loops exclude the pivot, `:98–99`; heap sort compares distinct nodes **[inferred]**) |
+| `0072839e65` | 47 | `Deadline < NextFrameTime` → `<=` | **real gap**: no test has a deadline exactly at the next frame time |
+| `84989a4f35` | 56 | `SpentMs + Predicted > BudgetMs` → `>=` | **real gap**: no update ever exactly fills the remaining budget |
+| `60ff682b30` | 70 | `bOverBudget = SpentMs > BudgetMs` → `>=` | **real gap**: no frame spends exactly the budget |
+
+**Score:** **M1 = 92.1%** (35 of 38) after the review; 89.7% (35 of 39) before it; M1-naive 89.7% (no stillborn mutants).
+
+**What it says about the hypotheses** (one suite, so evidence, not proof):
+- **H2 (boundaries are under-tested): supported.** All 4 survivors are relational-operator boundary shifts: 4 of 19 ROR mutants survived, against 0 of 20 others (AOR 3/3, LCR 4/4, COND 2/2, SDL 11/11 killed).
+- **H1 (weak oracles): supported in its boundary form.** Every survivor sits on a line that every test executes; the suite runs the code but never checks the exact boundary.
+- **H6 (cost): rejected for this suite.** Median 14.1 s per mutant [13.2–60.8]: build 4.1 s [3.8–7.5] with exactly **1 compile action** every time (the plugin's file came out of its unity blob, `01b #3`), test launch 9.9 s [9.4–56.7].
+
+**The 56.7 s outlier** (mutant `3569416fdb`, killed) was infrastructure, not the mutant: that editor launch had to start the shared Zen storage server ("Launching executable … zenserver", then about 31 s of "Waiting for ZenServer to be ready", and 10 s of shader-type setup), because no Zen server was running at that moment. Its tests themselves took 0.8 s. The cost is reported as measured.
+
+**Report:** `Benchmarks\Summaries\2026-11-21_025734_mut-updatebudget_summary.md`.

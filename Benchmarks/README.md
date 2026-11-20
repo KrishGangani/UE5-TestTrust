@@ -55,3 +55,4 @@ Resolution (gate): 1280x720 windowed, default scalability, no VSync, no sound
 |---|---|---|---|
 | `2026-11-21_013437_buildcost` | probe | Phase 2: build and test cost per mutant on a snapshot of UE5-UpdateBudget at `c25a996` (`09` P2) | `.cpp` mutant 3.6–7.6 s build; test launch 13.4–17.3 s, 5 s of it a fixed controller wait |
 | `2026-11-21_014645_mut-sample` | mutation | Phase 4 runner smoke test on the sample module M-S at `03771bf` (`09` P4-R) | 14 of 14 fates as predicted; M1 91.7% after review; 12.1 s median per mutant; [summary](Summaries/2026-11-21_014645_mut-sample_summary.md) |
+| `2026-11-21_025734_mut-updatebudget` | mutation | S6: UE5-UpdateBudget scheduler at `b890bc6`, before any new test (`09` S6) | 39 mutants; M1 92.1% after review (89.7% before); 3 real boundary gaps, 1 equivalent; 14.1 s median per mutant; [summary](Summaries/2026-11-21_025734_mut-updatebudget_summary.md) |
