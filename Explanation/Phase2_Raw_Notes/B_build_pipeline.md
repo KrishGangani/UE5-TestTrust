@@ -38,7 +38,7 @@ UHT logs "Parsing headers for ..." and "Generated code is up to date." only at *
 ## B4. Other build facts used
 
 - `Engine/Build/BatchFiles/Build.bat` holds a machine-wide lock file in `%tmp%` while it runs (`Build.bat:17–30`), so two `Build.bat` calls never overlap. The queue already serialises UE jobs; the lock is a second guard.
-- `-WaitMutex` makes UBT wait for its own single-instance mutex instead of failing (P01's build scripts use it).
+- `-WaitMutex` makes UBT wait for its own single-instance mutex instead of failing (UE5-UpdateBudget's build scripts use it).
 - **Deterministic compiler output** (`bDeterministic`, MSVC `/Brepro`) defaults to on only for Shipping and carries `[RequiresUniqueBuildEnvironment]` (`Rules/TargetRules.cs:2155–2167`; `Platform/Windows/VCToolChain.cs:786–799`). An editor target on the launcher engine uses the shared build environment, so this can't be switched on **[inferred]**. That rules out cheap "same object file = equivalent mutant" detection (trivial compiler equivalence) for now.
 - Dev automation tests are compiled into Development (`Configuration/UEBuildTarget.cs:6315–6331`).
 

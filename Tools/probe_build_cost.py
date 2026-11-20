@@ -93,7 +93,7 @@ def snapshot(destination: str) -> dict:
 
 
 def run_logged(name: str, batch: str, command: str, timeout: float) -> dict:
-    """Runs one command string (quoted by hand, as P01's run_bench.py does) with its output in a step log."""
+    """Runs one command string (quoted by hand, as UE5-UpdateBudget's run_bench.py does) with its output in a step log."""
     log_path = os.path.join(RAW_DIR, f"{batch}_{name}.log")
     print(f"[probe] {dt.datetime.now():%H:%M:%S} start {name}", flush=True)
     started = time.perf_counter()

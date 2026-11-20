@@ -245,7 +245,7 @@ run_bench.py → pinned packaged TestTrust.exe -deterministic -FPS=60 -windowed 
 | BOOL | `true`↔`false` | Wrong default or return value |
 | SDL | an assignment, increment or call statement → `;` | A forgotten update or call |
 
-**Gate** (fixed before any gate data exists; changed only on a separate calibration batch, `01b` §1)
+**Gate** (fixed before any gate data exists; changed only on a separate calibration batch, Phase 2 notes C4)
 
 | Setting | Default | Reasoning |
 |---|---|---|
@@ -298,7 +298,7 @@ run_bench.py → pinned packaged TestTrust.exe -deterministic -FPS=60 -windowed 
 - **Nightly CI.** `tt_mutate.py plan` on the night's commit, `queue` across a build farm, report published next to the test results. Only files changed since the last campaign need new mutants.
 - **Per-mutant test selection.** Run only the tests that execute the mutated function (needs coverage data; with clang-cl + `llvm-cov`, `01b` §5 growth note).
 - **Mutant schemata with a real front end.** libclang (shipped with VS 2022's LLVM) can give exact expression boundaries; then all mutants compile into one binary and a `-TTMutant=<id>` switch selects one per process. Build cost would drop from one build per mutant to one per campaign.
-- **Equivalent-mutant shortcuts.** Trivial compiler equivalence (identical object files mean an equivalent mutant) needs deterministic compiler output, which the launcher editor target can't enable (`01b` §1, B4).
+- **Equivalent-mutant shortcuts.** Trivial compiler equivalence (identical object files mean an equivalent mutant) needs deterministic compiler output, which the launcher editor target can't enable (`01b #13`).
 - **Gate in CI.** A pre-merge gate with k = 3 candidate runs; a nightly re-baseline; results exported as Gauntlet/Horde telemetry instead of local files.
 - **Reuse across the portfolio.** UE5-SpawnPacer and later projects can enable `TestTrustProbe` to make their benchmarks gate-able, and point the runner at their suites.
 

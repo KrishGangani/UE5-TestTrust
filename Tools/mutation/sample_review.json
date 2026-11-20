@@ -1,0 +1,14 @@
+{
+	"8125da701a": {
+		"verdict": "equivalent",
+		"reason": "Damage < MinDamage vs Damage <= MinDamage differ only when Damage == MinDamage, and then both branches leave Damage at MinDamage. No input can tell them apart."
+	},
+	"1c78e5d36c": {
+		"verdict": "equivalent",
+		"reason": "Next > 0.f vs Next >= 0.f differ only when Next is exactly zero (or negative zero), and then both return a value equal to 0.f. No input can tell them apart."
+	},
+	"62c038c366": {
+		"verdict": "real gap",
+		"reason": "The deliberate gap: no test puts a target exactly at the range limit, so <= becoming < is not noticed. Phase 7 adds that test (03, S8)."
+	}
+}

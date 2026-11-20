@@ -312,7 +312,7 @@ def cmd_batch(args) -> int:
     print(f"[mutate] baseline green: {baseline['tests']} tests, build {baseline['build_s']} s, tests {baseline['test_s']} s",
           flush=True)
 
-    record["stopped"] = "all mutants have a fate"
+    record["stopped"] = None                  # set when the loop ends, so a running batch never claims a reason
     for mutant in pending(manifest):
         elapsed = time.perf_counter() - clock
         if elapsed + estimate_seconds(manifest, baseline) > args.max_seconds:
@@ -349,6 +349,8 @@ def cmd_batch(args) -> int:
         print(f"[mutate] {mutant['id']} {mutant['file']}:{mutant['line']} {mutant['operator']} "
               f"{mutant['original'][:30]!r}->{mutant['replacement'][:30]!r}: {mutant['fate']} "
               f"(build {mutant['build_s']} s, test {mutant['test_s']} s)", flush=True)
+    record["stopped"] = record["stopped"] or ("all mutants have a fate" if not pending(manifest)
+                                              else "remaining mutants are errors with no attempts left")
     record["ended"] = dt.datetime.now().isoformat(timespec="seconds")
     record["seconds"] = round(time.perf_counter() - clock, 1)
     save(manifest)
@@ -507,6 +509,8 @@ def safety_selftest() -> bool:
 
 
 def main(argv: list[str]) -> int:
+    # The Windows console defaults to cp1252, which can't print the report's arrows; never let printing fail a run.
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="cmd", required=True)
     plan = sub.add_parser("plan")

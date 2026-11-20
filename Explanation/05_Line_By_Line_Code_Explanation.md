@@ -7,7 +7,7 @@
 | A | Phase 4, F1 (project and modules) | `.uproject`, two `Target.cs`, three `Build.cs`, three module `.cpp`, `.uplugin`, three `.ini` |
 | B | Phase 4, F2 (sample rules and tests) | `TTSampleRules.h`, `TTSampleRules.cpp`, `TTSampleRulesTests.cpp` |
 | C | Phase 4, F3 (scripts) | `Tools\*.bat` |
-| D | Phase 2 and Phase 4, F4 (Python) | `probe_build_cost.py`, `tt_common.py`, `tt_mutants.py`, `tt_mutate.py`, `mutation\sample.json` |
+| D | Phase 2 and Phase 4, F4 (Python) | `probe_build_cost.py`, `tt_common.py`, `tt_mutants.py`, `tt_mutate.py`, `mutation\sample.json`, `mutation\sample_review.json` |
 
 ---
 
@@ -131,7 +131,7 @@ IMPLEMENT_MODULE(FDefaultModuleImpl, TestTrustProbe);
 | Key | Why |
 |---|---|
 | `GameDefaultMap`, `EditorStartupMap` = `/Engine/Maps/Templates/Template_Default` | An engine map with a floor and lights. No map is authored: the workload spawns everything from code (as in UE5-UpdateBudget). The editor also opens this map when the runner starts `UnrealEditor-Cmd` |
-| `bSmoothFrameRate=False`, `bUseFixedFrameRate=False` | Restate engine defaults on purpose: a later change can't silently cap or smooth frame times. Gate runs use `-deterministic` anyway, where smoothing is skipped (`01b` §4) |
+| `bSmoothFrameRate=False`, `bUseFixedFrameRate=False` | Restate engine defaults on purpose: a later change can't silently cap or smooth frame times. Gate runs use `-deterministic` anyway, where smoothing is skipped (`01b` B-1) |
 | `r.VSync=0` under `[SystemSettings]` | Present never blocks the frame |
 | `r.AllowStaticLighting=False` | No baked lighting is needed, so no lighting-build warnings for the template map |
 | `DefaultGraphicsRHI_DX12`, SM6 only | One shader format to compile and cook (the RTX 5070 supports SM6), so packaging is shorter |
@@ -302,9 +302,11 @@ All of them are adapted from UE5-UpdateBudget's scripts and must be run **throug
 | `pending()` | Mutants without a fate, plus *error* fates with fewer than two attempts |
 | `estimate_seconds()` | The median cost of mutants already run, or baseline + 60 s before any has run; used to stop **before** the budget would be exceeded |
 | `cmd_batch()` | Restore → build and test the unmutated snapshot → refuse (exit 3) unless it built, exited 0, ran ≥ 1 test and failed none → test timeout = max(120 s, 3 × baseline) → for each pending mutant while the budget allows: apply, build, test, restore, classify, save. The build result starts as "nothing ran", and `OSError`/`ValueError` (a locked file, a file that changed since planning) are caught and stored in `detail`, so such a mutant becomes an *error* (retried once) instead of crashing the batch (found in the Phase 4 self-review, `07`) |
+| Stop reason | `record["stopped"]` is `None` while the batch runs and is set when the loop ends ("time budget reached", "all mutants have a fate", or errors with no attempts left). **Fixed after P4-R:** the first version set it before the loop, so a running batch already claimed a reason |
 | `cmd_queue()` | Submits `batch` jobs to `tools\ue_queue.py` until nothing is pending; the command is passed as one pre-quoted string because the queue joins its arguments with spaces (a lesson from the first probe submission, `09` P2). Stops if a batch makes no progress |
 | `scores()` | M1, M1 before review, M1-naive (`02` §9) |
 | `cmd_report()` | The summary page: fates, the three scores, a per-operator table, cost per mutant and per batch, and the survivor table with review verdicts from `Tools/mutation/<name>_review.json` |
+| `main()` | Reconfigures `stdout` to UTF-8 with `errors="replace"`. **Fixed after P4-R:** the Windows console's cp1252 couldn't print the report's `→`, and the driver crashed *after* a successful batch |
 | `cmd_selftest()` / `safety_selftest()` | Eight classification cases (including the 4294967295 exit code of a failed run); the three scores on a known example; and SC2: a throwaway repository with an **uncommitted edit** is snapshotted; its tree hash, status and file time must be unchanged and the edit must not appear in the snapshot |
 
 ### D5. `Tools\mutation\sample.json`
@@ -317,3 +319,11 @@ All of them are adapted from UE5-UpdateBudget's scripts and must be run **throug
 | `mutate` / `exclude` | `Source/TestTrustSample/Private/*.cpp` / `*/Tests/*`, `*Module.cpp` | Only the rules file remains |
 | `test_filter` | `StartsWith:TestTrust.Sample` | Exactly this suite (`01b #5`) |
 | `operators` | all six | |
+
+### D6. `Tools\mutation\sample_review.json`
+
+| Key | Why |
+|---|---|
+| `8125da701a`, `1c78e5d36c`: `equivalent` | The two equivalent survivors predicted in `09` P4-R, each with the reason no input can tell it from the original. `report` removes them from both sides of M1 and still prints M1 before the review |
+| `62c038c366`: `real gap` | The deliberate boundary gap. Recorded, never excluded: it stays a survivor in M1 |
+| Keys are mutant ids | Ids hash the file path, offsets, operator and replacement (D3), so the review carries over to any later campaign at a commit where that file is unchanged |

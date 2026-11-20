@@ -11,7 +11,7 @@
 
 ---
 
-**Progress (2026-11-21):** Phases 1–3 ✅. Phase 4: F1–F3 ✅ (`09`, one queue job); F4 runner code and self-tests ✅; F4 runner smoke test P4-R runs on the commit that contains this line.
+**Progress (2026-11-21):** Phases 1–3 ✅. Phase 4 ✅: F1–F3 (`09`, one queue job, re-run after the AndroidFileServer rule); F4 runner and self-tests; F4 runner smoke test P4-R: 14 of 14 fates as predicted, M1 = 91.7%, 12.1 s median per mutant. Next: **S1** (probe plugin).
 
 ## Phase 4: Foundation
 

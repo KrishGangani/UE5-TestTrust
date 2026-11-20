@@ -60,6 +60,12 @@ All seven checks ran as **one queue job**, `Tools\phase4_checks.bat`: job `20261
 
 **Side effect, then fixed:** the first uncooked run (F-3) made the engine append an `AndroidFileServerEditor` block with a random `SecurityToken` to `Config\DefaultEngine.ini`. Per the portfolio rule of 2026-11-21 the block was deleted and the `AndroidFileServer` plugin disabled in `TestTrust.uproject` (`05` A1, A7). The seven checks were re-run on that configuration: see **Phase 4 · Re-run** below.
 
+## Phase 4 · Re-run after disabling AndroidFileServer
+
+The same seven checks (`Tools\phase4_checks.bat`, one queue job) on the committed configuration: `AndroidFileServer` disabled in the `.uproject`, its generated block removed from `DefaultEngine.ini`, no `-ExitAfterSeconds`.
+
+*(results below)*
+
 ## Phase 4 · P4-R: runner smoke test on the sample module (M-S)
 
 **Predicted before the run** (from reading the code and the tests, `05` B2–B3):
@@ -83,4 +89,47 @@ All seven checks ran as **one queue job**, `Tools\phase4_checks.bat`: job `20261
 
 **Predicted:** 14 mutants, 11 killed, 3 survived (1 real gap, 2 equivalent), 0 stillborn, 0 error. M1 before review = 11/14 = 78.6%; after the equivalence review = 11/12 = 91.7%.
 
-*(results below)*
+The prediction was committed (`c18936d`) before the run.
+
+**The run.** Campaign `2026-11-21_014645_mut-sample`: target UE5-TestTrust at `03771bf` (the Phase 4 commit), `TestTrust\`, filter `StartsWith:TestTrust.Sample`. Planned with `tt_mutate.py plan --config Tools\mutation\sample.json`; run with `tt_mutate.py queue --campaign … --batch-seconds 1800`: **one queue job**, `20261121_014653_c65626`, **ok, exit 0, 278.0 s** for the baseline plus all 14 mutants. Test launches pinned to the P-cores (`0xFFFF`); builds unpinned.
+
+*Re-plan before the run:* the campaign was first planned on commit `4decfae`. Before its batch started, that local commit was rewritten as `03771bf` to keep a generated `SecurityToken` out of the repository's history (`05` A1, A7), and the campaign was re-planned in place with `plan --campaign <id>`, which is refused once any result exists. The mutated file and the tests are byte-identical in both commits; the 14 mutants and their ids didn't change.
+
+| Mutant | Line | Change | Predicted | **Result** | Killed by |
+|---|---|---|---|---|---|
+| `26b8b01f6c` | 7 | AOR `-` → `+` | killed | ✅ **killed** | Damage.ArmorSubtracts, CriticalDoubles, NeverBelowMinimum |
+| `ece7912d6a` | 8 | COND `!(Damage < MinDamage)` | killed | ✅ **killed** | the three Damage tests |
+| `8125da701a` | 8 | ROR `<` → `<=` | survived, equivalent | ✅ **survived** | — (reviewed: equivalent) |
+| `d8920aa447` | 8 | ROR `<` → `>=` | killed | ✅ **killed** | the three Damage tests |
+| `c82e2cf751` | 10 | SDL `Damage = MinDamage;` | killed | ✅ **killed** | Damage.NeverBelowMinimum |
+| `72300ed28a` | 12 | COND `!(bCritical)` | killed | ✅ **killed** | the three Damage tests |
+| `f5019b4aac` | 14 | SDL `Damage *= 2;` | killed | ✅ **killed** | Damage.CriticalDoubles |
+| `3b42b988c0` | 14 | AOR `*=` → `/=` | killed | ✅ **killed** | Damage.CriticalDoubles |
+| `62c038c366` | 22 | ROR `<=` → `<` | survived (the gap) | ✅ **survived** | — (reviewed: real gap) |
+| `249f330409` | 22 | ROR `<=` → `>` | killed | ✅ **killed** | Range.InsideAndOutside |
+| `f08f35021c` | 22 | AOR `*` → `/` | killed | ✅ **killed** | Range.InsideAndOutside |
+| `6dff9dc6e9` | 27 | AOR `-` → `+` | killed | ✅ **killed** | Cooldown.CountsDown, StopsAtZero |
+| `1c78e5d36c` | 28 | ROR `>` → `>=` | survived, equivalent | ✅ **survived** | — (reviewed: equivalent) |
+| `1cc079ff12` | 28 | ROR `>` → `<=` | killed | ✅ **killed** | Cooldown.CountsDown, StopsAtZero |
+
+**Outcome: 14 of 14 fates as predicted.** 11 killed, 3 survived, 0 stillborn, 0 timeout, 0 crash, **0 error**. **M1 = 91.7%** (11 of 12) after the review in `Tools\mutation\sample_review.json`; 78.6% before it; M1-naive 78.6% (no stillborn mutants here, so the naive rule changes nothing on this sample). Per operator: ROR 3 killed / 3 survived (all three survivors are relational boundaries, consistent with H2 on a sample built to show it, not evidence for it), AOR 4/0, COND 2/0, SDL 2/0. Report: `Benchmarks\Summaries\2026-11-21_014645_mut-sample_summary.md`.
+
+**Cost:**
+
+| | Median | [min–max] | Notes |
+|---|---|---|---|
+| Baseline build (cold snapshot) | 49.9 s | — | Once per campaign |
+| Baseline test launch | 34.0 s | — | First launch of a fresh snapshot |
+| Mutant build | **2.11 s** | [1.95–2.61] | Exactly **1 compile action** per mutant, every time: the snapshot's working-set rule held (`01b #3`). The sample module compiles against the small `SharedPCH.Core` |
+| Mutant test launch | **9.95 s** | [9.49–30.55] | The 30.55 s is the first mutant only: "AssetRegistryGather time 24.58 s … NumUncachedFiles 8896", a one-time scan of the fresh snapshot. The other 13: 9.88 s [9.49–11.42] |
+| **Mutant total (build + test)** | **12.07 s** | [11.44–33.16] | |
+| Batch | 277.9 s | | Baseline + 14 mutants |
+
+**`Automation Now` confirmed:** "Ready to start automation" → "Found N automation tests" took **0.12–0.19 s** in all 15 launches, against **5.0–5.1 s** in the probe without it (`01b #9`).
+
+**Against the targets** (judged in full in S8, across campaigns): SC1 so far: every mutant has a defined fate and 0 errors; the repeat-run half of SC1 is S8. SC3 so far: a 12.1 s median on M-S, within the 60 s target, on a suite of microsecond tests; M-P1 will show the cost on a real suite.
+
+**Found by this run and fixed:**
+1. The batch succeeded, but the queue driver then crashed while **printing** the report: the Windows console's cp1252 can't encode `→`. The summary file had been written (UTF-8). Fixed: `sys.stdout.reconfigure(encoding="utf-8", errors="replace")` in `main()`; the report was regenerated without UE.
+2. While the batch ran, its manifest already said `stopped: all mutants have a fate`, because the reason was set before the loop. Fixed: the reason is `None` while running and set when the loop ends.
+3. Expected but now measured: the first launch on a fresh snapshot pays a one-time asset-registry scan (≈ 25 s here).
