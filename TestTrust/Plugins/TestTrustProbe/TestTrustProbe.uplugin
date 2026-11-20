@@ -1,0 +1,25 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "TestTrust Probe",
+	"Description": "Makes any gameplay workload gate-able: opens and closes a CSV capture window after warm-up, records run metadata, and can inject a known game-thread cost for calibrating performance gates.",
+	"Category": "Testing",
+	"CreatedBy": "",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"EnabledByDefault": true,
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "TestTrustProbe",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

@@ -11,7 +11,7 @@
 
 ---
 
-**Progress (2026-11-21):** Phases 1–3 ✅. Phase 4 ✅ F1–F4 (results in `09`).
+**Progress (2026-11-21):** Phases 1–3 ✅. Phase 4: F1–F3 ✅ (`09`, one queue job); F4 runner code and self-tests ✅; F4 runner smoke test P4-R runs on the commit that contains this line.
 
 ## Phase 4: Foundation
 

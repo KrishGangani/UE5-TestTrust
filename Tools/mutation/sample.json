@@ -1,0 +1,13 @@
+{
+	"name": "sample",
+	"repo_name": "UE5-TestTrust",
+	"repo": "D:/UNREAL PORTFOLIO/P03_TestTrust",
+	"commit": "HEAD",
+	"project_subdir": "TestTrust",
+	"uproject": "TestTrust.uproject",
+	"editor_target": "TestTrustEditor",
+	"mutate": ["Source/TestTrustSample/Private/*.cpp"],
+	"exclude": ["*/Tests/*", "*Module.cpp"],
+	"test_filter": "StartsWith:TestTrust.Sample",
+	"operators": ["ROR", "AOR", "LCR", "COND", "BOOL", "SDL"]
+}

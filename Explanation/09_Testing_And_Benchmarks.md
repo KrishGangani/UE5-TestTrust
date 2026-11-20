@@ -46,7 +46,19 @@ Every build: exit 0. Every build log contains `[Adaptive Build] Excluded from Up
 
 ## Phase 4 · Foundation checks (2026-11-21)
 
-*(results below)*
+All seven checks ran as **one queue job**, `Tools\phase4_checks.bat`: job `20261121_011632_7422f2`, **ok, exit 0, 220.1 s**. Before it ran, `Config\DefaultInput.ini` was added and `-ExitAfterSeconds=0` was dropped from `smoke_game.bat` (both learned from a sibling project's log and checked in the 5.8.4 source, `05` A7 and Part C).
+
+| # | Check | Command (from `P03_TestTrust\`) | Result |
+|---|---|---|---|
+| F-1 | Editor target builds | `Tools\build.bat TestTrustEditor Development` | ✅ Succeeded, UBT total 38.3 s, 20 actions, **0 errors, 0 warnings**. MSVC 14.44.35229, Windows SDK 10.0.22621.0. The sample module compiles against the small `SharedPCH.Core` (it depends on Core only) |
+| F-2 | Game target builds | `Tools\build.bat TestTrust Development` | ✅ Succeeded, UBT total 39.9 s, 28 actions, `Link TestTrust.exe` (monolithic), **0 errors, 0 warnings** |
+| F-3 | Uncooked game loads the map, all modules present, quits | `Tools\smoke_game.bat` | ✅ Exit 0. `Mounting Project plugin TestTrustProbe`; `TestTrustSample` and `TestTrustProbe` DLLs loaded; `Template_Default` loaded in 0.063 s. **0 errors.** 21 warnings, all `LogEditorDataStorageUI` ("Unable to register widget factory"): engine-side, from running the editor binary in `-game` (UE5-UpdateBudget saw the same). **No `LogEnhancedInput` warning**: `DefaultInput.ini` works |
+| F-4 | The sample suite passes in the editor | `Tools\run_tests.bat StartsWith:TestTrust` | ✅ Exit 0. "Found 6 automation tests"; all six `Result={Success}`; `TEST COMPLETE. EXIT CODE: 0`; `index.json`: 6 succeeded, 0 failed, total test duration 0.099 s |
+| F-5 | Package a **Development** build | `Tools\package.bat` | ✅ BUILD SUCCESSFUL; BuildCookRun 67.4 s; 526 packages cooked; cook "Success - 0 error(s), 0 warning(s)"; **0 errors, 0 warnings**. Output `Build\Windows\TestTrust.exe` (983 MB staged, git-ignored) |
+| F-6 | Packaged build runs without a GPU | `Tools\smoke_packaged.bat nullrhi` | ✅ Exit 0; map loaded in 0.031 s; **0 errors, 0 warnings** |
+| F-7 | Packaged build runs on the GPU | `Tools\smoke_packaged.bat gpu` | ✅ Exit 0; D3D12, SM6; **chosen adapter 0 = NVIDIA GeForce RTX 5070 Laptop GPU** (driver 610.47), not the Intel UHD (adapter 1); map loaded in 0.133 s; **0 errors, 0 warnings**. Observation: 32 s passed between the map load and "Preparing to exit" on this first GPU run of a fresh build (a sibling project saw 35 s); not a failure, re-checked in Phase 5 when the workload exists |
+
+**Side effect, then fixed:** the first uncooked run (F-3) made the engine append an `AndroidFileServerEditor` block with a random `SecurityToken` to `Config\DefaultEngine.ini`. Per the portfolio rule of 2026-11-21 the block was deleted and the `AndroidFileServer` plugin disabled in `TestTrust.uproject` (`05` A1, A7). The seven checks were re-run on that configuration: see **Phase 4 · Re-run** below.
 
 ## Phase 4 · P4-R: runner smoke test on the sample module (M-S)
 

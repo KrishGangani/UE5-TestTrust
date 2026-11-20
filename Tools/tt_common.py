@@ -100,6 +100,9 @@ def pinned(command: str, console: bool = False) -> str:
     """
     if PERFORMANCE_CORE_MASK is None:
         return command
+    if "!" in command:
+        # Under /v:on, cmd would treat !text! as a variable and silently change the command line.
+        raise ValueError("pinned(): a '!' in the command would be expanded by cmd's delayed expansion")
     same_console = "/B " if console else ""
     return f'cmd /v:on /s /c "start "" {same_console}/wait /affinity {PERFORMANCE_CORE_MASK:X} {command} & exit !errorlevel!"'
 

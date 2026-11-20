@@ -36,7 +36,7 @@ One mutant's life:
 pristine snapshot ──apply one change──► mutated .cpp ──UBT incremental build──► compile error? ─yes─► STILLBORN
                                                                                     │ no
                                               fresh UnrealEditor-Cmd -nullrhi ◄─────┘
-                                              "Automation RunTests <filter>;Quit"
+                                              "Automation Now;RunTests <filter>;Quit"
                                                    │
                      exit 0, no failure, all tests ran ─► SURVIVED      any failure / missing test ─► KILLED
                      no report (crash) ─► CRASH (counts as killed)      over the time limit ─► TIMEOUT (counts as killed)
@@ -153,7 +153,7 @@ flowchart LR
   subgraph Machine["Shared machine"]
     Q["ue_queue.py<br/>one UE job at a time"]
     UBT["Build.bat / UBT<br/>editor target, incremental"]
-    ED["UnrealEditor-Cmd -nullrhi<br/>Automation RunTests;Quit<br/>(P-cores)"]
+    ED["UnrealEditor-Cmd -nullrhi<br/>Automation Now;RunTests;Quit<br/>(P-cores)"]
   end
   subgraph Gate["Perf gate"]
     PROBE["TestTrustProbe plugin<br/>UTTProbeSubsystem<br/>CSV window + injector"]
@@ -192,7 +192,7 @@ sequenceDiagram
   participant M as Manifest
   B->>FS: restore every target file to its pristine text
   B->>U: build the editor target (unmutated)
-  B->>E: Automation RunTests <filter>;Quit (unmutated)
+  B->>E: Automation Now;RunTests <filter>;Quit (unmutated)
   E-->>B: exit 0 + index.json (N tests, 0 failed), else STOP: suite not green
   loop each pending mutant, while budget allows
     B->>FS: write the mutated .cpp
@@ -231,7 +231,7 @@ run_bench.py → pinned packaged TestTrust.exe -deterministic -FPS=60 -windowed 
 | Test timeout per mutant | max(120 s, 3 × baseline test time) | A mutant that loops forever must be stopped; three times the green run is generous for startup noise |
 | Attempts | 2 for *error* fates | An infrastructure failure (for example a locked file) deserves one retry; a second failure is reported, never hidden |
 | Files mutated | `.cpp` under the configured globs, minus `Tests/` and module-registration files | Headers re-run UHT and rebuild includers (`01b #2`); tests must never mutate themselves |
-| Test launch | `UnrealEditor-Cmd <uproject> -nullrhi -nosound -unattended -nosplash -nopause -traceautostart=0 -ExecCmds="Automation RunTests <filter>;Quit" -ReportExportPath=<dir>`, pinned to the P-cores | No GPU needed; exit code and report give the result (`01b #4–5`); pinning keeps timeouts stable on the hybrid CPU |
+| Test launch | `UnrealEditor-Cmd <uproject> -nullrhi -nosound -unattended -nosplash -nopause -traceautostart=0 -ExecCmds="Automation Now;RunTests <filter>;Quit" -ReportExportPath=<dir>`, pinned to the P-cores | No GPU needed; exit code and report give the result (`01b #4–5`); `Now` skips the controller's fixed 5 s start delay (`01b #9`); pinning keeps timeouts stable on the hybrid CPU |
 | Test filter | `StartsWith:<prefix>` | A plain filter is a *substring* match (`01b #5`); `StartsWith:` selects exactly one suite |
 
 **Mutation operators** (`tt_mutants.py`; binary operators only with whitespace on both sides)
