@@ -62,9 +62,17 @@ All seven checks ran as **one queue job**, `Tools\phase4_checks.bat`: job `20261
 
 ## Phase 4 · Re-run after disabling AndroidFileServer
 
-The same seven checks (`Tools\phase4_checks.bat`, one queue job) on the committed configuration: `AndroidFileServer` disabled in the `.uproject`, its generated block removed from `DefaultEngine.ini`, no `-ExitAfterSeconds`.
+The same seven checks (`Tools\phase4_checks.bat`, one queue job) on the committed configuration: `AndroidFileServer` disabled in the `.uproject`, its generated block removed from `DefaultEngine.ini`, no `-ExitAfterSeconds`. Job `20261121_015125_fbc4d1`: **ok, exit 0, 120.4 s**.
 
-*(results below)*
+| # | Result |
+|---|---|
+| F-1 editor build | ✅ Succeeded, UBT total 11.1 s; only `Module.TestTrustProbe.cpp` recompiled and relinked (the plugin list in the `.uproject` changed); **0 errors, 0 warnings** |
+| F-2 game build | ✅ Succeeded, 18.6 s; the same file plus `Link TestTrust.exe`; **0 errors, 0 warnings** |
+| F-3 uncooked smoke | ✅ Exit 0; **0 errors**; the same 21 engine-side `LogEditorDataStorageUI` warnings and nothing else; no Android File Server line in the log; **`DefaultEngine.ini` was not rewritten** (`git status` clean) |
+| F-4 sample tests | ✅ 6 found, `TEST COMPLETE. EXIT CODE: 0` |
+| F-5 package | ✅ BUILD SUCCESSFUL, BuildCookRun 59.6 s, cook "Success - 0 error(s), 0 warning(s)" |
+| F-6 packaged, no GPU | ✅ Exit 0; map loaded in 0.021 s; **0 errors, 0 warnings** |
+| F-7 packaged, GPU | ✅ Exit 0; **chosen adapter 0 = RTX 5070 Laptop GPU**; map loaded in 0.058 s; **0 errors, 0 warnings**; "Preparing to exit" 0.8 s after the map load, so the 32 s of the first GPU run was a first-run cost, not a property of the build |
 
 ## Phase 4 · P4-R: runner smoke test on the sample module (M-S)
 

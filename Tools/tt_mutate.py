@@ -166,7 +166,8 @@ def cmd_plan(args) -> int:
         "target": {"repo": config["repo_name"], "commit": commit, "subdir": config["project_subdir"]},
         "environment": tt_common.environment_record(
             "Development editor target, tests in UnrealEditor-Cmd -nullrhi (not packaged)",
-            {"runner": "Tools/tt_mutate.py", "snapshot": os.path.relpath(root, PROJECT_DIR).replace("\\", "/")}),
+            {"runner": "Tools/tt_mutate.py", "snapshot": os.path.relpath(root, PROJECT_DIR).replace("\\", "/"),
+             "pinning": "test launches pinned to cpu_affinity via tt_common.pinned(); builds unpinned"}),
         "mutants": mutants,
         "baselines": [],
         "batches": [],
