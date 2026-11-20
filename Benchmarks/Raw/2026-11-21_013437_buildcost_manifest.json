@@ -1,0 +1,271 @@
+{
+  "batch": "2026-11-21_013437_buildcost",
+  "purpose": "Phase 2: build and test cost per source-level mutant",
+  "target": {
+    "repo": "UE5-UpdateBudget",
+    "commit": "c25a996f092407f83fcc76a09c8b9b225ebeb2ed",
+    "subdir": "UpdateBudget"
+  },
+  "copy": "Tools\\_work\\probe_c25a996",
+  "steps": [
+    {
+      "step": "b0_cold",
+      "exit_code": 0,
+      "seconds": 70.77,
+      "log": "2026-11-21_013437_buildcost_b0_cold.log",
+      "actions": [
+        "[1/19] Compile Resource [x64] Default.rc2",
+        "[2/19] Compile Resource [x64] Default.rc2",
+        "[3/19] Compile [x64] SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.cpp",
+        "[4/19] Compile [x64] Module.UpdateBudget.gen.cpp",
+        "[5/19] Compile [x64] UpdateBudgetCoreModule.cpp",
+        "[6/19] Compile [x64] Module.UpdateBudgetCore.cpp",
+        "[7/19] Compile [x64] BudgetedUpdateComponent.cpp",
+        "[8/19] Compile [x64] UpdateBudgetModule.cpp",
+        "[9/19] Compile [x64] UBDemoBrainComponent.cpp",
+        "[10/19] Compile [x64] PerModuleInline.gen.cpp",
+        "[11/19] Compile [x64] UBDemoAgent.cpp",
+        "[12/19] Compile [x64] UpdateBudgetSubsystem.cpp",
+        "[13/19] Link [x64] UnrealEditor-UpdateBudgetCore.lib",
+        "[14/19] Compile [x64] UBBenchmarkSubsystem.cpp",
+        "[15/19] Compile [x64] UBBaselineDriverSubsystem.cpp",
+        "[16/19] Link [x64] UnrealEditor-UpdateBudget.lib",
+        "[17/19] Link [x64] UnrealEditor-UpdateBudgetCore.dll",
+        "[18/19] Link [x64] UnrealEditor-UpdateBudget.dll",
+        "[19/19] WriteMetadata UpdateBudgetEditor.target [NoUba]"
+      ],
+      "compile_actions": 14,
+      "link_actions": 4,
+      "uht_ran": true,
+      "uht_up_to_date": false,
+      "working_set_lines": [
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp",
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp"
+      ],
+      "errors": 0,
+      "warnings": 0,
+      "ubt_total": "Total execution time: 70.23 seconds",
+      "result_line": "Result: Succeeded"
+    },
+    {
+      "step": "b1_noop",
+      "exit_code": 0,
+      "seconds": 1.51,
+      "log": "2026-11-21_013437_buildcost_b1_noop.log",
+      "actions": [],
+      "compile_actions": 0,
+      "link_actions": 0,
+      "uht_ran": false,
+      "uht_up_to_date": true,
+      "working_set_lines": [],
+      "errors": 0,
+      "warnings": 0,
+      "ubt_total": "Total execution time: 1.27 seconds",
+      "result_line": "Result: Succeeded"
+    },
+    {
+      "step": "b2_game_cpp",
+      "exit_code": 0,
+      "seconds": 7.81,
+      "log": "2026-11-21_013437_buildcost_b2_game_cpp.log",
+      "actions": [
+        "[1/4] Compile [x64] UBDemoBrainComponent.cpp",
+        "[2/4] Link [x64] UnrealEditor-UpdateBudget.lib",
+        "[3/4] Link [x64] UnrealEditor-UpdateBudget.dll",
+        "[4/4] WriteMetadata UpdateBudgetEditor.target [NoUba]"
+      ],
+      "compile_actions": 1,
+      "link_actions": 2,
+      "uht_ran": false,
+      "uht_up_to_date": true,
+      "working_set_lines": [
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp",
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp"
+      ],
+      "errors": 0,
+      "warnings": 0,
+      "ubt_total": "Total execution time: 7.58 seconds",
+      "result_line": "Result: Succeeded"
+    },
+    {
+      "step": "b3_game_cpp_restore",
+      "exit_code": 0,
+      "seconds": 3.83,
+      "log": "2026-11-21_013437_buildcost_b3_game_cpp_restore.log",
+      "actions": [
+        "[1/4] Compile [x64] UBDemoBrainComponent.cpp",
+        "[2/4] Link [x64] UnrealEditor-UpdateBudget.lib",
+        "[3/4] Link [x64] UnrealEditor-UpdateBudget.dll",
+        "[4/4] WriteMetadata UpdateBudgetEditor.target [NoUba]"
+      ],
+      "compile_actions": 1,
+      "link_actions": 2,
+      "uht_ran": false,
+      "uht_up_to_date": true,
+      "working_set_lines": [
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp",
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp"
+      ],
+      "errors": 0,
+      "warnings": 0,
+      "ubt_total": "Total execution time: 3.62 seconds",
+      "result_line": "Result: Succeeded"
+    },
+    {
+      "step": "b4_plugin_cpp",
+      "exit_code": 0,
+      "seconds": 4.42,
+      "log": "2026-11-21_013437_buildcost_b4_plugin_cpp.log",
+      "actions": [
+        "[1/4] Compile [x64] UpdateBudgetSubsystem.cpp",
+        "[2/4] Link [x64] UnrealEditor-UpdateBudgetCore.lib",
+        "[3/4] Link [x64] UnrealEditor-UpdateBudgetCore.dll",
+        "[4/4] WriteMetadata UpdateBudgetEditor.target [NoUba]"
+      ],
+      "compile_actions": 1,
+      "link_actions": 2,
+      "uht_ran": false,
+      "uht_up_to_date": true,
+      "working_set_lines": [
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp",
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp"
+      ],
+      "errors": 0,
+      "warnings": 0,
+      "ubt_total": "Total execution time: 4.21 seconds",
+      "result_line": "Result: Succeeded"
+    },
+    {
+      "step": "b5_plugin_cpp_restore",
+      "exit_code": 0,
+      "seconds": 4.4,
+      "log": "2026-11-21_013437_buildcost_b5_plugin_cpp_restore.log",
+      "actions": [
+        "[1/4] Compile [x64] UpdateBudgetSubsystem.cpp",
+        "[2/4] Link [x64] UnrealEditor-UpdateBudgetCore.lib",
+        "[3/4] Link [x64] UnrealEditor-UpdateBudgetCore.dll",
+        "[4/4] WriteMetadata UpdateBudgetEditor.target [NoUba]"
+      ],
+      "compile_actions": 1,
+      "link_actions": 2,
+      "uht_ran": false,
+      "uht_up_to_date": true,
+      "working_set_lines": [
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp",
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp"
+      ],
+      "errors": 0,
+      "warnings": 0,
+      "ubt_total": "Total execution time: 4.20 seconds",
+      "result_line": "Result: Succeeded"
+    },
+    {
+      "step": "b6_header",
+      "exit_code": 0,
+      "seconds": 6.92,
+      "log": "2026-11-21_013437_buildcost_b6_header.log",
+      "actions": [
+        "[1/7] Compile [x64] UBDemoBrainComponent.cpp",
+        "[2/7] Compile [x64] UBDemoAgent.cpp",
+        "[3/7] Compile [x64] UBBenchmarkSubsystem.cpp",
+        "[4/7] Compile [x64] UBBaselineDriverSubsystem.cpp",
+        "[5/7] Link [x64] UnrealEditor-UpdateBudget.lib",
+        "[6/7] Link [x64] UnrealEditor-UpdateBudget.dll",
+        "[7/7] WriteMetadata UpdateBudgetEditor.target [NoUba]"
+      ],
+      "compile_actions": 4,
+      "link_actions": 2,
+      "uht_ran": true,
+      "uht_up_to_date": false,
+      "working_set_lines": [
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp",
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp"
+      ],
+      "errors": 0,
+      "warnings": 0,
+      "ubt_total": "Total execution time: 6.68 seconds",
+      "result_line": "Result: Succeeded"
+    },
+    {
+      "step": "b7_header_restore",
+      "exit_code": 0,
+      "seconds": 6.71,
+      "log": "2026-11-21_013437_buildcost_b7_header_restore.log",
+      "actions": [
+        "[1/7] Compile [x64] UBDemoBrainComponent.cpp",
+        "[2/7] Compile [x64] UBDemoAgent.cpp",
+        "[3/7] Compile [x64] UBBenchmarkSubsystem.cpp",
+        "[4/7] Compile [x64] UBBaselineDriverSubsystem.cpp",
+        "[5/7] Link [x64] UnrealEditor-UpdateBudget.lib",
+        "[6/7] Link [x64] UnrealEditor-UpdateBudget.dll",
+        "[7/7] WriteMetadata UpdateBudgetEditor.target [NoUba]"
+      ],
+      "compile_actions": 4,
+      "link_actions": 2,
+      "uht_ran": true,
+      "uht_up_to_date": false,
+      "working_set_lines": [
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp",
+        "[Adaptive Build] Excluded from UpdateBudgetCore unity file: BudgetedUpdateComponent.cpp, UpdateBudgetCoreModule.cpp, UpdateBudgetSubsystem.cpp"
+      ],
+      "errors": 0,
+      "warnings": 0,
+      "ubt_total": "Total execution time: 6.46 seconds",
+      "result_line": "Result: Succeeded"
+    },
+    {
+      "step": "t1_editor_cold",
+      "exit_code": 0,
+      "seconds": 17.3,
+      "log": "2026-11-21_013437_buildcost_t1_editor_cold.log",
+      "test_complete_line": null,
+      "report": {
+        "succeeded": 1,
+        "succeededWithWarnings": 0,
+        "failed": 0,
+        "notRun": 0,
+        "inProcess": 0,
+        "totalDuration": 0.016562100499868393,
+        "tests": [
+          "System.Core.HAL.FileManager.Reader"
+        ]
+      }
+    },
+    {
+      "step": "t2_editor_warm",
+      "exit_code": 0,
+      "seconds": 14.8,
+      "log": "2026-11-21_013437_buildcost_t2_editor_warm.log",
+      "test_complete_line": null,
+      "report": {
+        "succeeded": 1,
+        "succeededWithWarnings": 0,
+        "failed": 0,
+        "notRun": 0,
+        "inProcess": 0,
+        "totalDuration": 0.01693759858608246,
+        "tests": [
+          "System.Core.HAL.FileManager.Reader"
+        ]
+      }
+    },
+    {
+      "step": "t3_game_mode",
+      "exit_code": 0,
+      "seconds": 13.41,
+      "log": "2026-11-21_013437_buildcost_t3_game_mode.log",
+      "test_complete_line": null,
+      "report": {
+        "succeeded": 1,
+        "succeededWithWarnings": 0,
+        "failed": 0,
+        "notRun": 0,
+        "inProcess": 0,
+        "totalDuration": 0.0005360990762710571,
+        "tests": [
+          "System.Core.HAL.FileManager.Reader"
+        ]
+      }
+    }
+  ]
+}
