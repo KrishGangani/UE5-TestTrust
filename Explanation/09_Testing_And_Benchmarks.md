@@ -206,3 +206,28 @@ The remaining survivor is `fbd237213c`, the tie-break already reviewed as **equi
 - **Re-verified with the final code:** `tt_mutate.py selftest` ok (also with `GIT_DIR` set to this repository); the patch re-applied to a copy of the S6 snapshot's test file gives the same SHA-256, the same target, and a byte-identical file to the one the campaign measured.
 
 **Report:** `Benchmarks\Summaries\2026-11-21_031329_mut-updatebudget_summary.md`.
+
+
+## Phase 5 · S8: repeatability (SC1) and cost (SC3), 2026-11-21
+
+**The repeat.** Campaign `2026-11-21_031347_mut-sample`, queue job `20261121_031356_4cd6c6`: **ok, exit 0, 239.0 s**. Config `Tools\mutation\sample_repeat.json`: the Phase 4 smoke test's `sample.json` with its commit pinned to `03771bf` (`sample.json` says `HEAD`, which has moved on), so the same 14 mutants and ids; a new campaign folder from a fresh snapshot. Baseline: 6 tests, 0 failed.
+
+**SC1 (the runner is trustworthy): met.**
+- **Same fate for 14 of 14 mutants (100%)** as `2026-11-21_014645_mut-sample`: 11 killed, 3 survived in both, and every killed mutant was killed by the same failing tests.
+- **0 error** in both campaigns (and in S6 and S7).
+- The unmutated snapshot built and passed before every batch of all four campaigns (the runner refuses to start a batch otherwise).
+
+**SC3 (cost per mutant): met.**
+
+| Campaign | Mutants | Median build + test | Range | Median build | Compile actions |
+|---|---|---|---|---|---|
+| `014645_mut-sample` (P4-R) | 14 | 12.1 s | 11.4–33.2 | 2.1 s | 1 each |
+| `031347_mut-sample` (S8) | 14 | 11.8 s | 11.5–12.2 | 2.0 s | 1 each |
+| `025734_mut-updatebudget` (S6) | 39 | 14.1 s | 13.1–60.8 | 4.1 s | 1 each |
+| `031329_mut-updatebudget` (S7) | 39 | 14.0 s | 13.5–20.0 | 4.0 s | 1 each |
+| **All** | **106** | **13.9 s** | 11.4–60.8 | | |
+
+- Median **13.9 s** per `.cpp` mutant, against the 60 s target. Both long outliers are test launches, not builds: 60.8 s in S6 was an editor launch that had to start the shared Zen storage server (S6 above); 33.2 s in P4-R was the first mutant of that batch (launch 30.6 s, build 2.6 s), whose cause wasn't recorded, because the runner keeps each mutant's test report but not its editor log **[unverified cause]**.
+- **4 of 4 batches (100%)** finished inside their queue timeout, every one with "all mutants have a fate".
+
+**H6 (each mutant costs a full C++ rebuild and an editor start): the rebuild half is rejected, the editor-start half holds.** For `.cpp` mutants in a game module (M-S) and a plugin module (M-P1), every mutant compiled exactly one file (2–4 s); the editor launch (about 10 s) is real and sets the floor. Across 106 mutants that is about 14 s each, practical for suites of this size.

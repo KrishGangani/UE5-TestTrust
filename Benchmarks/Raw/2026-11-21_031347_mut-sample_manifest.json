@@ -1,0 +1,372 @@
+{
+ "campaign": "2026-11-21_031347_mut-sample",
+ "purpose": "mutation campaign (02 section 4.1)",
+ "config": {
+  "name": "sample",
+  "repo_name": "UE5-TestTrust",
+  "commit": "03771bf",
+  "project_subdir": "TestTrust",
+  "uproject": "TestTrust.uproject",
+  "editor_target": "TestTrustEditor",
+  "mutate": [
+   "Source/TestTrustSample/Private/*.cpp"
+  ],
+  "exclude": [
+   "*/Tests/*",
+   "*Module.cpp"
+  ],
+  "test_filter": "StartsWith:TestTrust.Sample",
+  "operators": [
+   "ROR",
+   "AOR",
+   "LCR",
+   "COND",
+   "BOOL",
+   "SDL"
+  ]
+ },
+ "target": {
+  "repo": "UE5-TestTrust",
+  "commit": "03771bfe879653946e96aa2ca4e85584df16c64f",
+  "subdir": "TestTrust",
+  "patches": []
+ },
+ "environment": {
+  "date": "2026-11-21T03:13:48",
+  "engine": "5.8.4 (CL 58902052)",
+  "build_config": "Development editor target, tests in UnrealEditor-Cmd -nullrhi (not packaged)",
+  "compiler": "MSVC 14.44.35229, Windows SDK 10.0.22621.0",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "gpus": "Intel(R) UHD Graphics (driver 32.0.101.7088); NVIDIA GeForce RTX 5070 Laptop GPU (driver 32.0.16.1047)",
+  "ram_gb": "31.6",
+  "os": "Microsoft Windows 11 Home Single Language build 26200",
+  "power_plan": "Power Scheme GUID: 6fecc5ae-f350-48a5-b669-b472cb895ccf  (Turbo)",
+  "on_ac_power": true,
+  "cpu_affinity": "0xFFFF (performance cores only; hybrid CPU)",
+  "runner": "Tools/tt_mutate.py",
+  "snapshot": "Tools/_work/2026-11-21_031347_mut-sample",
+  "pinning": "test launches pinned to cpu_affinity via tt_common.pinned(); builds unpinned"
+ },
+ "mutants": [
+  {
+   "id": "26b8b01f6c",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "AOR",
+   "line": 7,
+   "col": 28,
+   "start": 191,
+   "end": 192,
+   "original": "-",
+   "replacement": "+",
+   "fate": "killed",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 2.54,
+   "compile_actions": 1,
+   "test_s": 9.65,
+   "failed_tests": [
+    "TestTrust.Sample.Damage.ArmorSubtracts",
+    "TestTrust.Sample.Damage.CriticalDoubles",
+    "TestTrust.Sample.Damage.NeverBelowMinimum"
+   ],
+   "batch": 1
+  },
+  {
+   "id": "ece7912d6a",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "COND",
+   "line": 8,
+   "col": 2,
+   "start": 205,
+   "end": 225,
+   "original": "(Damage < MinDamage)",
+   "replacement": "(!(Damage < MinDamage))",
+   "fate": "killed",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 2.0,
+   "compile_actions": 1,
+   "test_s": 9.87,
+   "failed_tests": [
+    "TestTrust.Sample.Damage.ArmorSubtracts",
+    "TestTrust.Sample.Damage.CriticalDoubles",
+    "TestTrust.Sample.Damage.NeverBelowMinimum"
+   ],
+   "batch": 1
+  },
+  {
+   "id": "8125da701a",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "ROR",
+   "line": 8,
+   "col": 13,
+   "start": 213,
+   "end": 214,
+   "original": "<",
+   "replacement": "<=",
+   "fate": "survived",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 1.94,
+   "compile_actions": 1,
+   "test_s": 9.69,
+   "failed_tests": [],
+   "batch": 1
+  },
+  {
+   "id": "d8920aa447",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "ROR",
+   "line": 8,
+   "col": 13,
+   "start": 213,
+   "end": 214,
+   "original": "<",
+   "replacement": ">=",
+   "fate": "killed",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 2.03,
+   "compile_actions": 1,
+   "test_s": 9.82,
+   "failed_tests": [
+    "TestTrust.Sample.Damage.ArmorSubtracts",
+    "TestTrust.Sample.Damage.CriticalDoubles",
+    "TestTrust.Sample.Damage.NeverBelowMinimum"
+   ],
+   "batch": 1
+  },
+  {
+   "id": "c82e2cf751",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "SDL",
+   "line": 10,
+   "col": 3,
+   "start": 233,
+   "end": 252,
+   "original": "Damage = MinDamage;",
+   "replacement": ";",
+   "fate": "killed",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 1.93,
+   "compile_actions": 1,
+   "test_s": 9.54,
+   "failed_tests": [
+    "TestTrust.Sample.Damage.NeverBelowMinimum"
+   ],
+   "batch": 1
+  },
+  {
+   "id": "72300ed28a",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "COND",
+   "line": 12,
+   "col": 2,
+   "start": 262,
+   "end": 273,
+   "original": "(bCritical)",
+   "replacement": "(!(bCritical))",
+   "fate": "killed",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 2.02,
+   "compile_actions": 1,
+   "test_s": 9.79,
+   "failed_tests": [
+    "TestTrust.Sample.Damage.ArmorSubtracts",
+    "TestTrust.Sample.Damage.CriticalDoubles",
+    "TestTrust.Sample.Damage.NeverBelowMinimum"
+   ],
+   "batch": 1
+  },
+  {
+   "id": "f5019b4aac",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "SDL",
+   "line": 14,
+   "col": 3,
+   "start": 281,
+   "end": 293,
+   "original": "Damage *= 2;",
+   "replacement": ";",
+   "fate": "killed",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 2.18,
+   "compile_actions": 1,
+   "test_s": 10.04,
+   "failed_tests": [
+    "TestTrust.Sample.Damage.CriticalDoubles"
+   ],
+   "batch": 1
+  },
+  {
+   "id": "3b42b988c0",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "AOR",
+   "line": 14,
+   "col": 10,
+   "start": 288,
+   "end": 290,
+   "original": "*=",
+   "replacement": "/=",
+   "fate": "killed",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 1.92,
+   "compile_actions": 1,
+   "test_s": 9.7,
+   "failed_tests": [
+    "TestTrust.Sample.Damage.CriticalDoubles"
+   ],
+   "batch": 1
+  },
+  {
+   "id": "62c038c366",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "ROR",
+   "line": 22,
+   "col": 46,
+   "start": 566,
+   "end": 568,
+   "original": "<=",
+   "replacement": "<",
+   "fate": "survived",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 2.2,
+   "compile_actions": 1,
+   "test_s": 9.75,
+   "failed_tests": [],
+   "batch": 1
+  },
+  {
+   "id": "249f330409",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "ROR",
+   "line": 22,
+   "col": 46,
+   "start": 566,
+   "end": 568,
+   "original": "<=",
+   "replacement": ">",
+   "fate": "killed",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 2.14,
+   "compile_actions": 1,
+   "test_s": 9.59,
+   "failed_tests": [
+    "TestTrust.Sample.Range.InsideAndOutside"
+   ],
+   "batch": 1
+  },
+  {
+   "id": "f08f35021c",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "AOR",
+   "line": 22,
+   "col": 55,
+   "start": 575,
+   "end": 576,
+   "original": "*",
+   "replacement": "/",
+   "fate": "killed",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 1.91,
+   "compile_actions": 1,
+   "test_s": 9.91,
+   "failed_tests": [
+    "TestTrust.Sample.Range.InsideAndOutside"
+   ],
+   "batch": 1
+  },
+  {
+   "id": "6dff9dc6e9",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "AOR",
+   "line": 27,
+   "col": 31,
+   "start": 696,
+   "end": 697,
+   "original": "-",
+   "replacement": "+",
+   "fate": "killed",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 1.93,
+   "compile_actions": 1,
+   "test_s": 9.63,
+   "failed_tests": [
+    "TestTrust.Sample.Cooldown.CountsDown",
+    "TestTrust.Sample.Cooldown.StopsAtZero"
+   ],
+   "batch": 1
+  },
+  {
+   "id": "1c78e5d36c",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "ROR",
+   "line": 28,
+   "col": 14,
+   "start": 726,
+   "end": 727,
+   "original": ">",
+   "replacement": ">=",
+   "fate": "survived",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 1.91,
+   "compile_actions": 1,
+   "test_s": 9.63,
+   "failed_tests": [],
+   "batch": 1
+  },
+  {
+   "id": "1cc079ff12",
+   "file": "Source/TestTrustSample/Private/TTSampleRules.cpp",
+   "operator": "ROR",
+   "line": 28,
+   "col": 14,
+   "start": 726,
+   "end": 727,
+   "original": ">",
+   "replacement": "<=",
+   "fate": "killed",
+   "attempts": 1,
+   "detail": null,
+   "build_s": 1.96,
+   "compile_actions": 1,
+   "test_s": 9.81,
+   "failed_tests": [
+    "TestTrust.Sample.Cooldown.CountsDown",
+    "TestTrust.Sample.Cooldown.StopsAtZero"
+   ],
+   "batch": 1
+  }
+ ],
+ "baselines": [
+  {
+   "batch": 1,
+   "build_s": 36.75,
+   "build_exit": 0,
+   "test_s": 34.83,
+   "test_exit": 0,
+   "tests": 6,
+   "failed": 0
+  }
+ ],
+ "batches": [
+  {
+   "batch": 1,
+   "started": "2026-11-21T03:38:21",
+   "max_seconds": 1800.0,
+   "mutants_run": 14,
+   "stopped": "all mutants have a fate",
+   "ended": "2026-11-21T03:42:20",
+   "seconds": 238.8
+  }
+ ]
+}
