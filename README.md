@@ -72,3 +72,7 @@ P03_TestTrust\
 ├── Tools\           ← runner, statistics, build and run scripts; _work\ snapshots (git-ignored)
 └── TestTrust\       ← the Unreal Engine project
 ```
+
+## License
+
+MIT, see [LICENSE](LICENSE). Unreal Engine itself is not included and is covered by Epic Games' own license.
