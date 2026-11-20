@@ -26,6 +26,9 @@
 | Reusing one editor process for several mutants | A test registered by a mutated DLL, or state left by the previous mutant, changes the next result | A fresh process per mutant (`04` §9) | — |
 | A mutant that loops forever | The batch never ends | Test timeout max(120 s, 3 × baseline) and a tree kill | The *timeout* fate; the queue's own timeout is the second guard |
 | A half-written manifest after a killed batch | JSON decode error on the next batch | Atomic write (`.tmp` then `os.replace`) | — |
+| ⚠ caught (S7): **`git apply` inside another repository's ignored folder.** In a snapshot under `Tools\_work\`, `git apply` resolved the paths against this repository and changed nothing, with exit 0 | An "after" campaign whose score equals the "before" score | `GIT_CEILING_DIRECTORIES` = the snapshot's parent, and a check that every target changed (`tt_mutate.apply_patch`) | `tt_mutate.py selftest` (`patch_selftest`); hash a target before and after |
+| ⚠ caught (code review, S7): **a patch whose line endings differ from the files.** `git diff` ran inside this repository, whose `* text=auto` turned the CRLF test file into an LF patch | `git apply` reports "patch does not apply" | Apply with `--ignore-whitespace`; keep the patch's bytes with `*.patch -text`, so its recorded SHA-256 stays valid | Count CRLF and LF in the patch and in the target |
+| ⚠ caught (code review, S7): **an inherited `GIT_DIR`.** A git hook or wrapper that sets it redirects every git call of the runner to that repository | A snapshot or patch from the wrong repository | `main()` clears `GIT_DIR` and `GIT_WORK_TREE` | The self-test with `GIT_DIR` set |
 
 ## Sample module (`TestTrustSample`)
 

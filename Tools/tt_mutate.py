@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import fnmatch
+import hashlib
 import io
 import json
 import os
@@ -135,6 +136,53 @@ def files_to_mutate(project: str, config: dict) -> list[str]:
     return sorted(found)
 
 
+def apply_patch(path: str, root: str) -> list[str]:
+    """Applies one patch file to the snapshot at root, never to the target; returns the files it changed.
+
+    The snapshot lies inside this repository's ignored tree, where a plain `git apply` resolves paths against this
+    repository and silently changes nothing (tested 2026-11-21: exit 0, file unchanged). GIT_CEILING_DIRECTORIES
+    stops git's repository search at the snapshot, so it patches like a plain `patch` tool (main() removes any
+    inherited GIT_DIR, which would override the search). --ignore-whitespace: the snapshot has CRLF line endings, the
+    patch LF (git diff normalised it, 05 H1). Every target must really change.
+    """
+    environment = dict(os.environ, GIT_CEILING_DIRECTORIES=os.path.dirname(os.path.abspath(root)))
+
+    def git_apply(*options: str) -> str:
+        result = subprocess.run(["git", "apply", "-p1", "--ignore-whitespace", "--whitespace=nowarn", *options, path],
+                                cwd=root, env=environment, capture_output=True)
+        if result.returncode != 0:   # keep git's reason (which hunk failed), not just the exit status
+            raise RuntimeError(f"git apply {' '.join(options)} {path}: {result.stderr.decode(errors='replace').strip()}")
+        return result.stdout.decode("utf-8", errors="replace")
+
+    # --numstat -z lists the files the patch touches ("added<TAB>deleted<TAB>path<NUL>"), spaces included.
+    fields = [r.split("\t") for r in git_apply("--numstat", "-z").split("\0") if r]
+    if not fields or any(len(f) != 3 or not f[2] for f in fields):
+        raise RuntimeError(f"patch {path}: no files, or a rename (not supported): {fields}")
+    targets = [f[2] for f in fields]
+
+    def content(target: str) -> str | None:   # None = no such file, so creating or deleting an empty file counts
+        file = os.path.join(root, target)
+        return read_text(file) if os.path.exists(file) else None
+
+    before = {t: content(t) for t in targets}
+    git_apply()
+    unchanged = [t for t in targets if content(t) == before[t]]
+    if unchanged:
+        raise RuntimeError(f"patch {path} changed nothing in {unchanged}")
+    return targets
+
+
+def apply_patches(config: dict, root: str) -> list[dict]:
+    """Applies the config's patch files (Tools/mutation/<name>) to the snapshot; returns one record per patch."""
+    applied = []
+    for name in config.get("patches", []):
+        path = os.path.join(TOOLS_DIR, "mutation", name)
+        with open(path, "rb") as handle:
+            digest = hashlib.sha256(handle.read()).hexdigest()
+        applied.append({"file": name, "sha256": digest, "targets": apply_patch(path, root)})
+    return applied
+
+
 def cmd_plan(args) -> int:
     with open(args.config, encoding="utf-8") as handle:
         config = json.load(handle)
@@ -146,6 +194,7 @@ def cmd_plan(args) -> int:
             raise RuntimeError(f"{campaign} already has results; plan a new campaign instead")
     root = os.path.join(WORK_DIR, campaign)
     commit = snapshot(config, root)
+    patches = apply_patches(config, root)   # before the pristine copies, so mutants are planned on the patched tree
     project = os.path.join(root, config["project_subdir"])
     mutants = []
     for relative in files_to_mutate(project, config):
@@ -163,7 +212,7 @@ def cmd_plan(args) -> int:
         "campaign": campaign,
         "purpose": "mutation campaign (02 section 4.1)",
         "config": {k: v for k, v in config.items() if k != "repo"},
-        "target": {"repo": config["repo_name"], "commit": commit, "subdir": config["project_subdir"]},
+        "target": {"repo": config["repo_name"], "commit": commit, "subdir": config["project_subdir"], "patches": patches},
         "environment": tt_common.environment_record(
             "Development editor target, tests in UnrealEditor-Cmd -nullrhi (not packaged)",
             {"runner": "Tools/tt_mutate.py", "snapshot": os.path.relpath(root, PROJECT_DIR).replace("\\", "/"),
@@ -475,6 +524,7 @@ def cmd_selftest(_args) -> int:
         ok = False
         print("scores:", s)
     ok = safety_selftest() and ok
+    ok = patch_selftest() and ok
     print("selftest:", "ok" if ok else "FAILED")
     return 0 if ok else 1
 
@@ -509,9 +559,45 @@ def safety_selftest() -> bool:
     return ok
 
 
+def patch_selftest() -> bool:
+    """apply_patch inside this repository's ignored tree, as in a real campaign: an LF patch with a space in its path
+    changes the CRLF snapshot file, this repository's status is unchanged, and a patch that doesn't apply raises."""
+    root = os.path.join(WORK_DIR, "_selftest_patch")
+    shutil.rmtree(root, ignore_errors=True)
+    target = os.path.join(root, "My Proj", "A.cpp")
+    os.makedirs(os.path.dirname(target))
+    with open(target, "w", encoding="utf-8", newline="") as handle:
+        handle.write("int F()\r\n{\r\n\treturn 1;\r\n}\r\n")
+    patch = root + ".patch"   # Tools/_work/ is ignored, so the status check below still holds
+    with open(patch, "w", encoding="utf-8", newline="") as handle:
+        handle.write('--- "a/My Proj/A.cpp"\n+++ "b/My Proj/A.cpp"\n@@ -1,4 +1,4 @@\n int F()\n {\n-\treturn 1;\n'
+                     '+\treturn 2;\n }\n')
+    status_before = git(PROJECT_DIR, "status", "--porcelain")
+    try:
+        ok = apply_patch(patch, root) == ["My Proj/A.cpp"] and "return 2;" in read_text(target)
+        try:
+            apply_patch(patch, root)   # already applied: the context no longer matches
+            ok = False
+        except RuntimeError as error:
+            ok = ok and "patch failed" in str(error)
+    except RuntimeError as error:
+        print("patch selftest:", error)
+        ok = False
+    ok = ok and git(PROJECT_DIR, "status", "--porcelain") == status_before
+    shutil.rmtree(root, ignore_errors=True)
+    os.remove(patch)
+    if not ok:
+        print("patch selftest: apply_patch did not patch only the snapshot")
+    return ok
+
+
 def main(argv: list[str]) -> int:
     # The Windows console defaults to cp1252, which can't print the report's arrows; never let printing fail a run.
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    # An inherited GIT_DIR or GIT_WORK_TREE (a git hook, a wrapper) would point every git call at that repository
+    # instead of the target or the snapshot (code review and altitude review, S7).
+    for name in ("GIT_DIR", "GIT_WORK_TREE"):
+        os.environ.pop(name, None)
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="cmd", required=True)
     plan = sub.add_parser("plan")

@@ -12,3 +12,6 @@
 *.mp4 binary
 *.zip binary
 *.utrace binary
+
+# Patch files keep their bytes exactly as committed, so the SHA-256 a campaign manifest records matches any checkout.
+*.patch -text

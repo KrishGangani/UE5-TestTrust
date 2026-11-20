@@ -172,3 +172,37 @@ The prediction was committed (`c18936d`) before the run.
 **The 56.7 s outlier** (mutant `3569416fdb`, killed) was infrastructure, not the mutant: that editor launch had to start the shared Zen storage server ("Launching executable … zenserver", then about 31 s of "Waiting for ZenServer to be ready", and 10 s of shader-type setup), because no Zen server was running at that moment. Its tests themselves took 0.8 s. The cost is reported as measured.
 
 **Report:** `Benchmarks\Summaries\2026-11-21_025734_mut-updatebudget_summary.md`.
+
+
+## Phase 5 · S7: UE5-UpdateBudget "after" (M-P1 + survivor tests, 2026-11-21)
+
+**What changed:** only the tests. `Tools\mutation\patches\updatebudget_boundary_tests.patch` adds three automation tests to UE5-UpdateBudget's `UpdateBudgetSchedulerTests.cpp` at `b890bc6`, one per real gap that S6 found (`05` H1). The patch is applied to this project's snapshot only (`tt_mutate.py apply_patches`, `05` H2); UE5-UpdateBudget's repository was only read. Config `Tools\mutation\updatebudget_after.json` = the S6 config plus `"patches"`, so the 39 mutants and their ids are identical and the S6 review applies unchanged.
+
+**The run.** Campaign `2026-11-21_031329_mut-updatebudget`, queue job `20261121_031339_a69cc4`: **ok, exit 0, 657.1 s**. The manifest records the patch's SHA-256 (`38b3f333…`) and its target file.
+
+**Baseline:** cold build 51.3 s; **11 tests** (8 + 3), 0 failed, test launch 16.5 s. The three new tests pass on the unmutated scheduler, so they encode its current behaviour, not a change to it.
+
+**Fates:** 27 killed, 11 crash, **1 survived**, 0 stillborn, 0 timeout, 0 error. Compared mutant by mutant with S6, exactly three fates changed, all **survived → killed**, each by the test written for it:
+
+| Id | Line | Change | Killed by |
+|---|---|---|---|
+| `0072839e65` | 47 | `Deadline < NextFrameTime` → `<=` | `DeadlineAtNextFrameIsOptional` |
+| `84989a4f35` | 56 | `SpentMs + Predicted > BudgetMs` → `>=` | `ExactFitStillRuns` and `ExactlyOnBudgetIsNotOverBudget` |
+| `60ff682b30` | 70 | `bOverBudget = SpentMs > BudgetMs` → `>=` | `ExactlyOnBudgetIsNotOverBudget` |
+
+The remaining survivor is `fbd237213c`, the tie-break already reviewed as **equivalent** in S6.
+
+**Score:** **M1 = 100.0%** (38 of 38) after the review; 97.4% (38 of 39) before it; M1-naive 97.4%. **SC4 met:** M1-after ≥ 90%, and the one remaining survivor is classified (equivalent, with its reason). Before → after: **92.1% → 100.0%**.
+
+**Cost:** median 14.0 s per mutant [13.5–20.0]: build 4.0 s [3.8–7.8], 1 compile action every time; test launch 10.0 s [9.6–12.1]. Three more tests added no measurable time: the launch, not the tests, dominates (`01b #8`).
+
+**What it says:** the survivor list was directly actionable. Each real gap needed one short test with exact binary-fraction inputs (0.25 ms, 0.5 ms) so the boundary is hit without rounding, and each test killed its mutant. This is one suite, so it is an example, not a general claim.
+
+**The patch is offered to UE5-UpdateBudget's owner** as `Tools\mutation\patches\updatebudget_boundary_tests.patch` (apply with `git apply --ignore-whitespace` in that repository); it is not committed there by this project.
+
+**Audit (after the run, before the commit).** The reviews changed only how the runner applies a patch, not the patch or the campaign:
+- **Code review (medium):** 7 findings. Fixed: git's own error text is kept when a patch fails; an inherited `GIT_DIR`/`GIT_WORK_TREE` is cleared; targets come from `git apply --numstat -z` (the regex cut paths at spaces and missed deletions); a self-test for the patch path; the `.gitattributes` comment, which wrongly called the patch CRLF. Documented: `--ignore-whitespace` stays, because the patch is LF and the snapshot CRLF (`05` H1). Skipped: asserting the run order in `ExactFitStillRuns` would change the measured patch; the order is covered by `DeadlineOrder` and `BudgetCutOff`.
+- **Simplify (4 reviewers):** one `content()` helper instead of a repeated expression, each `numstat` record split once, a dead assignment removed, the self-test's patch file next to its folder (no temp folder), `GIT_DIR` cleared once in `main()` (altitude: it affects every git call, not only the patch). Reuse and efficiency: nothing to change.
+- **Re-verified with the final code:** `tt_mutate.py selftest` ok (also with `GIT_DIR` set to this repository); the patch re-applied to a copy of the S6 snapshot's test file gives the same SHA-256, the same target, and a byte-identical file to the one the campaign measured.
+
+**Report:** `Benchmarks\Summaries\2026-11-21_031329_mut-updatebudget_summary.md`.

@@ -1,0 +1,14 @@
+{
+	"name": "updatebudget",
+	"repo_name": "UE5-UpdateBudget",
+	"repo": "D:/UNREAL PORTFOLIO/P01_UpdateBudget",
+	"commit": "b890bc6",
+	"project_subdir": "UpdateBudget",
+	"uproject": "UpdateBudget.uproject",
+	"editor_target": "UpdateBudgetEditor",
+	"mutate": ["Plugins/UpdateBudgetCore/Source/UpdateBudgetCore/Private/UpdateBudgetScheduler.cpp"],
+	"exclude": ["*/Tests/*"],
+	"patches": ["patches/updatebudget_boundary_tests.patch"],
+	"test_filter": "StartsWith:UpdateBudget.Scheduler",
+	"operators": ["ROR", "AOR", "LCR", "COND", "BOOL", "SDL"]
+}

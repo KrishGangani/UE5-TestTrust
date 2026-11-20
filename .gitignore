@@ -29,3 +29,6 @@ Benchmarks/*_console.txt
 
 # Mutation-runner and probe snapshots of target projects (build products, never committed).
 Tools/_work/
+
+# Parked work in progress (code waiting for its step); never committed (portfolio brief, rule 11).
+_wip/

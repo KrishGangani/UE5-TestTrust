@@ -327,3 +327,36 @@ All of them are adapted from UE5-UpdateBudget's scripts and must be run **throug
 | `8125da701a`, `1c78e5d36c`: `equivalent` | The two equivalent survivors predicted in `09` P4-R, each with the reason no input can tell it from the original. `report` removes them from both sides of M1 and still prints M1 before the review |
 | `62c038c366`: `real gap` | The deliberate boundary gap. Recorded, never excluded: it stays a survivor in M1 |
 | Keys are mutant ids | Ids hash the file path, offsets, operator and replacement (D3), so the review carries over to any later campaign at a commit where that file is unchanged |
+
+
+---
+
+## Part H · Step S7: tests written from survivors, applied as a patch
+
+### H1. `Tools\mutation\patches\updatebudget_boundary_tests.patch`
+
+A unified diff against UE5-UpdateBudget's `UpdateBudgetSchedulerTests.cpp` at `b890bc6`, adding three tests before the file's `#endif`. It is applied **only to this project's snapshot**; UE5-UpdateBudget's repository is never edited (owner rule). Its maintainer can apply the same file with `git apply --ignore-whitespace` (see "How it was made").
+
+| Test | The survivor it targets | Why the expected values are exact |
+|---|---|---|
+| `UpdateBudget.Scheduler.DeadlineAtNextFrameIsOptional` | line 47, `Deadline < NextFrameTime` → `<=` | One client with deadline 1.0, `NextFrameTime` 1.0, budget 0: a deadline exactly at the next frame can still wait, so it is not mandatory and doesn't run (`MandatoryRuns` 0, `Runs` 0, `Deferred` 1). The header defines mandatory as "deadline before the next frame", so this pins the documented meaning |
+| `UpdateBudget.Scheduler.ExactFitStillRuns` | line 56, `SpentMs + Predicted > BudgetMs` → `>=` | Predicted and measured cost 0.25 ms, budget 0.5 ms, four optional clients: 0.25 and 0.5 are exact binary fractions, so the second update fills the budget **exactly** (0.25 + 0.25 = 0.5 with no rounding) and must still run; the third must not (`Runs` 2) |
+| `UpdateBudget.Scheduler.ExactlyOnBudgetIsNotOverBudget` | line 70, `bOverBudget = SpentMs > BudgetMs` → `>=` (and line 56 again) | One update costing exactly the 0.5 ms budget runs and leaves `bOverBudget` false |
+
+**How it was made:** the pinned test file was copied out of the S6 snapshot (CRLF line endings, as `git archive` wrote it), the tests were inserted before `#endif // WITH_DEV_AUTOMATION_TESTS`, and `git diff --no-index` produced the patch. **Found in the code review:** the patch came out with LF line endings, because `git diff` ran inside this repository and its `* text=auto` attribute normalised the text; so the runner applies it with `--ignore-whitespace`, which lets the LF context match the CRLF file; git then writes the added lines with CRLF as well (checked: all 265 lines of the patched file end in CRLF). To apply it in UE5-UpdateBudget: `git apply --ignore-whitespace <patch>`. `.gitattributes` gains `*.patch -text`, so the committed bytes never change in any checkout and the SHA-256 that the campaign manifest records (`38b3f333…`) keeps matching the file.
+
+**Skipped review finding:** `ExactFitStillRuns` checks the counts, not which two clients ran. Asserting the order too would change the patch, and with it the measured campaign; the order is already pinned by UE5-UpdateBudget's own `DeadlineOrder` and `BudgetCutOff` tests, which record the run order, and every comparator mutant on line 42 except the reviewed-equivalent tie-break was killed in both campaigns.
+
+### H2. `Tools\tt_mutate.py`: `apply_patches()`, and `Tools\mutation\updatebudget_after.json`
+
+| Part | What, why |
+|---|---|
+| `"patches": ["patches/updatebudget_boundary_tests.patch"]` in the config | The "after" campaign is the "before" campaign plus this key; the commit, files, filter and operators are identical, so the 39 mutants and their ids are identical and the review file (`updatebudget_review.json`, keyed by id) applies to both |
+| `apply_patch(path, root)` (one patch) and `apply_patches(config, root)` (the config's list) | Runs `git apply -p1 --ignore-whitespace --whitespace=nowarn <patch>` in the campaign folder, **with `GIT_CEILING_DIRECTORIES` set to the folder's parent**. **Found while building it:** the campaign folder lies inside this repository's ignored tree, and there a plain `git apply` resolves paths against this repository and silently changes nothing (tested: exit 0, file unchanged). The ceiling stops git's repository search at the snapshot, so it patches like a plain `patch` tool. **Code review:** an inherited `GIT_DIR` or `GIT_WORK_TREE` would override the search, so they are removed from the child's environment; a failed apply now raises with git's own message (which hunk failed) instead of a bare exit status |
+| `git apply --numstat -z` | Lists the files the patch touches before applying it. **Code review:** the first version read the `+++ b/` lines with a regex that cut paths at a space and missed deleted files; git's own list has neither problem |
+| The "every target really changed" check | Each listed file must differ after the patch (or appear, or disappear), or planning stops. A silent no-op patch would otherwise produce an "after" score identical to "before" and look like a result |
+| `target.patches` in the manifest | Each patch's file name, SHA-256 and target files, so the "after" campaign records exactly which tests it measured |
+| Order: snapshot → patch → pristine copies | Mutants are planned on the patched tree. The patch here touches only the test file, which is never mutated, but the order keeps any future patch to a mutated file consistent |
+| `patch_selftest()` (in `selftest`) | **Code review:** the ceiling trick had been tested only by hand. The self-test applies an LF patch with a space in its path to a CRLF file inside `Tools\_work\`, checks that the file changed and this repository's `git status` didn't, and that applying it twice raises |
+| `main()` removes `GIT_DIR` and `GIT_WORK_TREE` | **Altitude review:** an inherited value would redirect every git call of the runner (the snapshot's `git archive` too), not only the patch, so it is cleared once for the whole process instead of in `apply_patch` |
+| After the reviews | The final code re-applied the patch to a copy of the S6 snapshot's test file: same SHA-256, same target, and a byte-identical result to the file the S7 campaign measured |
