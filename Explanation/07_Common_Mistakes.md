@@ -1,6 +1,6 @@
 # 07 · Common Mistakes: TestTrust
 
-**Rule:** for every module, the mistakes that are easy to make here, **how to spot them, how to prevent them and how to debug them**. Mistakes **actually caught in this project** are marked ⚠ caught; they make the best interview stories. (Current to Phase 4.)
+**Rule:** for every module, the mistakes that are easy to make here, **how to spot them, how to prevent them and how to debug them**. Mistakes **actually caught in this project** are marked ⚠ caught; they make the best interview stories. (Current to S1.)
 
 ---
 
@@ -29,6 +29,23 @@
 | ⚠ caught (S7): **`git apply` inside another repository's ignored folder.** In a snapshot under `Tools\_work\`, `git apply` resolved the paths against this repository and changed nothing, with exit 0 | An "after" campaign whose score equals the "before" score | `GIT_CEILING_DIRECTORIES` = the snapshot's parent, and a check that every target changed (`tt_mutate.apply_patch`) | `tt_mutate.py selftest` (`patch_selftest`); hash a target before and after |
 | ⚠ caught (code review, S7): **a patch whose line endings differ from the files.** `git diff` ran inside this repository, whose `* text=auto` turned the CRLF test file into an LF patch | `git apply` reports "patch does not apply" | Apply with `--ignore-whitespace`; keep the patch's bytes with `*.patch -text`, so its recorded SHA-256 stays valid | Count CRLF and LF in the patch and in the target |
 | ⚠ caught (code review, S7): **an inherited `GIT_DIR`.** A git hook or wrapper that sets it redirects every git call of the runner to that repository | A snapshot or patch from the wrong repository | `main()` clears `GIT_DIR` and `GIT_WORK_TREE` | The self-test with `GIT_DIR` set |
+
+## Probe plugin (`TestTrustProbe`)
+
+| Mistake | How to spot it | How to prevent it | How to debug it |
+|---|---|---|---|
+| ⚠ caught (while writing the tests): **a test value that lands exactly on a boundary.** Alternating 10 ms / 20 ms frames put a running sum exactly on 0.1 s; whether `>=` holds then depends on float rounding | A test that passes or fails depending on the compiler's rounding | Choose test inputs with a clear margin (10 ms / 30 ms), and simulate expected frames before building | Print the running sums; look for values equal to the boundary |
+| ⚠ caught (S1 check): **looking for the wrong column and the wrong event.** The scripts expected `TestTrustProbe/Injected` and both `BenchStart` and `BenchEnd` in the capture; the real column is `TestTrustProbe/GameThread/Injected`, and `BenchStart` sits on the frame before the first captured row (it starts the capture) | Every run would have been marked invalid by `run_bench.py`; the injected column summary was empty | Read the CSV header of a real capture before writing analysis code | `csv_stats.py` on one capture; print the header |
+| ⚠ caught (code review): **PIE support plus `RequestExit`.** With PIE allowed, `-TTExit` would quit the whole editor, losing unsaved work; every PIE client would also open its own window | The editor closes about 25 s after pressing Play | Game worlds only | — |
+| ⚠ caught (code review): **`FMath::Max(0.0, NaN)` is NaN.** `-TTWarmup=inf` or `nan` passed the clamp, the window never opened, and the run never ended | A gate batch that hangs until its timeout | `FMath::IsFinite` first, then clamp to a cap; fall back to the default | The `Options.Parse` test feeds `inf` and `nan` |
+| ⚠ caught (code review): **injection after the window.** The spin kept running after `BenchEnd`, forever without `-TTExit` | Frame time stays high after the capture | Inject only while the window isn't done | — |
+| ⚠ caught (code review): **a second window after a map change** | A second `BenchStart` in the log | One window per process | The `Probe already ran its window` log line |
+| ⚠ caught (simplify pass): **a log line inside the last captured frame.** `CSV_EVENT` writes a log line (`CsvProfiler.cpp:4797`), a variable cost in the measured `BenchEnd` frame | A max/p99 outlier on the last frame | `CSV_EVENT_NOLOG` there; log on the next frame | Compare the last frame's time with the rest |
+| Comparing accumulated float deltas with plain `>=` | The window opens one frame early or late (299 or 301 instead of 300) | The half-frame rule in `FTTProbeWindow::Advance` | The `FixedStepFrames` test; `BenchStart on frame N` in the game log |
+| Injecting with a loop count instead of wall time | The injected "1 ms" differs between machines and clock states | Spin on `FPlatformTime::Seconds()` | Compare `TestTrustProbe/GameThread/Injected` with the requested value |
+| Quitting on the `BenchEnd` frame | A CSV without its trailing header and metadata rows (`finalised: false` in `csv_stats.py`) | Exit `ExitDelayFrames` frames later | `csv_stats.py` flags unfinalised captures |
+| A probe that runs in every game | Normal play gets the injected cost or an unexpected exit | Off unless `-TTProbe` is on the command line | The `Options.Parse` test: no `-TTProbe`, not enabled |
+| Accepting editor worlds in `DoesSupportWorldType` | Events and spins while someone edits a map | Game and PIE only | — |
 
 ## Sample module (`TestTrustSample`)
 

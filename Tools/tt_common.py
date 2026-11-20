@@ -17,6 +17,18 @@ import subprocess
 ENGINE_ROOT = r"C:\Program Files\Epic Games\UE_5.8"
 ENGINE_BUILD_VERSION = os.path.join(ENGINE_ROOT, "Engine", "Build", "Build.version")
 
+# The packaged Development build. The real game executable is launched directly: Build\Windows\TestTrust.exe is only a
+# bootstrap that starts this one, and launching the real one makes the game our direct child, so its exit code and
+# its kill are reliable (UE5-UpdateBudget's finding, b890bc6).
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PACKAGED_GAME = os.path.join(PROJECT_DIR, "Build", "Windows", "TestTrust")
+PACKAGED_EXE = os.path.join(PACKAGED_GAME, "Binaries", "Win64", "TestTrust.exe")
+PACKAGED_SAVED = os.path.join(PACKAGED_GAME, "Saved")
+# The portfolio's measurement protocol for every packaged gate run (01 section 7); the S1/S2 checks proved the capture
+# window under exactly this string, and run_bench.py measures under it.
+GATE_ARGS = ("-windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync "
+             "-csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit")
+
 
 def performance_core_mask() -> int | None:
     """Affinity mask of the performance cores on a hybrid CPU; None on a non-hybrid CPU or if Windows can't say.

@@ -1,0 +1,205 @@
+{
+ "batch": "2026-11-21_032032_s1check",
+ "step": "s1",
+ "environment": {
+  "date": "2026-11-21T03:20:32",
+  "engine": "5.8.4 (CL 58902052)",
+  "build_config": "Development (editor target, game target, packaged)",
+  "compiler": "MSVC 14.44.35229, Windows SDK 10.0.22621.0",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "gpus": "Intel(R) UHD Graphics (driver 32.0.101.7088); NVIDIA GeForce RTX 5070 Laptop GPU (driver 32.0.16.1047)",
+  "ram_gb": "31.6",
+  "os": "Microsoft Windows 11 Home Single Language build 26200",
+  "power_plan": "Power Scheme GUID: 6fecc5ae-f350-48a5-b669-b472cb895ccf  (Turbo)",
+  "on_ac_power": true,
+  "cpu_affinity": "0xFFFF (performance cores only; hybrid CPU)",
+  "gate_args": "-windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit"
+ },
+ "results": [
+  {
+   "step": "build_TestTrustEditor",
+   "exit_code": 0,
+   "seconds": 12.8,
+   "log": "2026-11-21_032032_s1check_build_TestTrustEditor.log",
+   "compiler_warnings": 0,
+   "compiler_errors": 0,
+   "succeeded": true
+  },
+  {
+   "step": "build_TestTrust",
+   "exit_code": 0,
+   "seconds": 17.5,
+   "log": "2026-11-21_032032_s1check_build_TestTrust.log",
+   "compiler_warnings": 0,
+   "compiler_errors": 0,
+   "succeeded": true
+  },
+  {
+   "step": "tests",
+   "exit_code": 0,
+   "seconds": 15.3,
+   "log": "2026-11-21_032032_s1check_tests.log",
+   "report": {
+    "succeeded": 13,
+    "succeededWithWarnings": 0,
+    "failed": 0,
+    "notRun": 0,
+    "tests": [
+     "TestTrust.Probe.Injection.Schedule",
+     "TestTrust.Probe.Injection.Spin",
+     "TestTrust.Probe.Options.Parse",
+     "TestTrust.Probe.Window.FixedStepFrames",
+     "TestTrust.Probe.Window.IgnoresNegativeDelta",
+     "TestTrust.Probe.Window.VariableStep",
+     "TestTrust.Probe.Window.ZeroWarmup",
+     "TestTrust.Sample.Cooldown.CountsDown",
+     "TestTrust.Sample.Cooldown.StopsAtZero",
+     "TestTrust.Sample.Damage.ArmorSubtracts",
+     "TestTrust.Sample.Damage.CriticalDoubles",
+     "TestTrust.Sample.Damage.NeverBelowMinimum",
+     "TestTrust.Sample.Range.InsideAndOutside"
+    ]
+   }
+  },
+  {
+   "step": "package",
+   "exit_code": 0,
+   "seconds": 58.6,
+   "log": "2026-11-21_032032_s1check_package.log",
+   "succeeded": true,
+   "cook_line": "LogInit: Display: Success - 0 error(s), 0 warning(s)"
+  },
+  {
+   "step": "X10",
+   "exit_code": 0,
+   "seconds": 7.4,
+   "log": "2026-11-21_032032_s1check_X10.log",
+   "args": "-TTWarmup=3 -TTCapture=10 -TTInjectMs=1.0",
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_032032_s1check_X10",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "1.0",
+    "ttinjectevery": "1"
+   },
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 4.249112,
+     "min": 2.1681,
+     "median": 4.0075,
+     "p95": 5.666924999999997,
+     "p99": 7.664207999999998,
+     "max": 12.4007
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 2.4346758333333334,
+     "min": 1.9619,
+     "median": 2.255,
+     "p95": 3.493035,
+     "p99": 5.426608999999999,
+     "max": 6.7722
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 4.230181,
+     "min": 2.1937,
+     "median": 4.02075,
+     "p95": 6.194249999999998,
+     "p99": 8.320475999999998,
+     "max": 13.7026
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 3.6880478333333335,
+     "min": 3.0725,
+     "median": 3.5576,
+     "p95": 4.615405,
+     "p99": 5.361706,
+     "max": 5.9116
+    }
+   },
+   "capture": "2026-11-21_032032_s1check_X10.csv",
+   "log_errors": 0,
+   "log_warnings": 0,
+   "probe_lines": [
+    "Probe active: warm-up 3.000 s, capture 10.000 s, inject 1.000 ms every 1 frame(s), tag '2026-11-21_032032_s1check_X10'",
+    "BenchStart on frame 180 (world time 3.000 s)",
+    "BenchEnd on frame 780 after 600 captured frames"
+   ]
+  },
+  {
+   "step": "X0",
+   "exit_code": 0,
+   "seconds": 6.1,
+   "log": "2026-11-21_032032_s1check_X0.log",
+   "args": "-TTWarmup=3 -TTCapture=10",
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_032032_s1check_X0",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1"
+   },
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 3.8024513333333334,
+     "min": 2.0093,
+     "median": 3.7137000000000002,
+     "p95": 4.620644999999999,
+     "p99": 5.1619269999999995,
+     "max": 11.0046
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 1.4180738333333334,
+     "min": 0.9034,
+     "median": 1.3253,
+     "p95": 1.9062849999999996,
+     "p99": 3.2816899999999993,
+     "max": 5.034
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 3.789032666666667,
+     "min": 1.9061,
+     "median": 3.7338,
+     "p95": 4.754395,
+     "p99": 6.074034999999999,
+     "max": 6.299
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 3.3572331666666666,
+     "min": 2.9512,
+     "median": 3.2728,
+     "p95": 3.8905,
+     "p99": 4.470312,
+     "max": 4.8275
+    }
+   },
+   "capture": "2026-11-21_032032_s1check_X0.csv",
+   "log_errors": 0,
+   "log_warnings": 0,
+   "probe_lines": [
+    "Probe active: warm-up 3.000 s, capture 10.000 s, inject 0.000 ms every 1 frame(s), tag '2026-11-21_032032_s1check_X0'",
+    "BenchStart on frame 180 (world time 3.000 s)",
+    "BenchEnd on frame 780 after 600 captured frames"
+   ]
+  }
+ ]
+}

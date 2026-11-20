@@ -8,6 +8,7 @@
 | B | Phase 4, F2 (sample rules and tests) | `TTSampleRules.h`, `TTSampleRules.cpp`, `TTSampleRulesTests.cpp` |
 | C | Phase 4, F3 (scripts) | `Tools\*.bat` |
 | D | Phase 2 and Phase 4, F4 (Python) | `probe_build_cost.py`, `tt_common.py`, `tt_mutants.py`, `tt_mutate.py`, `mutation\sample.json`, `mutation\sample_review.json` |
+| E | Phase 5, S1 (the probe plugin) | `TTProbeWindow.h/.cpp`, `TTProbeSubsystem.h/.cpp`, `Tests\TTProbeTests.cpp`, `Tools\csv_stats.py`, `Tools\run_checks.py` |
 
 ---
 
@@ -328,6 +329,74 @@ All of them are adapted from UE5-UpdateBudget's scripts and must be run **throug
 | `62c038c366`: `real gap` | The deliberate boundary gap. Recorded, never excluded: it stays a survivor in M1 |
 | Keys are mutant ids | Ids hash the file path, offsets, operator and replacement (D3), so the review carries over to any later campaign at a commit where that file is unchanged |
 
+---
+
+## Part E · Step S1: the probe plugin (`Plugins\TestTrustProbe\`)
+
+### E1. `Public\TTProbeWindow.h` and `Private\TTProbeWindow.cpp`
+
+The arithmetic of a gate run, kept free of UObjects so it can be tested frame by frame without a world (the same split as UE5-UpdateBudget's pure scheduler).
+
+| Line | What it does, and why |
+|---|---|
+| `enum class ETTProbeEvent : uint8 { None, Start, Stop }` | What the subsystem must do on the frame just advanced. `enum class` keeps the names scoped and stops accidental conversion to `int` (`04` §12); `uint8` because three values need one byte |
+| `struct FTTProbeWindow` with `WarmupSeconds = 5.0`, `CaptureSeconds = 20.0` | Plain public data with the gate's defaults (`02` §7); the subsystem copies the command-line values in |
+| `ETTProbeEvent Advance(double DeltaSeconds)` | Called once per frame with that frame's delta. It returns `Start` once, then `Stop` once, and `None` otherwise |
+| `const double Step = FMath::Max(DeltaSeconds, 0.0);` | A negative delta can't move time backwards into the window (tested: `IgnoresNegativeDelta`) |
+| `PhaseElapsed + HalfFrame >= WarmupSeconds` | **The half-frame rule.** A fixed 1/60 s step reaches the engine as the float 0.016666668 s, so after 300 frames the sum is a hair above or below 5.0 depending on rounding. Comparing with half a frame of slack makes the window open after exactly round(5.0 / step) = 300 frames and last exactly round(20.0 / step) = 1,200 frames (tested: `FixedStepFrames`). *Alternative:* counting frames directly, which would break real-time runs whose deltas vary; time with a half-frame tolerance serves both |
+| `PhaseElapsed = 0.0` on `Start` | The capture is measured from its own start, so a long warm-up's rounding error can't leak into the capture length |
+| `++CapturedFrames` before the stop check | The Stop frame belongs to the capture: 1,200 frames means frames 301–1,500 at 60 fps. So a capture always has at least one frame, and `CaptureSeconds = 0` captures exactly one (documented in the header and tested, after the code review asked) |
+| `private: enum class EPhase { Warmup, Capture, Done }` | The three states. Private, because callers only need `IsDone()`; the inline getter may use it although it is declared below it (a class body is complete inside its own member functions, `04` §13). (An `IsCapturing()` getter was removed in the simplify pass: nothing called it) |
+| `struct FTTInjectionSchedule { Milliseconds, Every }` | The injected regression: how much, and on which frames |
+| `ShouldInject(int64 FrameIndex)` | `IsActive() && (Every <= 1 \|\| FrameIndex % Every == 0)`: every frame by default, every Nth for the exploratory spiky experiment (`02` §12). `int64` because a frame counter at 60 fps passes `int32` after about 414 days: cheap insurance |
+| `static double Spin(double Milliseconds)` | Busy-waits on `FPlatformTime::Seconds()` (QueryPerformanceCounter on Windows, `Core/Public/Windows/WindowsPlatformTime.h:23`) until the time has passed. The loop compares the same expression it returns (`(Now − Start) × 1000`), so the result can never come out a rounding error short of the request (code review: comparing against an absolute end time could return 0.4999… ms for 0.5). **Wall time, not a loop count**, so the injected cost is the same at any CPU clock, which is what makes the regression's size known. It returns the time actually spent, which the test checks is never shorter than asked |
+
+### E2. `Public\TTProbeSubsystem.h` and `Private\TTProbeSubsystem.cpp`
+
+| Line | What it does, and why |
+|---|---|
+| `struct FTTProbeOptions` | The run's options in one place, with the defaults of `02` §7. A plain struct (not a `USTRUCT`): nothing needs reflection. It holds an `FTTInjectionSchedule` directly, so the metadata and the spin read one copy of the injection settings (simplify pass) |
+| `static FTTProbeOptions FromCommandLine(const TCHAR* CommandLine)` | Takes the command line as a parameter instead of reading `FCommandLine::Get()` itself, so the parsing is testable with a fake command line (`Options.Parse` test) |
+| `FParse::Param(CommandLine, TEXT("TTProbe"))` | True if the token `-TTProbe` is present (`Core/Public/Misc/Parse.h:127`) |
+| `FParse::Value(..., TEXT("TTWarmup="), Read.WarmupSeconds)` etc. | The `double`, `int32` and `FString` overloads (`Parse.h:58, 60, 71`). A missing value leaves the default untouched. The run tag is read with `bShouldStopOnSeparator = false`, so only whitespace ends it, not `,` or `)` (`Core/Private/Misc/Parse.cpp:299`; code review) |
+| `TTProbe::ClampFinite(Value, Default, Max)` | A finite value clamped to [0, Max]; `nan` or `inf` fall back to the default. **Code review:** `FMath::Max(0.0, NaN)` is NaN, and `-TTWarmup=inf` would have kept the window shut forever, so the run would never end. Warm-up and capture are capped at 3,600 s, the injection at 100 ms; `InjectEvery` ≥ 1 |
+| `ShouldCreateSubsystem(Outer)`: `Super::…` and `FParse::Param(..., "TTProbe")` | **Simplify pass:** without `-TTProbe` the subsystem is never created, so a normal game pays nothing, not even a tick (`Runtime/Engine/Public/Subsystems/WorldSubsystem.h:34`; the world-type filter still applies through `Super`) |
+| `UCLASS(MinimalAPI) class UTTProbeSubsystem : public UTickableWorldSubsystem` | A world subsystem has the world's lifetime: created with the world, destroyed with it, one per world, no actor to place or lose. The tickable variant ticks every frame **on the game thread after `TG_PostPhysics`, inside the frame** (`Runtime/Engine/Private/LevelTick.cpp:1750, 1778, 1821`), so time spent in its `Tick` is part of `GameThreadTime` (`01b #12`). It becomes tickable only after `Initialize` (`Runtime/Engine/Private/Subsystems/WorldSubsystem.cpp:68–78`). `MinimalAPI` + `UE_API` on members is 5.8's export convention (`04` §10) |
+| `DoesSupportWorldType`: **Game only** | **Code review:** with PIE allowed, `-TTExit` would have quit the whole editor (`RequestExit` ends the process), and every PIE client would have opened its own window. Editor worlds never run the probe either |
+| `TTProbe::GWindowStartedThisProcess` | One window per process. **Code review:** a second world (a map change) would otherwise open a second window and fire a second `BenchStart`. The gate's workload never changes map; map travel during a run is a stated limit (header comment, `02` §12), not something the probe tries to survive. A game-instance subsystem would survive travel, but it would replace the world-scoped design for a case the gate never has (altitude review, kept as is) |
+| `OnWorldBeginPlay(UWorld& InWorld)` | Reads the options once the world is playing. Not in `Initialize`: the world exists earlier than play begins, and the window must count from play |
+| `CSV_METADATA(TEXT("TTRunTag"), …)` and the other four keys | The run's description goes into the capture's metadata row (`Core/Public/ProfilingDebugging/CsvProfiler.h:85`), so each CSV says which tag, window and injection produced it; `csv_stats.py` reads it back (keys lower-cased: `ttruntag`, `ttinjectms`, …) |
+| `if (!Window.IsDone() && Options.Injection.ShouldInject(FrameIndex)) { CSV_SCOPED_TIMING_STAT(TestTrustProbe, Injected); Spin(...); }` | Injection from the first frame (so the warm-up reaches the injected steady state) until `BenchEnd`. **Code review:** the first version kept spinning after the window, forever without `-TTExit`. The scoped stat records the time spent in the braces as the CSV column `TestTrustProbe/GameThread/Injected` (`CsvProfiler.h:120–122`). **Found in S1's check:** timing stats get the thread's name as a middle segment; the first scripts looked for `TestTrustProbe/Injected` and found nothing |
+| `case Start:` `CSV_EVENT(TestTrustProbe, TEXT("BenchStart"))` and a log line | The event the run's `-csvStartOnEvent=BenchStart` waits for (`Runtime/Core/Private/ProfilingDebugging/CsvProfiler.cpp:5081`). The capture begins at the next frame, so the event and the log line are outside the measured frames (and `BenchStart` never appears in the CSV itself, `09` S1) |
+| `case Stop:` `CSV_EVENT_NOLOG(TestTrustProbe, TEXT("BenchEnd"))` | `-csvStopOnEvent=BenchEnd` (`CsvProfiler.cpp:5090`) ends the capture after this frame, so this frame **is** measured. **Simplify pass:** `CSV_EVENT` would also write a log line (`CsvProfiler.cpp:4797–4799`), a run-to-run-variable cost in the last captured frame; the `NOLOG` variant (`CsvProfiler.h:64`) doesn't, and the "BenchEnd on frame…" line moved to the first frame after the window |
+| `case Stop:` `EndFrame = GFrameCounter` | The engine's frame number on the `BenchEnd` frame (`06` §16). **Altitude review (S2):** the frames since the end are counted from it, and `IsCaptureDone()` uses it, instead of a counter the probe increments in its own tick |
+| `default:` with `FramesSinceEnd = GFrameCounter - EndFrame`, `== 1` (log), `== ExitDelayFrames` (exit) | After the window: log once, then quit `ExitDelayFrames` (3) frames later so the CSV profiler finishes its file first (UE5-UpdateBudget's value). `RequestExit(false, ...)` is a normal, non-forced exit (`Core/Public/GenericPlatform/GenericPlatformMisc.h:1086`). **Simplify pass:** `==` makes both one-time actions without the old "set `bExitWhenDone` to false" latch, which made `GetOptions()` stop matching the command line |
+| `IsCaptureDone()`: `Window.IsDone() && GFrameCounter > EndFrame` | For a workload's end-of-run report. **Altitude review (S2):** the first version returned `Window.IsDone()`, which is already true on the last captured frame, so the workload had to wait one more tick itself, and which frame it reported on depended on whether the probe or the workload ticked first. `GFrameCounter` is the same in every tick of a frame and grows by 1 after all of them (`06` §16), so "true from the first frame after `BenchEnd`" holds in either tick order, for every workload |
+| `DEFINE_LOG_CATEGORY_STATIC(LogTTProbe, Log, All)` | A log category private to this file; its lines (`Probe active…`, `BenchStart on frame…`, `BenchEnd on frame…`) are what the step checks read |
+| `CSV_DEFINE_CATEGORY(TestTrustProbe, true)` | `true` = enabled by default, so a capture contains the category without `-csvCategories` (`CsvProfiler.h:50`) |
+| `GetStatId()` → `RETURN_QUICK_DECLARE_CYCLE_STAT(..., STATGROUP_Tickables)` | Required by `FTickableGameObject` (pure virtual in `UTickableWorldSubsystem`, `Runtime/Engine/Public/Subsystems/WorldSubsystem.h:92`); groups the tick under "Tickables" in `stat` views |
+
+### E3. `Private\Tests\TTProbeTests.cpp`
+
+| Test | What it proves |
+|---|---|
+| `TestTrust.Probe.Window.FixedStepFrames` | At the engine's float 1/60 s step: `Start` on frame 300, `Stop` on frame 1,500, 1,200 captured frames, exactly two events |
+| `Window.ZeroWarmup` | No warm-up: `Start` on the first frame; a 0.1 s capture is 6 frames; a 0 s capture is exactly 1 frame (the documented minimum) |
+| `Window.VariableStep` | Alternating 10 ms / 30 ms frames (real-time runs): `Start` on frame 6, `Stop` on frame 12. **Found while writing it:** 10 ms / 20 ms frames put a running sum exactly on 0.1 s, a floating-point tie whose outcome depends on rounding; the test uses values with a clear margin, and the expected frames of every window test were simulated in Python before the build |
+| `Window.IgnoresNegativeDelta` | Time can't run backwards into the window |
+| `Injection.Schedule` | 0 ms never injects; every frame by default; `Every = 3` hits frames 0, 3, 6 |
+| `Injection.Spin` | Never shorter than asked; under 50 ms for a 0.5 ms request (a loose bound on purpose, so preemption can't make the test flaky) |
+| `Options.Parse` | Every option parsed; clamps applied; `inf` and `nan` fall back to the defaults; a run tag keeps its commas; nothing enabled without `-TTProbe` |
+| Shared helper `TTProbeTests::Run` | One frame loop for every window test, with a per-frame delta function (the constant-delta form forwards to it); the variable-step and negative-delta tests use it instead of their own copies (simplify pass) |
+
+### E4. `Tools\csv_stats.py` and `Tools\run_checks.py`
+
+| Part | What, why |
+|---|---|
+| `csv_stats.py` | Copied from UE5-UpdateBudget's `Tools\csv_stats.py` at `b890bc6`; only the default columns (`TestTrustProbe/GameThread/Injected` instead of that project's stats), the run-tag key (`ttruntag`) and the self-test's event names changed. Its rules (drop the two trailing rows, the end header is authoritative, linear-interpolation percentiles) are restated in the file's docstring; `--selftest` checks them against hand-worked values |
+| `run_checks.py` | The checks of one step as **one queue job**: both builds (counting `warning Cxxxx` / `error Cxxxx`), the automation tests (`StartsWith:TestTrust`, `index.json`), a packaged Development build, then the step's own packaged runs. Builds are unpinned; packaged runs go through `tt_common.pinned()`. The manifest goes to `Benchmarks\Raw\<batch>_manifest.json` (batch `<date>_<time>_<step>check`), the CSVs and game logs next to it |
+| `packaged_run()` | Deletes `GameUserSettings.ini` first (it can override VSync and frame-rate caps), launches `TestTrust.exe` with the gate arguments (fixed step 60, 1280×720 windowed, `-novsync`, `-nosound`, `-traceautostart=0`, CSV start and stop on the probe's events, `-TTProbe -TTExit`), then moves the newest CSV into `Benchmarks\Raw\`, analyses it, and keeps the probe's log lines |
+| `step_s1()` | Two runs with the same 3 s warm-up and 10 s capture: `X10` (1.0 ms injected per frame) and `X0` (none). Expected: 600 captured frames each; `BenchStart` on frame 180; `Injected` ≈ 1.0 ms only in `X10`; `GameThreadTime` higher by about 1.0 ms in `X10`. Results in `09` S1 |
 
 ---
 

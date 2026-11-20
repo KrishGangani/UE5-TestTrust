@@ -142,6 +142,29 @@ The prediction was committed (`c18936d`) before the run.
 2. While the batch ran, its manifest already said `stopped: all mutants have a fate`, because the reason was set before the loop. Fixed: the reason is `None` while running and set when the loop ends.
 3. Expected but now measured: the first launch on a fresh snapshot pays a one-time asset-registry scan (≈ 25 s here).
 
+## Phase 5 · S1: the probe plugin (2026-11-21)
+
+**First check.** Batch `2026-11-21_032032_s1check` (`Tools\run_checks.py s1`), queue job `20261121_030407_979279`: **ok, exit 0, 120.2 s**.
+- Builds: editor target 12.8 s, game target 17.5 s, **0 warnings, 0 errors**.
+- Automation tests `StartsWith:TestTrust`: **13 of 13 pass** (the 7 new `TestTrust.Probe.*` tests and the 6 sample tests).
+- Packaged Development build: ok.
+- Two packaged runs, pinned to `0xFFFF`, 3 s warm-up and 10 s capture: `X10` (1.0 ms injected per frame) and `X0`.
+
+| Check | Expected | `X10` | `X0` |
+|---|---|---|---|
+| Captured frames, capture finalised | 600, yes | 600, yes | 600, yes |
+| `BenchStart` | frame 180 (3 s × 60) | frame 180 | frame 180 |
+| `BenchEnd` | after 600 captured frames | after 600 | after 600 |
+| `TestTrustProbe/GameThread/Injected` | 1.0 ms per frame in `X10` only | median 1.0003 [1.000–1.94], p95 1.002 | absent |
+| `GameThreadTime` median / mean | about +1.0 ms in `X10` | 2.255 / 2.435 ms | 1.325 / 1.418 ms (+0.93 / +1.02) |
+| Log errors and warnings | 0 | 0 | 0 |
+
+**Found in this check:** the timing column is `TestTrustProbe/GameThread/Injected` (the thread name is a middle segment), and `BenchStart` is not in the capture it starts (it sits on the frame before the first row); the scripts expected otherwise and were corrected before any gate data (`07`, probe section). Each capture also contains 2 `PSO` events (pipeline-state compilation); they are part of every run alike.
+
+**Audit (after the check).** Code review (medium): PIE support plus `-TTExit` would quit the editor (now Game worlds only); `nan`/`inf` options passed the clamp (now `ClampFinite`); the injection kept spinning after the window; a map change would open a second window; the run tag stopped at a comma. Simplify: no subsystem without `-TTProbe`; `CSV_EVENT_NOLOG` on the last captured frame; one shared test frame loop; the options hold the injection schedule directly. Every fix is listed where it lives in `05` Part E. S2's altitude review later moved the probe's "frames since the end" onto `GFrameCounter` (`05` E2, `06` §16).
+
+**Re-check of the reviewed code.** The fixes were built and run again inside S2's check job (batch `2026-11-21_040556_s2check`, queue job `20261121_034607_ca7fdd`, **ok, exit 0, 179.8 s**; the plugin doesn't depend on the game module, so the combined build checks it as it is committed here): both builds **0 warnings**, **13 of 13 tests pass**, and the same two runs again give 600 frames, `BenchStart` on frame 180, `BenchEnd` on frame 780 after 600 captured frames, 0 log errors or warnings, `Injected` median 1.000 ms [1.000–1.348], and `GameThreadTime` median 2.363 vs 1.306 ms (+1.06), mean 2.483 vs 1.406 ms (+1.08).
+
 ## Phase 5 · S6: UE5-UpdateBudget "before" (M-P1, 2026-11-21)
 
 **Order note:** S6–S8 need only the runner, so they were queued at the start of Phase 5, while S1 was being written, to use the machine's queue time; their order relative to S1–S5 doesn't affect any result. S6 was captured **before** any new test existed (`03` rule: baselines before the new thing).

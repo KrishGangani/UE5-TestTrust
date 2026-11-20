@@ -114,7 +114,7 @@ D:\UNREAL PORTFOLIO\P03_TestTrust\
 
 | Class | Kind / base | Responsibility | Why it exists, and what we rejected |
 |---|---|---|---|
-| `UTTProbeSubsystem` (plugin) | `UTickableWorldSubsystem`, Game and PIE worlds only | Parses `-TTWarmup=`, `-TTCapture=`, `-TTInjectMs=`, `-TTInjectEvery=`, `-TTRunTag=`, `-TTExit`. Counts simulated frames; fires `CSV_EVENT(BenchStart)` after warm-up and `BenchEnd` after the capture; writes `CSV_METADATA`; requests exit. Each frame, if injection is on, spins the game thread for exactly X ms inside `CSV_SCOPED_TIMING_STAT(TestTrustProbe, Injected)` | One tickable subsystem has the right lifetime (the world) and runs on the game thread inside the frame, so injected time lands in `GameThreadTime` (`01b #12`). *Rejected:* a custom `FTickFunction` (not needed: the injection doesn't need a specific tick group), an actor (must be placed or spawned; can be destroyed) |
+| `UTTProbeSubsystem` (plugin) | `UTickableWorldSubsystem`; created only with `-TTProbe`, in Game worlds only (never PIE), and runs one window per process | Parses `-TTWarmup=`, `-TTCapture=`, `-TTInjectMs=`, `-TTInjectEvery=`, `-TTRunTag=`, `-TTExit` (finite values, clamped). A pure `FTTProbeWindow` measures the window in the frames' own delta times with a half-frame tolerance; the subsystem fires `CSV_EVENT(BenchStart)` after warm-up and `CSV_EVENT_NOLOG(BenchEnd)` after the capture, writes `CSV_METADATA`, and requests exit. Until `BenchEnd`, on every `-TTInjectEvery`-th frame, it spins the game thread for exactly X ms inside `CSV_SCOPED_TIMING_STAT(TestTrustProbe, Injected)` | One tickable subsystem has the right lifetime (the world) and runs on the game thread inside the frame, so injected time lands in `GameThreadTime` (`01b #12`). *Rejected:* a custom `FTickFunction` (not needed: the injection doesn't need a specific tick group), an actor (must be placed or spawned; can be destroyed) |
 | `UTTWorkloadSubsystem` (game) | `UWorldSubsystem`, Game and PIE | Spawns N agents from a fixed seed in `OnWorldBeginPlay` (deferred spawn so state is set before `BeginPlay`), drives the camera along a fixed analytic path | Copied and adapted from UE5-UpdateBudget's `UUBBenchmarkSubsystem`: no map has to be authored, and spawning from a seed is deterministic |
 | `ATTWorkloadAgent` (game) | `AActor` | A mesh plus one brain component | Nothing else |
 | `UTTWorkloadBrainComponent` (game) | `UActorComponent`, native tick in `TG_PrePhysics` | Sense (distance and view cone to the camera) → decide (patrol / alert) → act (move along a patrol circle from accumulated time) → a calibrated compute step | Adapted from UE5-UpdateBudget's `UUBDemoBrainComponent`, minus the budget base class: here the workload only needs to be deterministic and game-thread bound |
@@ -269,7 +269,9 @@ run_bench.py → pinned packaged TestTrust.exe -deterministic -FPS=60 -windowed 
 | A pinned launch hides the exit code | `cmd /v:on /s /c "start … & exit !errorlevel!"`; a plain `cmd /c start /wait` always returns 0 (tested) | `tt_common.pinned()`; `01b #14` |
 | UBT links a stale mutant object | Timestamps are never faked; restored files are recompiled | `01b #1` |
 | Committed files leak personal paths | Manifests store paths relative to the project; `sanitize()` replaces the user profile path | `tt_common.sanitize()` |
-| (Gate) the probe ticks in editor worlds | `DoesSupportWorldType`: Game and PIE only | Same pattern as UE5-UpdateBudget (its `01b #2`) |
+| (Gate) the probe runs in an editor or PIE world | `DoesSupportWorldType`: Game only; not created at all without `-TTProbe` | In PIE, `-TTExit` would quit the whole editor (S1 code review) |
+| (Gate) a second world opens a second window | One window per process; map travel during a run is unsupported | S1 code review |
+| (Gate) logging inside the last captured frame | `BenchEnd` uses `CSV_EVENT_NOLOG`; the log line moves to the next frame | `CsvProfiler.cpp:4797` (S1 simplify pass) |
 | (Gate) the injected time lands outside the frame | The spin runs in the subsystem's `Tick`, on the game thread, inside the frame | `01b #12` |
 
 ## 9. Fates and scores
@@ -309,6 +311,7 @@ run_bench.py → pinned packaged TestTrust.exe -deterministic -FPS=60 -windowed 
 3. **One machine.** Costs and gate error rates are for this laptop and this protocol.
 4. **The gate is tested on synthetic regressions.** A spin-wait is a clean shift; spiky regressions are explored, not part of the success criteria.
 5. **A single-run gate has a floor.** It can't detect a change smaller than the run-to-run noise; that floor is measured, not assumed.
+6. **One capture window per process, one map.** The probe doesn't survive map travel during a run (it refuses a second window instead); the gate's workload never changes map.
 
 ## 13. Changes from the plan
 

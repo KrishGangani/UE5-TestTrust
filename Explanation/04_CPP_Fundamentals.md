@@ -1,6 +1,6 @@
 # 04 · C++ Fundamentals: TestTrust
 
-**Rule:** only the C++ ideas this project's code actually relies on, each with a tiny example first and then where it appears in our code. This file grows with every step. (Current to Phase 4.)
+**Rule:** only the C++ ideas this project's code actually relies on, each with a tiny example first and then where it appears in our code. This file grows with every step. (Current to S1.)
 
 ---
 
@@ -106,3 +106,35 @@ Next > 0.f;                 // false
 ```
 - **Equivalent mutants come from these details.** In `TickCooldown`, `Next > 0.f` → `Next >= 0.f` only differs when `Next` is exactly zero, and then both branches return zero (or negative zero, which compares equal). No test can tell them apart: the mutant is *equivalent* (`02` §4.4).
 - Comparing floats with `TestEqual` uses a tolerance (`UE_KINDA_SMALL_NUMBER` by default, `AutomationTest.h:1988`), so `0.75f` computed as `1.0f - 0.25f` passes even with rounding.
+
+## 12. `enum class` with an underlying type
+
+```cpp
+enum class EColour : uint8 { Red, Green };   // scoped: EColour::Red; one byte; no silent conversion to int
+int X = EColour::Red;                        // compile error: you must write static_cast<int>(EColour::Red)
+```
+- A plain `enum` leaks its names into the surrounding scope and converts to `int` silently, so two enums with a `None` clash and comparisons between unrelated enums compile.
+- `: uint8` fixes the size, which matters when the value is stored per object or sent over a network.
+- **In our code:** `ETTProbeEvent` (`None`, `Start`, `Stop`) and the private `FTTProbeWindow::EPhase`.
+
+## 13. A class body is "complete" inside its own member functions
+
+```cpp
+struct FCounter
+{
+	bool IsHigh() const { return Level == ELevel::High; }   // uses ELevel and Level, declared further down: fine
+private:
+	enum class ELevel : uint8 { Low, High };
+	ELevel Level = ELevel::Low;
+};
+```
+- The compiler reads inline member-function bodies as if they were written after the whole class, so they may use members and nested types declared later. (A *declaration*, such as a member's type, still needs the name declared before it.)
+- **In our code:** `FTTProbeWindow::IsCapturing()` sits in the public section, above the private `EPhase` it compares against, so the public interface reads first.
+
+## 14. `switch` with a `default`
+
+```cpp
+switch (Event) { case E::Start: Begin(); break; case E::Stop: End(); break; default: Idle(); break; }
+```
+- Each `case` needs its `break`, or execution falls through into the next one.
+- **In our code:** `UTTProbeSubsystem::Tick` switches on the window's event; the exit countdown lives in `default`, so it runs on ordinary frames only, never on the `BenchEnd` frame itself.

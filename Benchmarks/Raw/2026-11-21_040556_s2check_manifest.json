@@ -1,0 +1,569 @@
+{
+ "batch": "2026-11-21_040556_s2check",
+ "step": "s2",
+ "environment": {
+  "date": "2026-11-21T04:05:56",
+  "engine": "5.8.4 (CL 58902052)",
+  "build_config": "Development (editor target, game target, packaged)",
+  "compiler": "MSVC 14.44.35229, Windows SDK 10.0.22621.0",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "gpus": "Intel(R) UHD Graphics (driver 32.0.101.7088); NVIDIA GeForce RTX 5070 Laptop GPU (driver 32.0.16.1047)",
+  "ram_gb": "31.6",
+  "os": "Microsoft Windows 11 Home Single Language build 26200",
+  "power_plan": "Power Scheme GUID: 6fecc5ae-f350-48a5-b669-b472cb895ccf  (Turbo)",
+  "on_ac_power": true,
+  "cpu_affinity": "0xFFFF (performance cores only; hybrid CPU)",
+  "gate_args": "-windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit"
+ },
+ "results": [
+  {
+   "step": "build_TestTrustEditor",
+   "exit_code": 0,
+   "seconds": 13.8,
+   "log": "2026-11-21_040556_s2check_build_TestTrustEditor.log",
+   "compiler_warnings": 0,
+   "compiler_errors": 0,
+   "succeeded": true
+  },
+  {
+   "step": "build_TestTrust",
+   "exit_code": 0,
+   "seconds": 16.8,
+   "log": "2026-11-21_040556_s2check_build_TestTrust.log",
+   "compiler_warnings": 0,
+   "compiler_errors": 0,
+   "succeeded": true
+  },
+  {
+   "step": "tests",
+   "exit_code": 0,
+   "seconds": 22.2,
+   "log": "2026-11-21_040556_s2check_tests.log",
+   "report": {
+    "succeeded": 13,
+    "succeededWithWarnings": 0,
+    "failed": 0,
+    "notRun": 0,
+    "tests": [
+     "TestTrust.Probe.Injection.Schedule",
+     "TestTrust.Probe.Injection.Spin",
+     "TestTrust.Probe.Options.Parse",
+     "TestTrust.Probe.Window.FixedStepFrames",
+     "TestTrust.Probe.Window.IgnoresNegativeDelta",
+     "TestTrust.Probe.Window.VariableStep",
+     "TestTrust.Probe.Window.ZeroWarmup",
+     "TestTrust.Sample.Cooldown.CountsDown",
+     "TestTrust.Sample.Cooldown.StopsAtZero",
+     "TestTrust.Sample.Damage.ArmorSubtracts",
+     "TestTrust.Sample.Damage.CriticalDoubles",
+     "TestTrust.Sample.Damage.NeverBelowMinimum",
+     "TestTrust.Sample.Range.InsideAndOutside"
+    ]
+   }
+  },
+  {
+   "step": "package",
+   "exit_code": 0,
+   "seconds": 67.4,
+   "log": "2026-11-21_040556_s2check_package.log",
+   "succeeded": true,
+   "cook_line": "LogInit: Display: Success - 0 error(s), 0 warning(s)"
+  },
+  {
+   "step": "X10",
+   "exit_code": 0,
+   "seconds": 8.3,
+   "log": "2026-11-21_040556_s2check_X10.log",
+   "args": "-TTWarmup=3 -TTCapture=10 -TTInjectMs=1.0",
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_040556_s2check_X10",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "1.0",
+    "ttinjectevery": "1"
+   },
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 4.142545166666666,
+     "min": 2.5738,
+     "median": 3.95105,
+     "p95": 5.213759999999999,
+     "p99": 7.029456999999998,
+     "max": 11.8593
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 2.48327,
+     "min": 1.9589,
+     "median": 2.36315,
+     "p95": 3.2809549999999987,
+     "p99": 4.083723999999997,
+     "max": 7.6295
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 4.1258985,
+     "min": 1.7142,
+     "median": 3.9684999999999997,
+     "p95": 5.75753,
+     "p99": 7.779687999999999,
+     "max": 12.3538
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 3.6080880000000004,
+     "min": 3.1481,
+     "median": 3.49775,
+     "p95": 4.511164999999999,
+     "p99": 5.19703,
+     "max": 5.2996
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 600,
+     "mean": 1.0021425,
+     "min": 1.0,
+     "median": 1.0004,
+     "p95": 1.0022,
+     "p99": 1.0241339999999999,
+     "max": 1.3482
+    }
+   },
+   "capture": "2026-11-21_040556_s2check_X10.csv",
+   "log_errors": 0,
+   "log_warnings": 0,
+   "probe_lines": [
+    "Probe active: warm-up 3.000 s, capture 10.000 s, inject 1.000 ms every 1 frame(s), tag '2026-11-21_040556_s2check_X10'",
+    "BenchStart on frame 180 (world time 3.000 s)",
+    "BenchEnd on frame 780 after 600 captured frames"
+   ]
+  },
+  {
+   "step": "X0",
+   "exit_code": 0,
+   "seconds": 6.4,
+   "log": "2026-11-21_040556_s2check_X0.log",
+   "args": "-TTWarmup=3 -TTCapture=10",
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_040556_s2check_X0",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1"
+   },
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 4.0352085,
+     "min": 2.0263,
+     "median": 3.8912,
+     "p95": 4.987649999999999,
+     "p99": 6.679884999999999,
+     "max": 17.0741
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 1.4061723333333334,
+     "min": 0.9648,
+     "median": 1.306,
+     "p95": 2.023474999999995,
+     "p99": 3.248931,
+     "max": 12.1081
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 4.017554333333333,
+     "min": 2.3793,
+     "median": 3.91845,
+     "p95": 5.377539999999998,
+     "p99": 7.151658,
+     "max": 9.6819
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 3.548603666666667,
+     "min": 3.055,
+     "median": 3.42525,
+     "p95": 4.4883,
+     "p99": 5.2879,
+     "max": 5.7955
+    }
+   },
+   "capture": "2026-11-21_040556_s2check_X0.csv",
+   "log_errors": 0,
+   "log_warnings": 0,
+   "probe_lines": [
+    "Probe active: warm-up 3.000 s, capture 10.000 s, inject 0.000 ms every 1 frame(s), tag '2026-11-21_040556_s2check_X0'",
+    "BenchStart on frame 180 (world time 3.000 s)",
+    "BenchEnd on frame 780 after 600 captured frames"
+   ]
+  },
+  {
+   "step": "W128_r0_prime",
+   "exit_code": 0,
+   "seconds": 8.3,
+   "log": "2026-11-21_040556_s2check_W128_r0_prime.log",
+   "args": "-TTWarmup=3 -TTCapture=10 -TTAgents=1000 -TTSeed=1 -TTWork=128",
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_040556_s2check_W128_r0_prime",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 5.551638666666667,
+     "min": 4.6742,
+     "median": 5.3026,
+     "p95": 7.034904999999998,
+     "p99": 7.974112,
+     "max": 9.5117
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 5.542027333333333,
+     "min": 4.6247,
+     "median": 5.3056,
+     "p95": 7.005775,
+     "p99": 7.919206999999999,
+     "max": 9.2457
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 3.3187201666666666,
+     "min": 2.5119,
+     "median": 3.1007499999999997,
+     "p95": 4.705215,
+     "p99": 5.419379999999999,
+     "max": 7.5108
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 3.0791286666666666,
+     "min": 2.6808,
+     "median": 3.036,
+     "p95": 3.5376499999999997,
+     "p99": 3.9777819999999995,
+     "max": 5.0599
+    }
+   },
+   "capture": "2026-11-21_040556_s2check_W128_r0_prime.csv",
+   "log_errors": 0,
+   "log_warnings": 0,
+   "probe_lines": [
+    "Probe active: warm-up 3.000 s, capture 10.000 s, inject 0.000 ms every 1 frame(s), tag '2026-11-21_040556_s2check_W128_r0_prime'",
+    "Spawned 1000 agents (seed 1, work 128) in 43.9 ms; start-position hash 0x7F189215",
+    "BenchStart on frame 180 (world time 3.000 s)",
+    "End-state hash 0x5CA911B4 (329 state changes) at world time 13.016667 s",
+    "BenchEnd on frame 780 after 600 captured frames"
+   ]
+  },
+  {
+   "step": "W64",
+   "exit_code": 0,
+   "seconds": 7.4,
+   "log": "2026-11-21_040556_s2check_W64.log",
+   "args": "-TTWarmup=3 -TTCapture=10 -TTAgents=1000 -TTSeed=1 -TTWork=64",
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_040556_s2check_W64",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "64"
+   },
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 4.475255833333333,
+     "min": 3.5272,
+     "median": 4.39945,
+     "p95": 5.352614999999999,
+     "p99": 5.860590999999999,
+     "max": 11.708
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 4.452241666666667,
+     "min": 3.5101,
+     "median": 4.36095,
+     "p95": 5.367394999999999,
+     "p99": 6.103254,
+     "max": 11.2269
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 3.6663441666666667,
+     "min": 2.7458,
+     "median": 3.54635,
+     "p95": 4.793265,
+     "p99": 5.285422,
+     "max": 6.1653
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 3.1606765,
+     "min": 2.7263,
+     "median": 3.14415,
+     "p95": 3.5262949999999997,
+     "p99": 3.6125629999999997,
+     "max": 3.766
+    }
+   },
+   "capture": "2026-11-21_040556_s2check_W64.csv",
+   "log_errors": 0,
+   "log_warnings": 0,
+   "probe_lines": [
+    "Probe active: warm-up 3.000 s, capture 10.000 s, inject 0.000 ms every 1 frame(s), tag '2026-11-21_040556_s2check_W64'",
+    "Spawned 1000 agents (seed 1, work 64) in 38.5 ms; start-position hash 0x7F189215",
+    "BenchStart on frame 180 (world time 3.000 s)",
+    "End-state hash 0x5CA911B4 (329 state changes) at world time 13.016667 s",
+    "BenchEnd on frame 780 after 600 captured frames"
+   ]
+  },
+  {
+   "step": "W128",
+   "exit_code": 0,
+   "seconds": 8.6,
+   "log": "2026-11-21_040556_s2check_W128.log",
+   "args": "-TTWarmup=3 -TTCapture=10 -TTAgents=1000 -TTSeed=1 -TTWork=128",
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_040556_s2check_W128",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 5.920452166666666,
+     "min": 4.7051,
+     "median": 5.7946,
+     "p95": 7.302434999999998,
+     "p99": 8.638093999999999,
+     "max": 10.1093
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 5.906836666666666,
+     "min": 4.7861,
+     "median": 5.7758,
+     "p95": 7.359114999999999,
+     "p99": 8.377733,
+     "max": 9.818
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 3.5942505,
+     "min": 2.6561,
+     "median": 3.4377,
+     "p95": 4.792879999999997,
+     "p99": 5.738073999999998,
+     "max": 7.2298
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 3.1038403333333333,
+     "min": 2.7323,
+     "median": 3.0547,
+     "p95": 3.574524999999999,
+     "p99": 4.257556999999999,
+     "max": 5.2018
+    }
+   },
+   "capture": "2026-11-21_040556_s2check_W128.csv",
+   "log_errors": 0,
+   "log_warnings": 0,
+   "probe_lines": [
+    "Probe active: warm-up 3.000 s, capture 10.000 s, inject 0.000 ms every 1 frame(s), tag '2026-11-21_040556_s2check_W128'",
+    "Spawned 1000 agents (seed 1, work 128) in 47.2 ms; start-position hash 0x7F189215",
+    "BenchStart on frame 180 (world time 3.000 s)",
+    "End-state hash 0x5CA911B4 (329 state changes) at world time 13.016667 s",
+    "BenchEnd on frame 780 after 600 captured frames"
+   ]
+  },
+  {
+   "step": "W256",
+   "exit_code": 0,
+   "seconds": 9.4,
+   "log": "2026-11-21_040556_s2check_W256.log",
+   "args": "-TTWarmup=3 -TTCapture=10 -TTAgents=1000 -TTSeed=1 -TTWork=256",
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_040556_s2check_W256",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "256"
+   },
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 8.120270166666666,
+     "min": 7.559,
+     "median": 8.0076,
+     "p95": 8.862530000000001,
+     "p99": 9.478765999999998,
+     "max": 12.8621
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 8.109544,
+     "min": 7.532,
+     "median": 8.006499999999999,
+     "p95": 8.800870000000002,
+     "p99": 9.552083,
+     "max": 12.1794
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 3.0264805,
+     "min": 2.6017,
+     "median": 2.9956,
+     "p95": 3.4150849999999995,
+     "p99": 3.71541,
+     "max": 3.9512
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 2.8949556666666667,
+     "min": 2.609,
+     "median": 2.8861,
+     "p95": 3.25212,
+     "p99": 3.303708,
+     "max": 3.3473
+    }
+   },
+   "capture": "2026-11-21_040556_s2check_W256.csv",
+   "log_errors": 0,
+   "log_warnings": 0,
+   "probe_lines": [
+    "Probe active: warm-up 3.000 s, capture 10.000 s, inject 0.000 ms every 1 frame(s), tag '2026-11-21_040556_s2check_W256'",
+    "Spawned 1000 agents (seed 1, work 256) in 41.6 ms; start-position hash 0x7F189215",
+    "BenchStart on frame 180 (world time 3.000 s)",
+    "End-state hash 0x5CA911B4 (329 state changes) at world time 13.016667 s",
+    "BenchEnd on frame 780 after 600 captured frames"
+   ]
+  },
+  {
+   "step": "W128_repeat",
+   "exit_code": 0,
+   "seconds": 8.4,
+   "log": "2026-11-21_040556_s2check_W128_repeat.log",
+   "args": "-TTWarmup=3 -TTCapture=10 -TTAgents=1000 -TTSeed=1",
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_040556_s2check_W128_repeat",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 6.048794333333333,
+     "min": 5.1533,
+     "median": 5.9404,
+     "p95": 7.115729999999998,
+     "p99": 7.700073,
+     "max": 10.1797
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 6.034957333333334,
+     "min": 5.2032,
+     "median": 5.91745,
+     "p95": 7.123219999999999,
+     "p99": 7.7426960000000005,
+     "max": 9.5509
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 3.612543333333333,
+     "min": 2.826,
+     "median": 3.51495,
+     "p95": 4.580655,
+     "p99": 5.077103,
+     "max": 5.4727
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 2.968119333333333,
+     "min": 2.6596,
+     "median": 2.94665,
+     "p95": 3.311185,
+     "p99": 3.468314,
+     "max": 3.5493
+    }
+   },
+   "capture": "2026-11-21_040556_s2check_W128_repeat.csv",
+   "log_errors": 0,
+   "log_warnings": 0,
+   "probe_lines": [
+    "Probe active: warm-up 3.000 s, capture 10.000 s, inject 0.000 ms every 1 frame(s), tag '2026-11-21_040556_s2check_W128_repeat'",
+    "Spawned 1000 agents (seed 1, work 128) in 36.7 ms; start-position hash 0x7F189215",
+    "BenchStart on frame 180 (world time 3.000 s)",
+    "End-state hash 0x5CA911B4 (329 state changes) at world time 13.016667 s",
+    "BenchEnd on frame 780 after 600 captured frames"
+   ]
+  }
+ ]
+}

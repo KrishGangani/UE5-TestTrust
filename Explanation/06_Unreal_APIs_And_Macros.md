@@ -16,6 +16,13 @@
 | 7 | `-ReportExportPath=` and `index.json` | Phase 4 |
 | 8 | UnrealBuildTool from the command line: `Build.bat`, `-WaitMutex`, `-Log=` | Phase 2 / 4 |
 | 9 | `FVector::DistSquared` | Phase 4 |
+| 10 | `UCLASS`, `GENERATED_BODY`, `MinimalAPI`, `UE_INLINE_GENERATED_CPP_BY_NAME` | S1 |
+| 11 | `UWorldSubsystem` / `UTickableWorldSubsystem` | S1 |
+| 12 | CSV profiler macros: `CSV_DEFINE_CATEGORY`, `CSV_EVENT`, `CSV_METADATA`, `CSV_SCOPED_TIMING_STAT` | S1 |
+| 13 | `FParse::Param` / `FParse::Value` / `FCommandLine::Get` | S1 |
+| 14 | `FPlatformTime::Seconds`, `FPlatformMisc::RequestExit` | S1 |
+| 15 | `DEFINE_LOG_CATEGORY_STATIC`, `UE_LOG` | S1 |
+| 16 | `GFrameCounter` | S1 (after S2's altitude review) |
 
 ---
 
@@ -132,3 +139,80 @@
 6. **Common mistakes.** Comparing a squared distance with an unsquared range.
 7. **Example.** `FVector::DistSquared(A, B) <= Range * Range`
 8. **In this project.** `FTTSampleRules::IsInRange`, where its `<=` is the deliberately unprotected boundary.
+
+## 10. `UCLASS`, `GENERATED_BODY`, `MinimalAPI` and `UE_INLINE_GENERATED_CPP_BY_NAME`
+
+1. **What it is.** `UCLASS()` marks a class for the reflection system; `GENERATED_BODY()` is where UnrealHeaderTool pastes the generated boilerplate; `MinimalAPI` exports only what the class needs to be used from other modules; `#include UE_INLINE_GENERATED_CPP_BY_NAME(X)` pulls the generated `X.gen.cpp` into our `.cpp`.
+2. **Why it exists.** UObjects need run-time type information (class objects, CDOs, garbage-collection data) that C++ doesn't provide; UHT generates it from the markup.
+3. **How it works.** UHT parses every header with reflection markup (`01b #2`) and writes `X.generated.h` (which must be the last include of the header) and the `.gen.cpp`. With `MinimalAPI`, the class itself isn't exported; members marked `UE_API` are (`04` §10).
+4. **When to use it.** Every class deriving from `UObject` (subsystems, components, actors).
+5. **When not to.** Plain data and helpers (`FTTProbeWindow`, `FTTProbeOptions`): no reflection, no GC, cheaper and testable without a world.
+6. **Common mistakes.** Including another header after `.generated.h`; forgetting `GENERATED_BODY()`; exporting a whole class with `<MODULE>_API` when only a few members are called from outside.
+7. **Example.** `UCLASS(MinimalAPI) class UMySubsystem : public UWorldSubsystem { GENERATED_BODY() public: UE_API virtual void OnWorldBeginPlay(UWorld& W) override; };`
+8. **In this project.** `UTTProbeSubsystem` (S1). Every change to its header re-runs UHT; changes to `TTProbeSubsystem.cpp` don't (the same rule the mutation runner exploits).
+
+## 11. `UWorldSubsystem` and `UTickableWorldSubsystem`
+
+1. **What it is.** A subsystem whose lifetime is one `UWorld`; the tickable variant also derives from `FTickableGameObject` (`Runtime/Engine/Public/Subsystems/WorldSubsystem.h:80`).
+2. **Why it exists.** World-level services (managers, directors) without placing an actor in every map.
+3. **How it works.** The engine creates one instance per world for every subsystem class whose `DoesSupportWorldType` accepts the world. `OnWorldBeginPlay` runs when play starts. The tickable variant reports `ETickableTickType::Never` until `Initialize` has run, then `Conditional` (`Runtime/Engine/Private/Subsystems/WorldSubsystem.cpp:68–78`); its `Tick` runs on the game thread after `TG_PostPhysics` (`Runtime/Engine/Private/LevelTick.cpp:1821`).
+4. **When to use it.** One-per-world logic with no transform and no need for a specific tick group.
+5. **When not to.** Per-object state (use a component); logic that must run in a specific tick group (use a custom `FTickFunction`, as UE5-UpdateBudget's scheduler does).
+6. **Common mistakes.** Not calling `Super::` in `Initialize`/`Deinitialize`/`Tick` (the tickable base then never ticks, or asserts); accepting editor worlds, so the code runs while maps are edited; forgetting `GetStatId()` (pure virtual).
+7. **Example.** `bool DoesSupportWorldType(const EWorldType::Type T) const override { return T == EWorldType::Game || T == EWorldType::PIE; }`
+8. **In this project.** `UTTProbeSubsystem`: Game worlds only, and not created at all without `-TTProbe` (it overrides `ShouldCreateSubsystem`, `Runtime/Engine/Public/Subsystems/WorldSubsystem.h:34`, and calls `Super` so the world-type filter still applies); options read in `OnWorldBeginPlay`; the window and the injected cost in `Tick`. `UTTWorkloadSubsystem` (S2): Game and PIE, so the workload can be watched in the editor.
+
+## 12. The CSV profiler: `CSV_DEFINE_CATEGORY`, `CSV_EVENT`, `CSV_METADATA`, `CSV_SCOPED_TIMING_STAT`
+
+1. **What it is.** Macros that write per-frame columns, events and run metadata into a CSV capture (`Runtime/Core/Public/ProfilingDebugging/CsvProfiler.h:50, 56, 85, 120`).
+2. **Why it exists.** Frame-by-frame numbers for whole runs, cheap enough to leave on in Development and Test builds.
+3. **How it works.** `CSV_DEFINE_CATEGORY(Name, bOnByDefault)` declares a category; `CSV_SCOPED_TIMING_STAT(Cat, Stat)` times its scope into a column named `Cat/<Thread>/Stat` (seen in S1's capture: `TestTrustProbe/GameThread/Injected`); `CSV_EVENT(Cat, Text)` records an event in the frame's `EVENTS` cell and also writes a log line (`CsvProfiler.cpp:4797–4799`); `CSV_EVENT_NOLOG` (`CsvProfiler.h:64`) records it without the log line; `CSV_METADATA(Key, Value)` adds a pair to the trailing metadata row. A capture can start and stop on events: `-csvStartOnEvent=`, `-csvStopOnEvent=` (`Runtime/Core/Private/ProfilingDebugging/CsvProfiler.cpp:5081, 5090`).
+4. **When to use it.** Anything a benchmark must read per frame.
+5. **When not to.** Per-object stats in a hot loop (UE5-UpdateBudget measured about 50 ns per `CSV_CUSTOM_STAT`); Shipping builds (the profiler is compiled out).
+6. **Common mistakes.** A category defined twice in one module (unity builds join files); looking for a timing stat as `Cat/Stat` instead of `Cat/<Thread>/Stat`; expecting the start event inside a capture that it starts (it is on the frame before the first captured row); expecting a column on frames where the stat never ran (the cell is empty); reading metadata keys with their original case (the file lower-cases them).
+7. **Example.** `{ CSV_SCOPED_TIMING_STAT(MyCat, Work); DoWork(); }`
+8. **In this project.** Category `TestTrustProbe`: events `BenchStart` (`CSV_EVENT`, outside the capture) and `BenchEnd` (`CSV_EVENT_NOLOG`, because its frame is the last measured one) open and close the gate's capture window; column `TestTrustProbe/GameThread/Injected` shows the injected cost; metadata `TTRunTag`, `TTWarmup`, `TTCapture`, `TTInjectMs`, `TTInjectEvery`.
+
+## 13. `FParse::Param`, `FParse::Value` and `FCommandLine::Get`
+
+1. **What it is.** Command-line helpers: `Param` tests for a `-Switch`; `Value` reads `Key=value` into a typed variable (`Runtime/Core/Public/Misc/Parse.h:58, 60, 71, 127`).
+2. **Why it exists.** Benchmarks and tools configure a run without editing config files.
+3. **How it works.** `Value` searches the string for the key (the key includes the `=`), then parses the token after it; it returns false and leaves the variable alone if the key is missing.
+4. **When to use it.** Per-run options of a benchmark or tool.
+5. **When not to.** Settings a designer should edit (use `UDeveloperSettings` or config).
+6. **Common mistakes.** Forgetting that `Value` is a substring search (`TTWarmup=` would also match `XTTWarmup=`); expecting quotes to group a value with spaces unless the value is quoted on the command line.
+7. **Example.** `double Seconds = 5.0; FParse::Value(FCommandLine::Get(), TEXT("TTWarmup="), Seconds);`
+8. **In this project.** `FTTProbeOptions::FromCommandLine` takes the string as a parameter, so the test feeds it a fake command line.
+
+## 14. `FPlatformTime::Seconds` and `FPlatformMisc::RequestExit`
+
+1. **What it is.** A high-resolution wall clock (`Runtime/Core/Public/Windows/WindowsPlatformTime.h:23`, QueryPerformanceCounter) and a request to quit the application (`Runtime/Core/Public/GenericPlatform/GenericPlatformMisc.h:1086`).
+2. **Why it exists.** Timing that doesn't depend on the game's (possibly fixed) delta; an orderly exit from code.
+3. **How it works.** `Seconds()` returns a `double` in seconds since an arbitrary start. `RequestExit(false, CallSite)` asks the engine loop to finish the frame and shut down normally; `true` would force an immediate exit.
+4. **When to use it.** Measuring real elapsed time; ending a scripted run.
+5. **When not to.** Simulation timing (use the world's delta, which is deterministic under `-deterministic`); forcing an exit while files are still being written.
+6. **Common mistakes.** Mixing world time and wall time; exiting on the same frame as the last CSV event, before the profiler has written its file.
+7. **Example.** `const double T0 = FPlatformTime::Seconds(); Work(); const double Ms = (FPlatformTime::Seconds() - T0) * 1000.0;`
+8. **In this project.** `FTTInjectionSchedule::Spin` busy-waits on `Seconds()`; the probe calls `RequestExit(false, …)` three frames after `BenchEnd`.
+
+## 15. `DEFINE_LOG_CATEGORY_STATIC` and `UE_LOG`
+
+1. **What it is.** A log category visible in one `.cpp` file, and the logging macro.
+2. **Why it exists.** Logs that can be filtered by category and verbosity.
+3. **How it works.** `DEFINE_LOG_CATEGORY_STATIC(LogX, Log, All)` declares and defines the category with a default verbosity (`Log`) and a compile-time maximum (`All`). `UE_LOG(LogX, Display, TEXT("…"), args)` formats printf-style.
+4. **When to use it.** Messages tools parse, and diagnostics.
+5. **When not to.** Inside hot per-frame loops (formatting costs time); `Warning` or `Error` for normal events, because the smoke checks count them.
+6. **Common mistakes.** `%s` with an `FString` instead of `*MyString`; a `Warning` that fires every run and hides real ones.
+7. **Example.** `UE_LOG(LogTTProbe, Display, TEXT("BenchStart on frame %lld"), FrameIndex);`
+8. **In this project.** `LogTTProbe`: `Probe active…`, `BenchStart on frame…`, `BenchEnd on frame…`, all at `Display`, which `run_checks.py` reads back.
+
+## 16. `GFrameCounter`
+
+1. **What it is.** The engine's frame number, a `uint64` (`Runtime/Core/Public/CoreGlobals.h:532`).
+2. **Why it exists.** One frame index that every system on the game thread agrees on.
+3. **How it works.** `FEngineLoop::Tick` adds 1 once per frame (`Runtime/Launch/Private/LaunchEngineLoop.cpp:6131`), after the engine and every world have ticked (`GEngine->Tick` at `:5859`), so it has the same value in every tick function of one frame.
+4. **When to use it.** "Has a frame passed since X?" across objects whose tick order isn't fixed.
+5. **When not to.** Time (frames aren't seconds); render-thread code (it has its own counter).
+6. **Common mistakes.** Counting frames with a per-object counter that one object increments in its own tick: another object sees the old or the new value depending on tick order.
+7. **Example.** `bool bLater = GFrameCounter > RecordedFrame;`
+8. **In this project.** `UTTProbeSubsystem` records it on the `BenchEnd` frame; `IsCaptureDone()` is true only on later frames, whatever order the probe and the workload tick in.
