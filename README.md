@@ -2,7 +2,7 @@
 
 **Domain:** Debugging & automated testing · **Difficulty:** ★★★★☆ · **Engine:** UE 5.8.4
 
-> **Status: planned, not started.** The projects in this portfolio are built one at a time, and this one starts after the projects before it are complete. Everything below is the plan. The success criteria are **targets fixed before any code exists, not results**. Real numbers will only come from controlled before/after runs, each traceable to a raw benchmark batch.
+> **Status: planned; Phases 1–3 (problem analysis, research, architecture) are starting.** The ten projects are developed in parallel, and every Unreal Engine build and benchmark runs one at a time on the same machine, so measurements stay clean. Everything below is the plan. The success criteria are **targets fixed before any code exists, not results**. Real numbers will only come from controlled before/after runs, each traceable to a raw benchmark batch.
 
 ## The problem
 
