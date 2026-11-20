@@ -138,3 +138,19 @@ switch (Event) { case E::Start: Begin(); break; case E::Stop: End(); break; defa
 ```
 - Each `case` needs its `break`, or execution falls through into the next one.
 - **In our code:** `UTTProbeSubsystem::Tick` switches on the window's event; the exit countdown lives in `default`, so it runs on ordinary frames only, never on the `BenchEnd` frame itself.
+
+## 15. A function-local `static`
+
+```cpp
+AMyActor::AMyActor() { static ConstructorHelpers::FObjectFinder<UStaticMesh> Cube(TEXT("/Engine/BasicShapes/Cube.Cube")); }
+```
+- A `static` variable inside a function is constructed once, the first time execution reaches it (thread-safe since C++11), and lives until the program ends; later calls reuse it.
+- **In our code:** `ATTWorkloadAgent`'s constructor runs once per agent (1,000 times in a gate run), but the cube lookup runs once.
+
+## 16. Out-parameters: non-`const` reference parameters
+
+```cpp
+uint32 HashState(int32& OutStateChanges) const;
+```
+- A non-`const` reference (`int32&`) lets the function write a second result into the caller's variable; the `Out` prefix is Unreal's naming convention for it. The trailing `const` promises the function doesn't change the object.
+- **In our code:** `UTTWorkloadSubsystem::HashState` returns the hash and writes the total state-change count, both logged on one line.

@@ -398,6 +398,59 @@ The arithmetic of a gate run, kept free of UObjects so it can be tested frame by
 | `packaged_run()` | Deletes `GameUserSettings.ini` first (it can override VSync and frame-rate caps), launches `TestTrust.exe` with the gate arguments (fixed step 60, 1280×720 windowed, `-novsync`, `-nosound`, `-traceautostart=0`, CSV start and stop on the probe's events, `-TTProbe -TTExit`), then moves the newest CSV into `Benchmarks\Raw\`, analyses it, and keeps the probe's log lines |
 | `step_s1()` | Two runs with the same 3 s warm-up and 10 s capture: `X10` (1.0 ms injected per frame) and `X0` (none). Expected: 600 captured frames each; `BenchStart` on frame 180; `Injected` ≈ 1.0 ms only in `X10`; `GameThreadTime` higher by about 1.0 ms in `X10`. Results in `09` S1 |
 
+
+---
+
+## Part F · Step S2: the deterministic workload (`Source\TestTrust\`)
+
+The gate needs a workload whose frames cost the same in every run and whose cost is on the game thread, so that an injected 0.25 ms shows up in `GameThreadTime`. It is adapted from UE5-UpdateBudget's demo (`b890bc6`): the same "sense → decide → act" agent and compute knob, without that project's budget scheduler. It lives in the **game module**, not in the plugin: the plugin is the reusable part (window, injection, metadata, exit), and any project brings its own workload (`02` §4.2).
+
+### F1. `Public\TTWorkloadBrainComponent.h` and `Private\TTWorkloadBrainComponent.cpp`
+
+| Line | What it does, and why |
+|---|---|
+| `UENUM() enum class ETTBrainState : uint8 { Patrol, Alert }` | The agent's state. `UENUM` makes it visible to reflection (and so to the details panel and the debugger's watch formatting); `uint8` keeps it one byte (`04` §12) |
+| `UCLASS(ClassGroup = (TestTrust)) class UTTWorkloadBrainComponent : public UActorComponent` | A component, so the per-agent work ticks once per agent through the engine's own tick system, as gameplay code usually does. `ClassGroup` only sorts it in the editor's "Add Component" menu |
+| Constructor: `PrimaryComponentTick.bCanEverTick = true; TickGroup = TG_PrePhysics` | Components don't tick unless asked (`bCanEverTick` defaults to false, `Runtime/Engine/Classes/Engine/EngineBaseTypes.h:213`). `TG_PrePhysics` (`EngineBaseTypes.h:86`) is where UE5-UpdateBudget's native baseline ran; it is before the probe's tick (after `TG_PostPhysics`), but both are inside the game thread's frame, so both count in `GameThreadTime` |
+| `InitPatrol(Center, Phase)` | Sets the patrol circle. Called between `SpawnActorDeferred` and `FinishSpawning`, so the brain is set up before `BeginPlay` and before its first tick |
+| `SetComputeIterations` / `GetComputeIterations` | The calibration knob, clamped to ≥ 0. The getter is also read from the class default object, so the workload subsystem knows the default without spawning anything |
+| `GetPatrolPosition(TotalTime)` | The patrol position as a closed-form function of time: the subsystem places each agent at its time-0 position, so the start-position hash doesn't depend on the first tick |
+| `TickComponent`: `PatrolTime += DeltaTime` | Accumulated time. Under `-deterministic` (fixed step 1/60 s), every run adds the same floats in the same order, so every run computes the same positions to the bit |
+| One angle → `Cos`, `Sin`, `Position`, `Forward` | Position and walking direction (the tangent of a counter-clockwise circle) from one pair of trig calls |
+| **Sense:** `GetFirstPlayerController()`, `PlayerCameraManager`, `GetCameraLocation()` | Each agent asks for the player's camera itself, as real perception code would; that per-agent lookup is part of the deliberate workload. The cone test compares `dot(F, v) > cos · |v|`, which equals the normalised test without a division |
+| **Decide:** `Patrol` ↔ `Alert`, `++StateChanges` | A state that depends on the camera's path, so two runs agree only if they sensed the same thing; the state-change count goes into the end-state hash |
+| **Act:** `SetActorLocationAndRotation(Position, FacingDirection.Rotation())` | One transform update per frame (location and rotation together, so the scene is updated once, not twice) |
+| The compute loop, stored in `ComputeSink` | Stand-in for heavier logic: `ComputeIterations` rounds of `Fmod(Sink * 1.000123 + Sin(Sink + i), 1000)`. Storing the result in a member keeps the optimiser from deleting the loop. Calibrated in S2 (`09`) so the frame is game-thread bound |
+
+### F2. `Public\TTWorkloadAgent.h` and `Private\TTWorkloadAgent.cpp`
+
+| Line | What it does, and why |
+|---|---|
+| `PrimaryActorTick.bCanEverTick = false` | The actor itself has no per-frame work; only its brain ticks, so the tick count is one per agent |
+| `CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"))`, `RootComponent = Mesh` | The visible cube, as the root, so moving the actor moves the mesh |
+| `SetCollisionEnabled(NoCollision)`, `SetGenerateOverlapEvents(false)`, `SetCastShadow(false)` | The gate measures gameplay logic, not physics, overlaps or shadow rendering: these keep the cost on the game thread's gameplay code |
+| `static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"))` | Engine content loaded in the constructor (`Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h:77`). `static`: the lookup runs once per class, not once per agent. The packaged build contains the cube because `Config\DefaultGame.ini` lists `+DirectoriesToAlwaysCook=(Path="/Engine/BasicShapes")` |
+| `Brain = CreateDefaultSubobject<UTTWorkloadBrainComponent>(TEXT("Brain"))` | The brain, created with the actor; `UPROPERTY` + `TObjectPtr` keep both components visible to the garbage collector |
+
+### F3. `Public\TTWorkloadSubsystem.h` and `Private\TTWorkloadSubsystem.cpp`
+
+| Line | What it does, and why |
+|---|---|
+| `struct FTTWorkloadOptions` and `FromCommandLine(CommandLine)` | `-TTAgents=` (0 to 20,000; 0 = no workload), `-TTSeed=`, `-TTWork=` (≥ 0). **Simplify pass:** the defaults come first (the work default is read from the brain's class default object, `GetDefault<UTTWorkloadBrainComponent>()`), then the command line, then the clamps: the probe's own pattern. The first version kept a `-1` "use the default" sentinel plus a second `EffectiveComputeIterations` member; now `Options` holds the value actually used. A negative `-TTWork=` now means 0, no longer "the default" |
+| `ShouldCreateSubsystem`: `Super::…` and `NumAgents > 0` | **Code review:** without `-TTAgents` there is no subsystem at all, so a normal game or PIE session pays nothing (the same gate as the probe's `-TTProbe`) |
+| `DoesSupportWorldType`: Game and PIE | Unlike the probe, the workload is harmless in PIE (it never quits the process), so it can be watched in the editor with `-TTAgents=` on the editor's command line |
+| `OnWorldBeginPlay`: options, `SpawnAgents`, the spawn log line, the camera, `CSV_METADATA` | Spawning in `OnWorldBeginPlay`, so it happens during the warm-up, never in the capture. The log line (`Spawned N agents (seed, work) in X ms; start-position hash 0x…`) is what the determinism check reads. Metadata `TTAgents`, `TTSeed`, `TTWork` sit next to the probe's in the capture |
+| `TTWorkload::ArenaHalfExtent(Count)` | Half the width of the square grid, shared by the spawn and the camera path. **Simplify pass:** the camera radius is computed once in `OnWorldBeginPlay`, not every frame from a member that `SpawnAgents` set as a side effect |
+| `SpawnAgents`: `FRandomStream Random(Options.Seed)` | A seeded linear congruential generator (`Runtime/Core/Public/Math/RandomStream.h:19, 364`): the same seed gives the same jitter and phases on every machine and run, unlike `FMath::FRand` |
+| `SpawnActorDeferred` … `InitPatrol` … `FinishSpawning(FTransform(StartPosition))` | Deferred spawn (`Runtime/Engine/Classes/Engine/World.h:3851`, `Runtime/Engine/Classes/GameFramework/Actor.h:3117`): the actor exists but hasn't run its construction script or `BeginPlay`, so the brain is configured first. `AlwaysSpawn`: agents never collide, so there is nothing to adjust |
+| `PositionHash = FCrc::TypeCrc32(FVector3f(StartPosition), PositionHash)` | A running CRC over the bytes of each start position (`Runtime/Core/Public/Misc/Crc.h:36`); chaining gives one CRC over all positions without buffering them. `FVector3f`: 12 bytes with no padding, so the bytes hashed are exactly the three coordinates |
+| `Tick`: `UpdateCamera(GetWorld()->GetTimeSeconds() - BeginPlayTime)` | The camera's path depends only on world time, which is the same in every fixed-step run, so the agents sense the same camera in every run |
+| `Tick`: end-of-run report when `Probe->IsCaptureDone()`, once (`bEndReported`) | The determinism check: `HashState` over every agent's location, rotation and state-change count, logged as `End-state hash 0x… (N state changes) at world time T s`. **Altitude review:** the first version waited one extra tick with a three-state counter, because the probe said "done" already on the last captured frame and the two subsystems tick in no guaranteed order, so the hashed frame depended on the order. The fix moved into the probe: `IsCaptureDone()` is true only from the first frame after `BenchEnd` (E2), so the report always lands on that frame, outside the capture, in either order |
+| `HashState(OutStateChanges)` | **Code review:** the position alone is a closed-form function of time and would match even if two runs sensed or decided differently; adding rotation (which faces the player when alert) and the state-change count makes the hash notice that |
+| `UpdateCamera`: a circle of `CameraRadius`, 4 m up, pitch −15°, one lap per 20 s | Spawned as an `ACameraActor` and made the view target. Re-applied each frame only if something else changed the view target (`APlayerController::SetViewTarget`, `Runtime/Engine/Classes/GameFramework/PlayerController.h:2154`), so the default pawn can't take the view back |
+| `GetStatId()` | As in the probe: required by `FTickableGameObject` |
+
+
 ---
 
 ## Part H · Step S7: tests written from survivors, applied as a patch

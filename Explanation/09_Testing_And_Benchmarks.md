@@ -165,6 +165,35 @@ The prediction was committed (`c18936d`) before the run.
 
 **Re-check of the reviewed code.** The fixes were built and run again inside S2's check job (batch `2026-11-21_040556_s2check`, queue job `20261121_034607_ca7fdd`, **ok, exit 0, 179.8 s**; the plugin doesn't depend on the game module, so the combined build checks it as it is committed here): both builds **0 warnings**, **13 of 13 tests pass**, and the same two runs again give 600 frames, `BenchStart` on frame 180, `BenchEnd` on frame 780 after 600 captured frames, 0 log errors or warnings, `Injected` median 1.000 ms [1.000–1.348], and `GameThreadTime` median 2.363 vs 1.306 ms (+1.06), mean 2.483 vs 1.406 ms (+1.08).
 
+## Phase 5 · S2: the workload, determinism and calibration (2026-11-21)
+
+**The check.** Batch `2026-11-21_040556_s2check` (`Tools\run_checks.py s2`), queue job `20261121_034607_ca7fdd`: **ok, exit 0, 179.8 s**. Both builds **0 warnings, 0 errors**; **13 of 13** tests pass; packaged build ok; the two S1 runs again (S1 above); then five packaged runs with N = 1,000 agents, seed 1, 3 s warm-up and 10 s capture, pinned to `0xFFFF`. Every run: 600 frames, finalised, `BenchEnd` present, 0 log errors or warnings.
+
+**Calibration** (`02` §7 fixed W = 128 iterations from UE5-UpdateBudget; S2 checks it on this workload before any gate data):
+
+| Run | `-TTWork` | `GameThreadTime` median [p95] | `FrameTime` median | `RenderThreadTime` median | `GPUTime` median |
+|---|---|---|---|---|---|
+| `W128_r0_prime` (first run after packaging) | 128 | 5.306 [7.006] ms | 5.303 ms | 3.101 ms | 3.036 ms |
+| `W64` | 64 | 4.361 [5.367] ms | 4.399 ms | 3.546 ms | 3.144 ms |
+| `W128` | 128 | 5.776 [7.359] ms | 5.795 ms | 3.438 ms | 3.055 ms |
+| `W256` | 256 | 8.006 [8.801] ms | 8.008 ms | 2.996 ms | 2.886 ms |
+| `W128_repeat` (no `-TTWork`: the class default) | 128 | 5.917 [7.123] ms | 5.940 ms | 3.515 ms | 2.947 ms |
+
+- **Chosen: W = 128, unchanged.** The frame is game-thread bound (`FrameTime` within 0.03 ms of `GameThreadTime`), with about 2.3 ms between the game thread and the render thread, so an injected game-thread cost lands one for one in the frame. W = 64 is also game-thread bound, but only about 0.8 ms above the render thread. At 5.8 ms the injected sizes are 4.3%, 8.6% and 17% of the game thread.
+- **The compute step scales as expected:** +64 iterations cost about 1.4 ms; +128 cost about 2.2 ms.
+- `W128_repeat` left out `-TTWork`; its metadata says `ttwork 128`, so the class-default path works.
+- **A first look at run-to-run noise** (three runs, so only a hint): the W = 128 medians were 5.306, 5.776 and 5.917 ms. The first run after packaging was about 0.5 ms faster than the next two, which were 0.14 ms apart. Its cause is not known yet **[unverified]**. S4's stored baseline and interleaved batches measure the spread properly, and every batch starts with a discarded priming run.
+- Each run took 6–10 s of wall time for 13 s of world time: the fixed step runs faster than real time when a frame takes less than 16.7 ms.
+
+**Determinism** (packaged build, five runs, three different compute sizes):
+- **Start-position hash `0x7F189215` in all five runs.** Spawning 1,000 agents took 36.7–47.2 ms, during the warm-up.
+- **End-state hash `0x5CA911B4`, with 329 state changes, in all five runs.** The hash covers location, rotation and state changes, not the compute step's result, so W = 64, 128 and 256 agree too: the compute step changes the cost, not the behaviour.
+- Every end-state line was logged at world time 13.016667 s, which is frame 781, the first frame after `BenchEnd` on frame 780. So the report is outside the capture. In this build the workload ticked before the probe in that frame (its line comes before the probe's `BenchEnd on frame 780` line); `GFrameCounter` makes the frame the same in either order (`05` F3).
+- **In the editor:** batch `2026-11-21_041111_s2editorcheck` (`run_checks.py s2editor`), queue job `20261121_035052_81920c`: **ok, exit 0, 99.4 s** (no-op builds, 13 of 13 tests, package, then two uncooked runs in the editor's `-game -nullrhi` mode, same seed). Start-position hash `0x7F189215`, the same as packaged, and end-state hash `0xA11AE791` with 329 state changes in **both** runs.
+- **Deterministic within each build, not bit-identical across builds.** The editor's end state differs from the packaged build's `0x5CA911B4`, although the start positions and the 329 state changes agree. The editor runs modular DLLs, built differently from the monolithic packaged game, and the per-frame trigonometry and transform maths can round differently in the last bits between such builds **[inferred; which component differs was not isolated]**. The gate only ever compares packaged runs with packaged runs, so this doesn't affect it; it is a limit of the determinism claim.
+
+**Audit (before the commit).** Code review (medium): no subsystem without `-TTAgents` (`ShouldCreateSubsystem`); the compute-step value in the metadata is the one actually used, also from the class default; the hash covers rotation and state changes, not only positions; the end-of-run report stays out of the capture. Simplify (4 reviewers): one options struct with the resolved compute value instead of a sentinel plus a second member; one `bEndReported` flag; the camera radius computed once; an unused getter removed. Altitude: `IsCaptureDone()` moved onto `GFrameCounter` in the probe, instead of a three-state counter in the workload (`05` E2, F3). Skipped: caching the probe subsystem and the player controller (tens of nanoseconds per frame); spawning at the start position directly (warm-up only); `bAutoManageActiveCameraTarget` instead of re-applying the view target (a behaviour change with no measured benefit). Reuse: nothing to change.
+
 ## Phase 5 · S6: UE5-UpdateBudget "before" (M-P1, 2026-11-21)
 
 **Order note:** S6–S8 need only the runner, so they were queued at the start of Phase 5, while S1 was being written, to use the machine's queue time; their order relative to S1–S5 doesn't affect any result. S6 was captured **before** any new test existed (`03` rule: baselines before the new thing).

@@ -47,6 +47,18 @@
 | A probe that runs in every game | Normal play gets the injected cost or an unexpected exit | Off unless `-TTProbe` is on the command line | The `Options.Parse` test: no `-TTProbe`, not enabled |
 | Accepting editor worlds in `DoesSupportWorldType` | Events and spins while someone edits a map | Game and PIE only | — |
 
+## Workload (`Source\TestTrust\`)
+
+| Mistake | How to spot it | How to prevent it | How to debug it |
+|---|---|---|---|
+| ⚠ caught (code review): **a determinism hash over positions only.** The patrol position is a closed-form function of time, so it matches even when two runs sensed or decided differently | Two runs with different behaviour still report equal hashes | Hash rotation and the state-change count as well | Log the state-change count next to the hash |
+| ⚠ caught (code review): **an end-of-run report inside the capture.** Logging the hash on the `BenchEnd` frame adds a variable cost to the last measured frame | A last-frame outlier | Report only once `IsCaptureDone()` is true, which is from the first frame after `BenchEnd` | Compare the frame the hash line names with the probe's `BenchEnd on frame` line |
+| ⚠ caught (altitude review): **a frame counter kept by one tickable and read by another.** Two subsystems tick in no guaranteed order, so the reader sees the old or the new count | The report moves by one frame when the tick order changes | Compare `GFrameCounter` values (`06` §16) | Log `GFrameCounter` in both ticks |
+| ⚠ caught (code review): **a workload subsystem in every game.** Without `ShouldCreateSubsystem`, every session would create (and tick) it | A tickable in `stat` views of a normal session | `ShouldCreateSubsystem` returns false without `-TTAgents` | — |
+| `FMath::FRand` instead of a seeded `FRandomStream` | The start-position hash differs between runs | `FRandomStream(Seed)` for every random draw | Compare the `start-position hash` lines of two runs |
+| Engine content missing from the packaged build | Agents invisible in the packaged game; a load warning in the log | `DirectoriesToAlwaysCook` for `/Engine/BasicShapes` | Search the packaged log for `Cube` |
+| Spawning during the capture | Spawn cost in the measured frames | Spawn in `OnWorldBeginPlay`; the warm-up covers it | The spawn log line's time against `BenchStart` |
+
 ## Sample module (`TestTrustSample`)
 
 | Mistake | How to spot it | How to prevent it | How to debug it |

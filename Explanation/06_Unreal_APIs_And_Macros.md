@@ -23,6 +23,11 @@
 | 14 | `FPlatformTime::Seconds`, `FPlatformMisc::RequestExit` | S1 |
 | 15 | `DEFINE_LOG_CATEGORY_STATIC`, `UE_LOG` | S1 |
 | 16 | `GFrameCounter` | S1 (after S2's altitude review) |
+| 17 | `UActorComponent::TickComponent`, `PrimaryComponentTick`, tick groups | S2 |
+| 18 | `UWorld::SpawnActorDeferred` / `AActor::FinishSpawning` | S2 |
+| 19 | `FRandomStream` | S2 |
+| 20 | `FCrc::TypeCrc32` | S2 |
+| 21 | `ConstructorHelpers::FObjectFinder`, `DirectoriesToAlwaysCook` | S2 |
 
 ---
 
@@ -216,3 +221,58 @@
 6. **Common mistakes.** Counting frames with a per-object counter that one object increments in its own tick: another object sees the old or the new value depending on tick order.
 7. **Example.** `bool bLater = GFrameCounter > RecordedFrame;`
 8. **In this project.** `UTTProbeSubsystem` records it on the `BenchEnd` frame; `IsCaptureDone()` is true only on later frames, whatever order the probe and the workload tick in.
+
+## 17. `UActorComponent::TickComponent`, `PrimaryComponentTick` and tick groups
+
+1. **What it is.** A component's per-frame function (`Runtime/Engine/Classes/Components/ActorComponent.h:976`) and its tick settings (`ActorComponent.h:177`): whether it can tick (`bCanEverTick`, `Runtime/Engine/Classes/Engine/EngineBaseTypes.h:213`) and in which group (`TickGroup`, `EngineBaseTypes.h:196`; groups from `:83`).
+2. **Why it exists.** Per-object behaviour that the engine schedules, orders and can disable per object.
+3. **How it works.** Every registered tick function in a group runs on the game thread before the next group starts; `TG_PrePhysics` runs before the physics step, `TG_PostPhysics` after it. A component ticks only if `bCanEverTick` was set in its constructor.
+4. **When to use it.** Per-object logic that must run every frame.
+5. **When not to.** Logic that can be event-driven or run less often; thousands of objects whose total cost needs a budget (UE5-UpdateBudget's scheduler is the alternative).
+6. **Common mistakes.** Setting `bCanEverTick` after construction (too late); forgetting `Super::TickComponent`; assuming an order between objects in the same group (there is none unless prerequisites are added).
+7. **Example.** `PrimaryComponentTick.bCanEverTick = true; PrimaryComponentTick.TickGroup = TG_PrePhysics;`
+8. **In this project.** `UTTWorkloadBrainComponent` (S2): one tick per agent in `TG_PrePhysics`; the actor itself has `PrimaryActorTick.bCanEverTick = false`.
+
+## 18. `UWorld::SpawnActorDeferred` and `AActor::FinishSpawning`
+
+1. **What it is.** A spawn split in two: create the actor (`Runtime/Engine/Classes/Engine/World.h:3851`), then finish it (`Runtime/Engine/Classes/GameFramework/Actor.h:3117`).
+2. **Why it exists.** To set properties on an actor before its construction script and `BeginPlay` run.
+3. **How it works.** `SpawnActorDeferred` returns the actor with its components created but not yet finished; `FinishSpawning(Transform)` runs the rest of the spawn, including `BeginPlay` if the world is already playing.
+4. **When to use it.** When `BeginPlay` (or the first tick) must already see configured values.
+5. **When not to.** When nothing needs setting first: `SpawnActor` is one call.
+6. **Common mistakes.** Forgetting `FinishSpawning` (the actor never begins play); passing a different transform to the two calls without meaning to.
+7. **Example.** `AMyActor* A = World.SpawnActorDeferred<AMyActor>(AMyActor::StaticClass(), T); A->Configure(...); A->FinishSpawning(T);`
+8. **In this project.** `UTTWorkloadSubsystem::SpawnAgents`: `InitPatrol` and `SetComputeIterations` between the two calls, then `FinishSpawning` at the patrol's time-0 position.
+
+## 19. `FRandomStream`
+
+1. **What it is.** A seeded pseudo-random generator (`Runtime/Core/Public/Math/RandomStream.h:19`), a linear congruential generator (`:364`).
+2. **Why it exists.** Repeatable randomness: the same seed gives the same sequence everywhere.
+3. **How it works.** Each call advances a 32-bit seed (`Seed * 196314165 + 907633515`) and maps it to the requested range; the stream's state is only its seed.
+4. **When to use it.** Procedural layouts, tests and benchmarks that must be identical run to run.
+5. **When not to.** Security or anything that needs good statistical quality.
+6. **Common mistakes.** Using `FMath::FRand()` (global, unseeded) where repeatability matters; drawing in a different order between runs (the values then differ).
+7. **Example.** `FRandomStream R(1); const double X = R.FRandRange(-100.0, 100.0);`
+8. **In this project.** The workload's grid jitter and patrol phases, from `-TTSeed=`.
+
+## 20. `FCrc::TypeCrc32`
+
+1. **What it is.** A CRC-32 over the bytes of a value (`Runtime/Core/Public/Misc/Crc.h:36`).
+2. **Why it exists.** A quick fingerprint of data.
+3. **How it works.** `MemCrc32(&Data, sizeof(T), CRC)`: the previous CRC is the starting value, so calls chain into one CRC over all values.
+4. **When to use it.** Comparing state between runs or machines where any bit difference matters.
+5. **When not to.** Types with padding bytes or pointers (their bytes are not the value); new code that needs a good hash (the header itself recommends xxhash).
+6. **Common mistakes.** Hashing an `FVector` of doubles when the comparison should tolerate rounding; hashing a struct with padding.
+7. **Example.** `uint32 H = 0; for (const FVector& P : Points) { H = FCrc::TypeCrc32(FVector3f(P), H); }`
+8. **In this project.** The workload's start-position and end-state hashes: bit-equal hashes across runs are the determinism check (`09` S2).
+
+## 21. `ConstructorHelpers::FObjectFinder` and `DirectoriesToAlwaysCook`
+
+1. **What it is.** A helper that loads an asset by path inside a `UObject` constructor (`Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h:77`), and a project setting that cooks a whole content folder.
+2. **Why it exists.** Default assets for C++ classes without a Blueprint.
+3. **How it works.** The finder loads the object when the constructor runs (for the class default object, at startup). In a packaged build the asset must have been cooked; engine content is cooked only if something references it or a cook rule includes it.
+4. **When to use it.** Small engine defaults, such as a basic shape.
+5. **When not to.** Outside constructors (a fatal error, `Runtime/CoreUObject/Private/UObject/UObjectGlobals.cpp:4974`); game content that designers should choose (use a property).
+6. **Common mistakes.** A non-`static` finder (the lookup repeats per object); a missing cook rule, so the packaged game has an invisible mesh.
+7. **Example.** `static ConstructorHelpers::FObjectFinder<UStaticMesh> Cube(TEXT("/Engine/BasicShapes/Cube.Cube"));`
+8. **In this project.** `ATTWorkloadAgent`'s cube; `Config\DefaultGame.ini` has `+DirectoriesToAlwaysCook=(Path="/Engine/BasicShapes")`.
