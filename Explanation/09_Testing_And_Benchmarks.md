@@ -450,3 +450,42 @@ How it is run, to test interruption and resumption on real builds:
 **P7-3. A suite that isn't green** (`edge_red_suite.json`: `patches\edge_red_suite.patch` changes one expected value to 851). Predicted: the baseline builds, 1 of its tests fails, `batch` exits **3**, 0 mutants run.
 
 **Without Unreal** (in `tt_mutate.py selftest`): crash recovery with a killed child process (`05` D4), the patch path, the snapshot safety test.
+
+
+## Phase 7 · Results (2026-11-21; stopped early by owner direction)
+
+The plan above was cut short. The owner ended the project after P7-2 and P7-3, and the queued resume of P7-1 was cancelled. Only what actually ran is reported.
+
+- **P7-1 run 1, killed on purpose** (campaign `2026-11-21_082645_mut-sample-p7`). The queue watchdog killed the job at 150 s, which for the runner is the same as a crash. The state it left, recorded before anything could touch it:
+  - the manifest still loads, and no `.tmp` file was left;
+  - the killed batch has `stopped: null`;
+  - the two finished mutants kept their fates: both `TotalPrice` AOR mutants are **stillborn** as predicted (builds 1.6 s and 1.5 s that failed to compile);
+  - the third mutant was mid-run, and its file, `TTSampleEdgeCases.cpp`, was left mutated in the snapshot.
+- **P7-1 resume: not measured.** The batch that would restore that file and finish the other 20 mutants was cancelled, so the predicted real-build **timeout** fates and the closed gap's kill were never observed. Restore-then-resume after a kill is covered only by `crash_selftest` (a child process killed with `os._exit`, no Unreal), which passes.
+- **P7-2, a target that doesn't build** (`2026-11-21_082647_mut-edge-broken`, queue job `20261121_082714_98aaea`), **as predicted:** the baseline build failed (`fatal error C1189: #error`), `batch` exited **3** ("baseline not green"), and **0 of 8** mutants ran.
+- **P7-3, a suite that isn't green** (`2026-11-21_082650_mut-edge-red-suite`, queue job `20261121_082714_61fcc3`), **as predicted:**
+  - the baseline built, and 1 of its 2 tests failed (`Expected ... to be 851, but it was 850`);
+  - `batch` exited **3**, and **0** mutants ran;
+  - the editor's exit code for the failed suite was **255**: `RequestExitWithStatus` takes a `uint8` (`Runtime/Core/Public/GenericPlatform/GenericPlatformMisc.h:1096`), so −1 arrives as 255. That is still non-zero, so it is still classified correctly.
+
+## Final check (2026-11-21)
+
+One queue job, `20261121_102254_179903`: **ok, exit 0, 31.9 s**.
+- Editor and game targets: `Result: Succeeded`, with no compiler warnings in the log.
+- Automation tests `StartsWith:TestTrust`: **16 of 16 pass** (`TEST COMPLETE. EXIT CODE: 0`).
+- Python self-tests: `tt_mutants`, `tt_mutate` (classification, scores, snapshot safety, patch path, crash recovery), `csv_stats` and `tt_gate` all ok.
+
+## Success criteria: final status (existing data only)
+
+| # | Target (`01` §6.4) | Result | Evidence |
+|---|---|---|---|
+| SC1 | Every mutant gets a defined fate (0 error); a repeat gives the same fate for 100% | ✅ **met**: 0 errors in all campaigns; 14 of 14 mutants had the same fate on repeat | S8 |
+| SC2 | 0 files written in any target repository | ✅ **met** by construction (`git archive` of a commit object; read-only git) and by the snapshot self-test; UE5-UpdateBudget was only read | P4-R, S6, S7 |
+| SC3 | Median ≤ 60 s per `.cpp` mutant; 100% of batches inside their timeout | ✅ **met**: 13.9 s median over 106 mutants; 4 of 4 batches | S8 |
+| SC4 | Tests written from survivors raise M1 to ≥ 90% | ✅ **met**: 92.1% → 100% on UE5-UpdateBudget's scheduler | S6, S7 |
+| SC5 | TT false positives ≤ 5% of ≥ 30 unchanged runs, (a) and (b) | ❌ **not met** under (a): 15.6%. ✅ met under (b): 3.1% | S5 |
+| SC6 | Detection 100% / ≥ 95% / ≥ 80% at 1.0 / 0.5 / 0.25 ms | ✅ at 1.0 ms; ❌ 93.8% / 87.5% at 0.5 ms; ❌ 56.2% / 40.6% at 0.25 ms | S5 |
+| SC7 | TT no worse than N1, N2, N3 on every rate | ❌ **not met** under either baseline | S5 |
+| SC8 | One decision ≤ 90 s | ✅ **met**: about 12 s | S5 |
+| Phase 7 | Real-build timeout fates; resume after a real kill | **not measured** (cancelled) | above |
+| Gate v2 | k = 3, median only, two priming runs | **not measured** (dropped by owner direction; no v2 data exists) | — |

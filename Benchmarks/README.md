@@ -69,3 +69,7 @@ Resolution (gate): 1280x720 windowed, default scalability, no VSync, no sound
 | `2026-11-21_055612_gate-eval3` | gate | S4: evaluation batch 3 of 4, priming + 8 rounds × `X0`/`X025`/`X05`/`X10` (`09` S4) | 33 of 33 valid; [summary](Summaries/2026-11-21_055612_gate-eval3_summary.md) |
 | `2026-11-21_060429_gate-eval4` | gate | S4: evaluation batch 4 of 4, priming + 8 rounds × `X0`/`X025`/`X05`/`X10` (`09` S4) | 33 of 33 valid; [summary](Summaries/2026-11-21_060429_gate-eval4_summary.md) |
 | `2026-11-21_s5` | gate evaluation | S5: `tt_gate.py evaluate`, stored baseline + the 4 evaluation batches (`09` S5) | TT false positives 15.6% (interleaved) / 3.1% (stored); detection 100% at 1.0 ms, 94% / 88% at 0.5 ms, 56% / 41% at 0.25 ms; SC5a, SC6 at 0.5 and 0.25 ms, and SC7 not met; [evaluation](Summaries/2026-11-21_s5_gate_evaluation.md) |
+| `2026-11-21_082400_s1check` | step check | Phase 7 code: builds, 16 tests, package, probe runs (`09` Phase 7) | 0 warnings; 16 of 16 tests |
+| `2026-11-21_082645_mut-sample-p7` | mutation | P7-1: deliberately killed at 150 s; the resume was cancelled (`09` Phase 7) | 2 stillborn as predicted; 20 mutants never run |
+| `2026-11-21_082647_mut-edge-broken` | mutation | P7-2: a target that doesn't build | refused, exit 3, 0 mutants run |
+| `2026-11-21_082650_mut-edge-red-suite` | mutation | P7-3: a suite that isn't green | refused, exit 3, 0 mutants run |

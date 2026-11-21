@@ -11,7 +11,7 @@
 
 ---
 
-**Progress (2026-11-21):** Phases 1–3 ✅. Phase 4 ✅: F1–F3 (`09`, one queue job, re-run after the AndroidFileServer rule); F4 runner and self-tests; F4 runner smoke test P4-R: 14 of 14 fates as predicted, M1 = 91.7%, 12.1 s median per mutant. **Phase 5 ✅: S1–S8**, each committed with its checks (`09`): SC1, SC3, SC4 and SC8 met; SC5 met only against the stored baseline; SC6 met at 1.0 ms only; SC7 not met. Next: Phases 6–7.
+**Progress (2026-11-21):** Phases 1–3 ✅. Phase 4 ✅: F1–F3 (`09`, one queue job, re-run after the AndroidFileServer rule); F4 runner and self-tests; F4 runner smoke test P4-R: 14 of 14 fates as predicted, M1 = 91.7%, 12.1 s median per mutant. **Phase 5 ✅: S1–S8**, each committed with its checks (`09`): SC1, SC3, SC4 and SC8 met; SC5 met only against the stored baseline; SC6 met at 1.0 ms only; SC7 not met. Phase 6 ✅ (one explanation pass, `08` written). Phase 7: P7-2 and P7-3 as predicted; P7-1 cut short. The project was then finished by owner direction: gate v2, any further campaign and the demo video were dropped (`09`, final status).
 
 ## Phase 4: Foundation
 

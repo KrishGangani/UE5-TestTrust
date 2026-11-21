@@ -1,0 +1,188 @@
+{
+ "campaign": "2026-11-21_082650_mut-edge-red-suite",
+ "purpose": "mutation campaign (02 section 4.1)",
+ "config": {
+  "name": "edge-red-suite",
+  "repo_name": "UE5-TestTrust",
+  "commit": "82f8901",
+  "project_subdir": "TestTrust",
+  "uproject": "TestTrust.uproject",
+  "editor_target": "TestTrustEditor",
+  "mutate": [
+   "Source/TestTrustSample/Private/TTSampleEdgeCases.cpp"
+  ],
+  "exclude": [
+   "*/Tests/*",
+   "*Module.cpp"
+  ],
+  "test_filter": "StartsWith:TestTrust.Sample.Edge",
+  "operators": [
+   "ROR",
+   "AOR",
+   "LCR",
+   "COND",
+   "BOOL",
+   "SDL"
+  ],
+  "patches": [
+   "patches/edge_red_suite.patch"
+  ]
+ },
+ "target": {
+  "repo": "UE5-TestTrust",
+  "commit": "82f8901a2d49e83ad70f1e0c5f26bd9a3651e802",
+  "subdir": "TestTrust",
+  "patches": [
+   {
+    "file": "patches/edge_red_suite.patch",
+    "sha256": "84c559479e20216678169ff9578df7d7f2f10de05e265c077078e1a2040fd8cd",
+    "targets": [
+     "TestTrust/Source/TestTrustSample/Private/Tests/TTSampleEdgeCasesTests.cpp"
+    ]
+   }
+  ]
+ },
+ "environment": {
+  "date": "2026-11-21T08:26:50",
+  "engine": "5.8.4 (CL 58902052)",
+  "build_config": "Development editor target, tests in UnrealEditor-Cmd -nullrhi (not packaged)",
+  "compiler": "MSVC 14.44.35229, Windows SDK 10.0.22621.0",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "gpus": "Intel(R) UHD Graphics (driver 32.0.101.7088); NVIDIA GeForce RTX 5070 Laptop GPU (driver 32.0.16.1047)",
+  "ram_gb": "31.6",
+  "os": "Microsoft Windows 11 Home Single Language build 26200",
+  "power_plan": "Power Scheme GUID: 6fecc5ae-f350-48a5-b669-b472cb895ccf  (Turbo)",
+  "on_ac_power": true,
+  "cpu_affinity": "0xFFFF (performance cores only; hybrid CPU)",
+  "runner": "Tools/tt_mutate.py",
+  "snapshot": "Tools/_work/2026-11-21_082650_mut-edge-red-suite",
+  "pinning": "test launches pinned to cpu_affinity via tt_common.pinned(); builds unpinned"
+ },
+ "mutants": [
+  {
+   "id": "c95b553742",
+   "file": "Source/TestTrustSample/Private/TTSampleEdgeCases.cpp",
+   "operator": "AOR",
+   "line": 7,
+   "col": 14,
+   "start": 244,
+   "end": 245,
+   "original": "*",
+   "replacement": "/",
+   "fate": null,
+   "attempts": 0
+  },
+  {
+   "id": "11009156dc",
+   "file": "Source/TestTrustSample/Private/TTSampleEdgeCases.cpp",
+   "operator": "AOR",
+   "line": 7,
+   "col": 22,
+   "start": 252,
+   "end": 253,
+   "original": "+",
+   "replacement": "-",
+   "fate": null,
+   "attempts": 0
+  },
+  {
+   "id": "23640b83ec",
+   "file": "Source/TestTrustSample/Private/TTSampleEdgeCases.cpp",
+   "operator": "COND",
+   "line": 13,
+   "col": 2,
+   "start": 363,
+   "end": 381,
+   "original": "(Remaining > 0.0f)",
+   "replacement": "(!(Remaining > 0.0f))",
+   "fate": null,
+   "attempts": 0
+  },
+  {
+   "id": "c295d47fff",
+   "file": "Source/TestTrustSample/Private/TTSampleEdgeCases.cpp",
+   "operator": "ROR",
+   "line": 13,
+   "col": 19,
+   "start": 374,
+   "end": 375,
+   "original": ">",
+   "replacement": ">=",
+   "fate": null,
+   "attempts": 0
+  },
+  {
+   "id": "e49c2b7dc3",
+   "file": "Source/TestTrustSample/Private/TTSampleEdgeCases.cpp",
+   "operator": "ROR",
+   "line": 13,
+   "col": 19,
+   "start": 374,
+   "end": 375,
+   "original": ">",
+   "replacement": "<=",
+   "fate": null,
+   "attempts": 0
+  },
+  {
+   "id": "a7b13eac3c",
+   "file": "Source/TestTrustSample/Private/TTSampleEdgeCases.cpp",
+   "operator": "SDL",
+   "line": 15,
+   "col": 3,
+   "start": 389,
+   "end": 407,
+   "original": "Remaining -= Step;",
+   "replacement": ";",
+   "fate": null,
+   "attempts": 0
+  },
+  {
+   "id": "558d08955e",
+   "file": "Source/TestTrustSample/Private/TTSampleEdgeCases.cpp",
+   "operator": "AOR",
+   "line": 15,
+   "col": 13,
+   "start": 399,
+   "end": 401,
+   "original": "-=",
+   "replacement": "+=",
+   "fate": null,
+   "attempts": 0
+  },
+  {
+   "id": "3c1d5e4e6f",
+   "file": "Source/TestTrustSample/Private/TTSampleEdgeCases.cpp",
+   "operator": "SDL",
+   "line": 16,
+   "col": 3,
+   "start": 411,
+   "end": 419,
+   "original": "++Ticks;",
+   "replacement": ";",
+   "fate": null,
+   "attempts": 0
+  }
+ ],
+ "baselines": [
+  {
+   "batch": 1,
+   "build_s": 42.62,
+   "build_exit": 0,
+   "test_s": 40.01,
+   "test_exit": 255,
+   "tests": 2,
+   "failed": 1
+  }
+ ],
+ "batches": [
+  {
+   "batch": 1,
+   "started": "2026-11-21T09:20:50",
+   "max_seconds": 1800.0,
+   "mutants_run": 0,
+   "ended": "2026-11-21T09:22:13",
+   "stopped": "baseline not green: the unmutated snapshot must build and pass before mutants run"
+  }
+ ]
+}

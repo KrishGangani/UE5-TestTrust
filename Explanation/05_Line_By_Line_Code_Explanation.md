@@ -372,6 +372,12 @@ All of them are adapted from UE5-UpdateBudget's scripts and must be run **throug
 
 ---
 
+### D8. `Tools\make_charts.py` (Phase 10)
+
+Draws `Media\gate_rates.png` (the S5 table: each rule's flag rate per config, both baselines, with the 5% line) and `Media\gate_runs.png` (every S4 run's median `GameThreadTime` by batch and config) from the committed manifests only. It reuses `tt_gate.evaluate`, so the chart can't disagree with the evaluation report. `matplotlib` with the `Agg` backend (no window).
+
+---
+
 ## Part E · Step S1: the probe plugin (`Plugins\TestTrustProbe\`)
 
 ### E1. `Public\TTProbeWindow.h` and `Private\TTProbeWindow.cpp`
