@@ -1,0 +1,2690 @@
+{
+ "batch": "2026-11-21_055612_gate-eval3",
+ "environment": {
+  "date": "2026-11-21T05:56:12",
+  "engine": "5.8.4 (CL 58902052)",
+  "build_config": "Development (packaged)",
+  "compiler": "MSVC 14.44.35229, Windows SDK 10.0.22621.0",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "gpus": "Intel(R) UHD Graphics (driver 32.0.101.7088); NVIDIA GeForce RTX 5070 Laptop GPU (driver 32.0.16.1047)",
+  "ram_gb": "31.6",
+  "os": "Microsoft Windows 11 Home Single Language build 26200",
+  "power_plan": "Power Scheme GUID: 6fecc5ae-f350-48a5-b669-b472cb895ccf  (Turbo)",
+  "on_ac_power": true,
+  "cpu_affinity": "0xFFFF (performance cores only; hybrid CPU)",
+  "common_args": "-windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit",
+  "resolution": "1280x720 windowed, default scalability"
+ },
+ "settings": {
+  "configs": "X0,X025,X05,X10",
+  "rounds": 8,
+  "agents": 1000,
+  "work": 128,
+  "seed": 1,
+  "warmup": 5.0,
+  "capture": 20.0,
+  "cooldown": 3.0,
+  "label": "gate-eval3",
+  "no_prime": false
+ },
+ "runs": [
+  {
+   "name": "2026-11-21_055612_gate-eval3_X0_r0_prime",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 0,
+   "position": 0,
+   "priming": true,
+   "exit_code": 0,
+   "wall_seconds": 11.1,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X0_r0_prime",
+   "capture": "2026-11-21_055612_gate-eval3_X0_r0_prime.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.3460775,
+     "min": 4.4432,
+     "median": 4.9369,
+     "p95": 7.056515,
+     "p99": 7.583861,
+     "max": 9.8197
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.335812416666667,
+     "min": 4.4169,
+     "median": 4.9177,
+     "p95": 7.06131,
+     "p99": 7.57222,
+     "max": 9.7523
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 3.1216975,
+     "min": 2.3542,
+     "median": 2.7215499999999997,
+     "p95": 4.765669999999999,
+     "p99": 5.119070999999999,
+     "max": 6.927
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.1715615833333333,
+     "min": 2.72,
+     "median": 3.06805,
+     "p95": 3.90101,
+     "p99": 4.2407,
+     "max": 5.1797
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X0_r0_prime",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 35.4 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X0_r1",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 1,
+   "position": 0,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X0_r1",
+   "capture": "2026-11-21_055612_gate-eval3_X0_r1.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.06889325,
+     "min": 4.4671,
+     "median": 4.8337,
+     "p95": 6.77746,
+     "p99": 7.286249,
+     "max": 10.3268
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.057208666666667,
+     "min": 4.4498,
+     "median": 4.822900000000001,
+     "p95": 6.763229999999999,
+     "p99": 7.2665489999999995,
+     "max": 9.9275
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9394244166666668,
+     "min": 2.3263,
+     "median": 2.72645,
+     "p95": 4.63326,
+     "p99": 4.985397,
+     "max": 7.0638
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.1045088333333335,
+     "min": 2.6981,
+     "median": 3.04425,
+     "p95": 3.74384,
+     "p99": 4.098871999999999,
+     "max": 4.9176
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X0_r1",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 32.5 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X025_r1",
+   "config": "X025",
+   "inject_ms": 0.25,
+   "round": 1,
+   "position": 1,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.5,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X025_r1 -TTInjectMs=0.25",
+   "capture": "2026-11-21_055612_gate-eval3_X025_r1.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.602193583333333,
+     "min": 4.7366,
+     "median": 5.4301,
+     "p95": 7.00497,
+     "p99": 7.728187999999999,
+     "max": 11.2183
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.590959333333333,
+     "min": 4.7823,
+     "median": 5.4116,
+     "p95": 7.01007,
+     "p99": 7.648205,
+     "max": 10.4058
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 3.09161525,
+     "min": 2.3843,
+     "median": 2.91175,
+     "p95": 4.524415,
+     "p99": 5.133667999999999,
+     "max": 6.4613
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.0748342500000003,
+     "min": 2.7066,
+     "median": 3.03965,
+     "p95": 3.56995,
+     "p99": 4.200216999999999,
+     "max": 5.3068
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.25050466666666665,
+     "min": 0.25,
+     "median": 0.2502,
+     "p95": 0.2504,
+     "p99": 0.2562729999999999,
+     "max": 0.35
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X025_r1",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.25",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 30.1 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X05_r1",
+   "config": "X05",
+   "inject_ms": 0.5,
+   "round": 1,
+   "position": 2,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.3,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X05_r1 -TTInjectMs=0.5",
+   "capture": "2026-11-21_055612_gate-eval3_X05_r1.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.72806925,
+     "min": 5.0636,
+     "median": 5.604,
+     "p95": 6.51593,
+     "p99": 7.531314999999999,
+     "max": 11.8922
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.717421416666667,
+     "min": 4.9028,
+     "median": 5.58845,
+     "p95": 6.515685,
+     "p99": 7.4720059999999995,
+     "max": 12.6896
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.893228666666667,
+     "min": 2.4,
+     "median": 2.7688,
+     "p95": 3.66914,
+     "p99": 4.694082,
+     "max": 6.4617
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.02356775,
+     "min": 2.7076,
+     "median": 3.0172,
+     "p95": 3.37525,
+     "p99": 4.0537,
+     "max": 5.1909
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.5007655833333333,
+     "min": 0.5,
+     "median": 0.5001,
+     "p95": 0.5004,
+     "p99": 0.526907,
+     "max": 0.5739
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X05_r1",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.5",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 42.7 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X10_r1",
+   "config": "X10",
+   "inject_ms": 1.0,
+   "round": 1,
+   "position": 3,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.1,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X10_r1 -TTInjectMs=1.0",
+   "capture": "2026-11-21_055612_gate-eval3_X10_r1.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 6.2471050833333335,
+     "min": 5.5784,
+     "median": 6.14095,
+     "p95": 7.053725,
+     "p99": 7.6925110000000005,
+     "max": 10.3238
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 6.23528725,
+     "min": 5.5918,
+     "median": 6.10685,
+     "p95": 7.09274,
+     "p99": 7.697472,
+     "max": 9.804
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.8830227500000003,
+     "min": 2.3583,
+     "median": 2.7902,
+     "p95": 3.5638199999999998,
+     "p99": 4.028415,
+     "max": 5.1989
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 2.99418275,
+     "min": 2.7007,
+     "median": 3.00595,
+     "p95": 3.3394,
+     "p99": 3.4511049999999996,
+     "max": 4.2496
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 1.0012065833333332,
+     "min": 1.0,
+     "median": 1.0002,
+     "p95": 1.0007,
+     "p99": 1.027832,
+     "max": 1.1251
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X10_r1",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "1.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 28.1 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X025_r2",
+   "config": "X025",
+   "inject_ms": 0.25,
+   "round": 2,
+   "position": 0,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.1,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X025_r2 -TTInjectMs=0.25",
+   "capture": "2026-11-21_055612_gate-eval3_X025_r2.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.595500166666667,
+     "min": 4.8794,
+     "median": 5.4872499999999995,
+     "p95": 6.462905,
+     "p99": 6.941428,
+     "max": 9.3021
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.585119833333334,
+     "min": 4.8116,
+     "median": 5.4849,
+     "p95": 6.40492,
+     "p99": 6.847811999999999,
+     "max": 8.4327
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9922902500000004,
+     "min": 2.5078,
+     "median": 2.9112,
+     "p95": 3.550385,
+     "p99": 3.9072479999999996,
+     "max": 4.9097
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.0184366666666667,
+     "min": 2.7079,
+     "median": 3.0223000000000004,
+     "p95": 3.35547,
+     "p99": 3.5330019999999998,
+     "max": 4.1938
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.25074091666666665,
+     "min": 0.25,
+     "median": 0.2502,
+     "p95": 0.2503,
+     "p99": 0.27092499999999997,
+     "max": 0.3472
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X025_r2",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.25",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 33.4 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X05_r2",
+   "config": "X05",
+   "inject_ms": 0.5,
+   "round": 2,
+   "position": 1,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X05_r2 -TTInjectMs=0.5",
+   "capture": "2026-11-21_055612_gate-eval3_X05_r2.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.858059,
+     "min": 5.2031,
+     "median": 5.7875,
+     "p95": 6.52824,
+     "p99": 6.958597999999999,
+     "max": 9.3922
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.846877833333333,
+     "min": 5.2057,
+     "median": 5.7706,
+     "p95": 6.520155,
+     "p99": 6.905191,
+     "max": 9.0626
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.942878,
+     "min": 2.4962,
+     "median": 2.88795,
+     "p95": 3.4616949999999997,
+     "p99": 3.8709759999999998,
+     "max": 4.4809
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.0316690833333335,
+     "min": 2.6764,
+     "median": 3.0303500000000003,
+     "p95": 3.3661299999999996,
+     "p99": 3.530322,
+     "max": 3.7737
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.50098575,
+     "min": 0.5,
+     "median": 0.5001,
+     "p95": 0.5004,
+     "p99": 0.5358040000000001,
+     "max": 0.5927
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X05_r2",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.5",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 28.8 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X10_r2",
+   "config": "X10",
+   "inject_ms": 1.0,
+   "round": 2,
+   "position": 2,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X10_r2 -TTInjectMs=1.0",
+   "capture": "2026-11-21_055612_gate-eval3_X10_r2.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 6.426061916666667,
+     "min": 5.6462,
+     "median": 6.34685,
+     "p95": 7.23661,
+     "p99": 7.713073,
+     "max": 12.0251
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 6.4127530833333335,
+     "min": 5.6474,
+     "median": 6.3274,
+     "p95": 7.2961849999999995,
+     "p99": 7.736436,
+     "max": 10.914
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 3.015915333333333,
+     "min": 2.4667,
+     "median": 2.8983499999999998,
+     "p95": 3.85558,
+     "p99": 4.252419,
+     "max": 4.6655
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 2.9993673333333333,
+     "min": 2.6933,
+     "median": 3.0145,
+     "p95": 3.34021,
+     "p99": 3.44933,
+     "max": 3.9158
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 1.0010315833333334,
+     "min": 1.0,
+     "median": 1.0002,
+     "p95": 1.0006,
+     "p99": 1.021,
+     "max": 1.1069
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X10_r2",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "1.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 33.3 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X0_r2",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 2,
+   "position": 3,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X0_r2",
+   "capture": "2026-11-21_055612_gate-eval3_X0_r2.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.4110819999999995,
+     "min": 4.8253,
+     "median": 5.302149999999999,
+     "p95": 6.173215,
+     "p99": 6.711549,
+     "max": 9.7995
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.400174666666667,
+     "min": 4.7367,
+     "median": 5.2879000000000005,
+     "p95": 6.169975,
+     "p99": 6.601406,
+     "max": 8.888
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.962835833333333,
+     "min": 2.4963,
+     "median": 2.9019500000000003,
+     "p95": 3.466915,
+     "p99": 3.838286,
+     "max": 4.7219
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.0894861666666666,
+     "min": 2.7076,
+     "median": 3.0737,
+     "p95": 3.4886,
+     "p99": 3.629105,
+     "max": 3.8126
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X0_r2",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 35.2 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X05_r3",
+   "config": "X05",
+   "inject_ms": 0.5,
+   "round": 3,
+   "position": 0,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.3,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X05_r3 -TTInjectMs=0.5",
+   "capture": "2026-11-21_055612_gate-eval3_X05_r3.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.744306166666667,
+     "min": 5.1794,
+     "median": 5.68375,
+     "p95": 6.336040000000001,
+     "p99": 6.6444399999999995,
+     "max": 9.1842
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.734559,
+     "min": 5.1832,
+     "median": 5.66455,
+     "p95": 6.375335,
+     "p99": 6.696051,
+     "max": 9.0067
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.8483360833333333,
+     "min": 2.5029,
+     "median": 2.81345,
+     "p95": 3.232405,
+     "p99": 3.402266,
+     "max": 3.8218
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.0471173333333335,
+     "min": 2.6846,
+     "median": 3.0414000000000003,
+     "p95": 3.400745,
+     "p99": 3.555711,
+     "max": 3.789
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.5009711666666666,
+     "min": 0.5,
+     "median": 0.5001,
+     "p95": 0.5003,
+     "p99": 0.519004,
+     "max": 0.6488
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X05_r3",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.5",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 36.5 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X10_r3",
+   "config": "X10",
+   "inject_ms": 1.0,
+   "round": 3,
+   "position": 1,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 13.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X10_r3 -TTInjectMs=1.0",
+   "capture": "2026-11-21_055612_gate-eval3_X10_r3.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 6.424841083333333,
+     "min": 5.7607,
+     "median": 6.3551,
+     "p95": 7.093399999999999,
+     "p99": 7.641645,
+     "max": 10.3482
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 6.411726166666667,
+     "min": 5.7775,
+     "median": 6.327999999999999,
+     "p95": 7.132904999999999,
+     "p99": 7.559450999999999,
+     "max": 9.9358
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.954715666666667,
+     "min": 2.4528,
+     "median": 2.8764,
+     "p95": 3.546425,
+     "p99": 3.9004039999999995,
+     "max": 4.2506
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 2.9905621666666664,
+     "min": 2.6962,
+     "median": 2.992,
+     "p95": 3.34504,
+     "p99": 3.454232,
+     "max": 3.6064
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 1.00126,
+     "min": 1.0,
+     "median": 1.0002,
+     "p95": 1.000605,
+     "p99": 1.0250449999999998,
+     "max": 1.1059
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X10_r3",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "1.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 37.7 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X0_r3",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 3,
+   "position": 2,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X0_r3",
+   "capture": "2026-11-21_055612_gate-eval3_X0_r3.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.434769916666666,
+     "min": 4.8032,
+     "median": 5.3157499999999995,
+     "p95": 6.22248,
+     "p99": 6.629679999999999,
+     "max": 9.1329
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.424072916666667,
+     "min": 4.7853,
+     "median": 5.3073,
+     "p95": 6.160299999999999,
+     "p99": 6.548926999999999,
+     "max": 8.6956
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9692138333333333,
+     "min": 2.4902,
+     "median": 2.8714000000000004,
+     "p95": 3.6046099999999996,
+     "p99": 4.052913999999999,
+     "max": 4.8311
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.047812,
+     "min": 2.6828,
+     "median": 3.0244999999999997,
+     "p95": 3.427435,
+     "p99": 3.591862,
+     "max": 3.9088
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X0_r3",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 38.5 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X025_r3",
+   "config": "X025",
+   "inject_ms": 0.25,
+   "round": 3,
+   "position": 3,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.3,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X025_r3 -TTInjectMs=0.25",
+   "capture": "2026-11-21_055612_gate-eval3_X025_r3.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.663672,
+     "min": 5.0367,
+     "median": 5.572699999999999,
+     "p95": 6.324615,
+     "p99": 6.67033,
+     "max": 9.7281
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.6544584166666665,
+     "min": 4.9866,
+     "median": 5.56085,
+     "p95": 6.3459449999999995,
+     "p99": 6.630922999999999,
+     "max": 8.8312
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.909939666666667,
+     "min": 2.4949,
+     "median": 2.8524000000000003,
+     "p95": 3.3863499999999997,
+     "p99": 3.730652,
+     "max": 4.4718
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.09823825,
+     "min": 2.706,
+     "median": 3.0721,
+     "p95": 3.4905999999999997,
+     "p99": 3.692223,
+     "max": 3.8721
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.2505495833333333,
+     "min": 0.25,
+     "median": 0.2502,
+     "p95": 0.2503,
+     "p99": 0.2613309999999999,
+     "max": 0.3449
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X025_r3",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.25",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 32.7 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X10_r4",
+   "config": "X10",
+   "inject_ms": 1.0,
+   "round": 4,
+   "position": 0,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.3,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X10_r4 -TTInjectMs=1.0",
+   "capture": "2026-11-21_055612_gate-eval3_X10_r4.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 6.3792903333333335,
+     "min": 5.7688,
+     "median": 6.3290500000000005,
+     "p95": 6.95909,
+     "p99": 7.311866,
+     "max": 10.5316
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 6.367054166666667,
+     "min": 5.7589,
+     "median": 6.2881,
+     "p95": 7.00633,
+     "p99": 7.3624279999999995,
+     "max": 10.0558
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9072603333333333,
+     "min": 2.5036,
+     "median": 2.85825,
+     "p95": 3.3176849999999996,
+     "p99": 3.7979249999999998,
+     "max": 4.3278
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 2.993513166666667,
+     "min": 2.6861,
+     "median": 2.98735,
+     "p95": 3.3337,
+     "p99": 3.495301,
+     "max": 3.7573
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 1.0011138333333331,
+     "min": 1.0,
+     "median": 1.0002,
+     "p95": 1.0005,
+     "p99": 1.0369169999999999,
+     "max": 1.1077
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X10_r4",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "1.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 37.3 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X0_r4",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 4,
+   "position": 1,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X0_r4",
+   "capture": "2026-11-21_055612_gate-eval3_X0_r4.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.566871166666666,
+     "min": 4.9042,
+     "median": 5.4247,
+     "p95": 6.467995,
+     "p99": 7.0412799999999995,
+     "max": 9.8728
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.5558967500000005,
+     "min": 4.8838,
+     "median": 5.40665,
+     "p95": 6.4612099999999995,
+     "p99": 7.046448,
+     "max": 8.7694
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 3.0164964999999997,
+     "min": 2.5375,
+     "median": 2.91715,
+     "p95": 3.7052749999999994,
+     "p99": 4.22149,
+     "max": 4.6715
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.1474378333333335,
+     "min": 2.6962,
+     "median": 3.1313500000000003,
+     "p95": 3.540165,
+     "p99": 3.7272019999999997,
+     "max": 3.9905
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X0_r4",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 30.2 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X025_r4",
+   "config": "X025",
+   "inject_ms": 0.25,
+   "round": 4,
+   "position": 2,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X025_r4 -TTInjectMs=0.25",
+   "capture": "2026-11-21_055612_gate-eval3_X025_r4.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.909161583333334,
+     "min": 5.0563,
+     "median": 5.8275500000000005,
+     "p95": 6.873665,
+     "p99": 7.285616,
+     "max": 9.5997
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.898830333333334,
+     "min": 5.0556,
+     "median": 5.81235,
+     "p95": 6.885165,
+     "p99": 7.251869,
+     "max": 9.0559
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 3.1245344166666666,
+     "min": 2.5317,
+     "median": 2.9827500000000002,
+     "p95": 4.030059999999999,
+     "p99": 4.516913,
+     "max": 4.962
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.076135416666667,
+     "min": 2.6986,
+     "median": 3.0457,
+     "p95": 3.457235,
+     "p99": 3.6785419999999998,
+     "max": 3.9253
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.25086099999999995,
+     "min": 0.25,
+     "median": 0.2502,
+     "p95": 0.2503,
+     "p99": 0.271519,
+     "max": 0.4533
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X025_r4",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.25",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 28.5 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X05_r4",
+   "config": "X05",
+   "inject_ms": 0.5,
+   "round": 4,
+   "position": 3,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.3,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X05_r4 -TTInjectMs=0.5",
+   "capture": "2026-11-21_055612_gate-eval3_X05_r4.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 6.083361833333333,
+     "min": 5.3087,
+     "median": 6.00615,
+     "p95": 6.91713,
+     "p99": 7.345766,
+     "max": 10.0593
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 6.072618666666666,
+     "min": 5.2865,
+     "median": 5.9932,
+     "p95": 6.924785,
+     "p99": 7.260812,
+     "max": 9.0075
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 3.054589416666667,
+     "min": 2.5524,
+     "median": 2.9867,
+     "p95": 3.65,
+     "p99": 4.204502,
+     "max": 4.6062
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.03161925,
+     "min": 2.6694,
+     "median": 3.0039,
+     "p95": 3.4067,
+     "p99": 3.5429019999999998,
+     "max": 3.6647
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.5014872499999999,
+     "min": 0.5,
+     "median": 0.5001,
+     "p95": 0.5005,
+     "p99": 0.541604,
+     "max": 0.8331
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X05_r4",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.5",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 36.5 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X0_r5",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 5,
+   "position": 0,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.3,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X0_r5",
+   "capture": "2026-11-21_055612_gate-eval3_X0_r5.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.469204416666667,
+     "min": 4.9229,
+     "median": 5.3518,
+     "p95": 6.236905,
+     "p99": 6.675963,
+     "max": 9.8101
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.45801775,
+     "min": 4.8701,
+     "median": 5.332649999999999,
+     "p95": 6.2612499999999995,
+     "p99": 6.630261,
+     "max": 9.2027
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.95270725,
+     "min": 2.5042,
+     "median": 2.8962,
+     "p95": 3.407995,
+     "p99": 3.859298,
+     "max": 4.6558
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.1887072499999998,
+     "min": 2.7559,
+     "median": 3.16875,
+     "p95": 3.569095,
+     "p99": 3.727201,
+     "max": 3.9111
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X0_r5",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 34.8 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X025_r5",
+   "config": "X025",
+   "inject_ms": 0.25,
+   "round": 5,
+   "position": 1,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X025_r5 -TTInjectMs=0.25",
+   "capture": "2026-11-21_055612_gate-eval3_X025_r5.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.7533294999999995,
+     "min": 5.1285,
+     "median": 5.66605,
+     "p95": 6.412764999999999,
+     "p99": 6.874377,
+     "max": 10.3042
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.740547083333333,
+     "min": 5.1003,
+     "median": 5.65045,
+     "p95": 6.47321,
+     "p99": 6.859332,
+     "max": 8.8002
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9923090833333332,
+     "min": 2.537,
+     "median": 2.93025,
+     "p95": 3.483605,
+     "p99": 3.823485,
+     "max": 4.4934
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 2.9529835833333333,
+     "min": 2.6143,
+     "median": 2.9237,
+     "p95": 3.34262,
+     "p99": 3.519043,
+     "max": 3.8659
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.25066066666666664,
+     "min": 0.25,
+     "median": 0.2502,
+     "p95": 0.2503,
+     "p99": 0.26890499999999995,
+     "max": 0.3511
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X025_r5",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.25",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 32.8 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X05_r5",
+   "config": "X05",
+   "inject_ms": 0.5,
+   "round": 5,
+   "position": 2,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X05_r5 -TTInjectMs=0.5",
+   "capture": "2026-11-21_055612_gate-eval3_X05_r5.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 6.05375625,
+     "min": 5.2832,
+     "median": 5.9036,
+     "p95": 7.001145,
+     "p99": 7.51407,
+     "max": 9.9163
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 6.042392749999999,
+     "min": 5.2808,
+     "median": 5.87675,
+     "p95": 7.000285,
+     "p99": 7.499668,
+     "max": 9.19
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 3.0794549166666667,
+     "min": 2.5384,
+     "median": 2.9471,
+     "p95": 3.93744,
+     "p99": 4.5019849999999995,
+     "max": 5.3157
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.1075441666666666,
+     "min": 2.731,
+     "median": 3.0861,
+     "p95": 3.459425,
+     "p99": 3.579447,
+     "max": 3.7762
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.5008644999999999,
+     "min": 0.5,
+     "median": 0.5001,
+     "p95": 0.5005,
+     "p99": 0.524053,
+     "max": 0.5846
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X05_r5",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.5",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 38.9 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X10_r5",
+   "config": "X10",
+   "inject_ms": 1.0,
+   "round": 5,
+   "position": 3,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X10_r5 -TTInjectMs=1.0",
+   "capture": "2026-11-21_055612_gate-eval3_X10_r5.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 6.3925055833333335,
+     "min": 5.7116,
+     "median": 6.35755,
+     "p95": 7.014585,
+     "p99": 7.2403949999999995,
+     "max": 9.7027
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 6.38082425,
+     "min": 5.757,
+     "median": 6.311400000000001,
+     "p95": 7.014555,
+     "p99": 7.428585999999999,
+     "max": 9.3265
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9255801666666668,
+     "min": 2.5001,
+     "median": 2.8846499999999997,
+     "p95": 3.353109999999999,
+     "p99": 3.8625089999999997,
+     "max": 4.7286
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.0571445,
+     "min": 2.6822,
+     "median": 3.056,
+     "p95": 3.4124,
+     "p99": 3.5794799999999998,
+     "max": 3.8009
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 1.0011762499999999,
+     "min": 1.0,
+     "median": 1.0002,
+     "p95": 1.000505,
+     "p99": 1.037347,
+     "max": 1.1075
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X10_r5",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "1.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 38.2 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X025_r6",
+   "config": "X025",
+   "inject_ms": 0.25,
+   "round": 6,
+   "position": 0,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X025_r6 -TTInjectMs=0.25",
+   "capture": "2026-11-21_055612_gate-eval3_X025_r6.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.626030416666667,
+     "min": 5.0915,
+     "median": 5.56875,
+     "p95": 6.158779999999999,
+     "p99": 6.487095,
+     "max": 9.077
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.614762083333333,
+     "min": 5.1054,
+     "median": 5.553599999999999,
+     "p95": 6.19777,
+     "p99": 6.485175,
+     "max": 8.6806
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9265599166666667,
+     "min": 2.4611,
+     "median": 2.87595,
+     "p95": 3.3692450000000003,
+     "p99": 3.563101,
+     "max": 4.034
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.091977583333333,
+     "min": 2.7109,
+     "median": 3.0824,
+     "p95": 3.4577,
+     "p99": 3.617931,
+     "max": 3.8063
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.2502780833333333,
+     "min": 0.25,
+     "median": 0.2502,
+     "p95": 0.2503,
+     "p99": 0.2507,
+     "max": 0.2982
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X025_r6",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.25",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 37.6 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X05_r6",
+   "config": "X05",
+   "inject_ms": 0.5,
+   "round": 6,
+   "position": 1,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X05_r6 -TTInjectMs=0.5",
+   "capture": "2026-11-21_055612_gate-eval3_X05_r6.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.9481676666666665,
+     "min": 5.287,
+     "median": 5.86965,
+     "p95": 6.6023499999999995,
+     "p99": 6.929827,
+     "max": 9.4484
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.938034916666666,
+     "min": 5.3324,
+     "median": 5.84255,
+     "p95": 6.646345,
+     "p99": 7.10974,
+     "max": 9.0757
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9205921666666668,
+     "min": 2.449,
+     "median": 2.8770499999999997,
+     "p95": 3.350055,
+     "p99": 3.668389,
+     "max": 4.159
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.030424833333333,
+     "min": 2.6652,
+     "median": 3.01315,
+     "p95": 3.395735,
+     "p99": 3.552442,
+     "max": 3.6524
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.50067,
+     "min": 0.5,
+     "median": 0.5001,
+     "p95": 0.5004,
+     "p99": 0.5146229999999999,
+     "max": 0.6546
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X05_r6",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.5",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 37.2 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X10_r6",
+   "config": "X10",
+   "inject_ms": 1.0,
+   "round": 6,
+   "position": 2,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 13.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X10_r6 -TTInjectMs=1.0",
+   "capture": "2026-11-21_055612_gate-eval3_X10_r6.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 6.469777833333334,
+     "min": 5.7605,
+     "median": 6.4195,
+     "p95": 7.130534999999999,
+     "p99": 7.458324999999999,
+     "max": 10.038
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 6.457881416666667,
+     "min": 5.6434,
+     "median": 6.3929,
+     "p95": 7.18552,
+     "p99": 7.5377920000000005,
+     "max": 9.5647
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9794791666666667,
+     "min": 2.4476,
+     "median": 2.90355,
+     "p95": 3.5783799999999997,
+     "p99": 4.019244,
+     "max": 4.9023
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.0580563333333335,
+     "min": 2.6926,
+     "median": 3.0505500000000003,
+     "p95": 3.41731,
+     "p99": 3.568949,
+     "max": 3.8944
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 1.0010198333333333,
+     "min": 1.0,
+     "median": 1.0002,
+     "p95": 1.000505,
+     "p99": 1.0246009999999999,
+     "max": 1.1537
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X10_r6",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "1.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 31.5 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X0_r6",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 6,
+   "position": 3,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.4,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X0_r6",
+   "capture": "2026-11-21_055612_gate-eval3_X0_r6.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.664143083333333,
+     "min": 4.8566,
+     "median": 5.5161,
+     "p95": 6.5728,
+     "p99": 7.1222259999999995,
+     "max": 8.9507
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.6537508333333335,
+     "min": 4.8746,
+     "median": 5.49815,
+     "p95": 6.573315,
+     "p99": 7.142808,
+     "max": 8.6777
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 3.077965416666667,
+     "min": 2.5144,
+     "median": 2.9824,
+     "p95": 3.8079499999999995,
+     "p99": 4.296297,
+     "max": 4.7945
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.1535990833333334,
+     "min": 2.7116,
+     "median": 3.1082,
+     "p95": 3.60551,
+     "p99": 3.812835,
+     "max": 4.3003
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X0_r6",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 38.0 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X05_r7",
+   "config": "X05",
+   "inject_ms": 0.5,
+   "round": 7,
+   "position": 0,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.3,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X05_r7 -TTInjectMs=0.5",
+   "capture": "2026-11-21_055612_gate-eval3_X05_r7.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.931363416666667,
+     "min": 5.3613,
+     "median": 5.83665,
+     "p95": 6.634004999999999,
+     "p99": 6.957375,
+     "max": 10.1251
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.920241833333334,
+     "min": 5.2771,
+     "median": 5.81755,
+     "p95": 6.654299999999999,
+     "p99": 6.989992999999999,
+     "max": 9.9099
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9534410833333333,
+     "min": 2.5056,
+     "median": 2.8968499999999997,
+     "p95": 3.4449949999999996,
+     "p99": 3.7153089999999995,
+     "max": 4.1942
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.12871,
+     "min": 2.7228,
+     "median": 3.11335,
+     "p95": 3.5204,
+     "p99": 3.696584,
+     "max": 3.8937
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.5007951666666667,
+     "min": 0.5,
+     "median": 0.5001,
+     "p95": 0.5005,
+     "p99": 0.517235,
+     "max": 0.6042
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X05_r7",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.5",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 34.5 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X10_r7",
+   "config": "X10",
+   "inject_ms": 1.0,
+   "round": 7,
+   "position": 1,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X10_r7 -TTInjectMs=1.0",
+   "capture": "2026-11-21_055612_gate-eval3_X10_r7.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 6.307691,
+     "min": 5.8251,
+     "median": 6.2637,
+     "p95": 6.76906,
+     "p99": 7.092421,
+     "max": 9.7569
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 6.295376,
+     "min": 5.7229,
+     "median": 6.2421500000000005,
+     "p95": 6.817585,
+     "p99": 7.126971,
+     "max": 9.3366
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.8635843333333333,
+     "min": 2.4346,
+     "median": 2.82925,
+     "p95": 3.20993,
+     "p99": 3.4578349999999998,
+     "max": 3.9505
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.0272890833333332,
+     "min": 2.6942,
+     "median": 3.0276,
+     "p95": 3.3582849999999995,
+     "p99": 3.512324,
+     "max": 3.6705
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 1.0008244166666667,
+     "min": 1.0,
+     "median": 1.0002,
+     "p95": 1.0005,
+     "p99": 1.020209,
+     "max": 1.1094
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X10_r7",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "1.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 38.3 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X0_r7",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 7,
+   "position": 2,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X0_r7",
+   "capture": "2026-11-21_055612_gate-eval3_X0_r7.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.53811125,
+     "min": 4.8183,
+     "median": 5.3771,
+     "p95": 6.485275,
+     "p99": 7.139695999999999,
+     "max": 10.0394
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.52722625,
+     "min": 4.8777,
+     "median": 5.3668,
+     "p95": 6.4815949999999996,
+     "p99": 7.005764999999999,
+     "max": 9.9252
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 3.0017816666666666,
+     "min": 2.5171,
+     "median": 2.9019500000000003,
+     "p95": 3.644335,
+     "p99": 4.147426,
+     "max": 4.9254
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.0802058333333333,
+     "min": 2.6477,
+     "median": 3.0574000000000003,
+     "p95": 3.4977349999999996,
+     "p99": 3.684728,
+     "max": 3.8824
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X0_r7",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 38.9 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X025_r7",
+   "config": "X025",
+   "inject_ms": 0.25,
+   "round": 7,
+   "position": 3,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.3,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X025_r7 -TTInjectMs=0.25",
+   "capture": "2026-11-21_055612_gate-eval3_X025_r7.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.82208225,
+     "min": 5.104,
+     "median": 5.71465,
+     "p95": 6.651925,
+     "p99": 7.041111999999998,
+     "max": 9.1379
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.811802,
+     "min": 5.126,
+     "median": 5.711,
+     "p95": 6.6161,
+     "p99": 7.125502,
+     "max": 8.8872
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 3.0594484166666667,
+     "min": 2.5464,
+     "median": 2.9789,
+     "p95": 3.70715,
+     "p99": 4.185474999999999,
+     "max": 4.7607
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.0918773333333336,
+     "min": 2.6785,
+     "median": 3.0712,
+     "p95": 3.4682,
+     "p99": 3.669734,
+     "max": 3.9443
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.2511116666666667,
+     "min": 0.25,
+     "median": 0.2502,
+     "p95": 0.2503,
+     "p99": 0.2883899999999999,
+     "max": 0.3696
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X025_r7",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.25",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 36.8 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X10_r8",
+   "config": "X10",
+   "inject_ms": 1.0,
+   "round": 8,
+   "position": 0,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.3,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X10_r8 -TTInjectMs=1.0",
+   "capture": "2026-11-21_055612_gate-eval3_X10_r8.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 6.4110993333333335,
+     "min": 5.733,
+     "median": 6.2921,
+     "p95": 7.36881,
+     "p99": 8.1011,
+     "max": 9.8344
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 6.397982083333333,
+     "min": 5.7263,
+     "median": 6.2456499999999995,
+     "p95": 7.3871,
+     "p99": 8.168379,
+     "max": 9.2722
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.950316583333333,
+     "min": 2.4828,
+     "median": 2.8574,
+     "p95": 3.7015799999999994,
+     "p99": 4.466786,
+     "max": 4.8817
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.02667525,
+     "min": 2.709,
+     "median": 3.0231,
+     "p95": 3.3776,
+     "p99": 3.548244,
+     "max": 3.7502
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 1.0009853333333332,
+     "min": 1.0,
+     "median": 1.0002,
+     "p95": 1.0005,
+     "p99": 1.0226279999999999,
+     "max": 1.0938
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X10_r8",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "1.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 38.2 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X0_r8",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 8,
+   "position": 1,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 11.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X0_r8",
+   "capture": "2026-11-21_055612_gate-eval3_X0_r8.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.6357995,
+     "min": 4.9185,
+     "median": 5.4475,
+     "p95": 6.75063,
+     "p99": 7.139244999999999,
+     "max": 10.0379
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.6246029166666665,
+     "min": 4.9021,
+     "median": 5.44395,
+     "p95": 6.67847,
+     "p99": 7.185124999999999,
+     "max": 9.312
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 3.0667479166666665,
+     "min": 2.4999,
+     "median": 2.9322,
+     "p95": 3.87559,
+     "p99": 4.518479999999999,
+     "max": 5.0484
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.16282025,
+     "min": 2.7007,
+     "median": 3.1548,
+     "p95": 3.55821,
+     "p99": 3.712387,
+     "max": 3.7997
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X0_r8",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 31.3 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X025_r8",
+   "config": "X025",
+   "inject_ms": 0.25,
+   "round": 8,
+   "position": 2,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.3,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X025_r8 -TTInjectMs=0.25",
+   "capture": "2026-11-21_055612_gate-eval3_X025_r8.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 5.736549416666667,
+     "min": 5.1444,
+     "median": 5.63375,
+     "p95": 6.466479999999999,
+     "p99": 6.912045,
+     "max": 9.3785
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.7258259166666665,
+     "min": 5.0866,
+     "median": 5.615399999999999,
+     "p95": 6.4619349999999995,
+     "p99": 6.933295,
+     "max": 8.9027
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9821475833333335,
+     "min": 2.4663,
+     "median": 2.9166,
+     "p95": 3.51456,
+     "p99": 3.880835,
+     "max": 4.6118
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.038024666666667,
+     "min": 2.6714,
+     "median": 3.0131500000000004,
+     "p95": 3.428655,
+     "p99": 3.625423,
+     "max": 3.7705
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.25056675,
+     "min": 0.25,
+     "median": 0.2502,
+     "p95": 0.2503,
+     "p99": 0.26851200000000003,
+     "max": 0.3148
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X025_r8",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.25",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 38.7 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_055612_gate-eval3_X05_r8",
+   "config": "X05",
+   "inject_ms": 0.5,
+   "round": 8,
+   "position": 3,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 12.2,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5.0 -TTCapture=20.0 -TTRunTag=2026-11-21_055612_gate-eval3_X05_r8 -TTInjectMs=0.5",
+   "capture": "2026-11-21_055612_gate-eval3_X05_r8.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 1200,
+     "mean": 6.007571583333333,
+     "min": 5.3186,
+     "median": 5.94755,
+     "p95": 6.714359999999999,
+     "p99": 7.280325,
+     "max": 9.5051
+    },
+    "GameThreadTime": {
+     "n": 1200,
+     "mean": 5.998273583333333,
+     "min": 5.3401,
+     "median": 5.9165,
+     "p95": 6.747669999999999,
+     "p99": 7.219799999999999,
+     "max": 8.8699
+    },
+    "RenderThreadTime": {
+     "n": 1200,
+     "mean": 2.9905844166666666,
+     "min": 2.5341,
+     "median": 2.9204,
+     "p95": 3.576914999999999,
+     "p99": 4.0715200000000005,
+     "max": 4.7376
+    },
+    "GPUTime": {
+     "n": 1200,
+     "mean": 3.01239025,
+     "min": 2.6796,
+     "median": 2.99715,
+     "p95": 3.36605,
+     "p99": 3.4838279999999995,
+     "max": 3.7534
+    },
+    "TestTrustProbe/GameThread/Injected": {
+     "n": 1200,
+     "mean": 0.5008665,
+     "min": 0.5,
+     "median": 0.5001,
+     "p95": 0.5005,
+     "p99": 0.524818,
+     "max": 0.6491
+    }
+   },
+   "frames": 1200,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_055612_gate-eval3_X05_r8",
+    "ttwarmup": "5.0",
+    "ttcapture": "20.0",
+    "ttinjectms": "0.5",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 36.7 ms; start-position hash 0x7F189215",
+    "End-state hash 0x2C812651 (612 state changes) at world time 25.016668 s"
+   ],
+   "problems": [],
+   "valid": true
+  }
+ ]
+}

@@ -228,6 +228,36 @@ Every run was pinned (`0xFFFF`) and took 7.1–8.6 s of wall time from launch to
   - Unused parameters and a dead branch removed.
   - Efficiency: nothing material. N3 costs about 1.2 ms per call; the whole evaluation of 128 runs is estimated at about 3 s, mostly CSV loading.
 
+## Phase 5 · S4: gate data, captured before any evaluation (2026-11-21)
+
+Protocol of `01` §7 and `02` §7, unchanged: packaged Development, `-deterministic -FPS=60`, 1280×720 windowed, `-novsync`, N = 1,000 agents, W = 128, seed 1, **5 s warm-up + 20 s capture (1,200 frames)**, every run pinned to `0xFFFF`, one discarded priming run per batch, 3 s cool-down between runs. The rule parameters were fixed in code before these batches (`tt_gate.py`, `02` §7) and were not changed afterwards.
+
+| Batch | Queue job (ok, exit 0) | Ran | Runs | Valid |
+|---|---|---|---|---|
+| `2026-11-21_050350_gate-stored` (stored baseline) | `20261121_041601_dd3a68`, 159.3 s | 05:03–05:06 | priming + 10 × `X0` | 11 of 11 |
+| `2026-11-21_053701_gate-eval1` | `20261121_050715_faa5e5`, 496.3 s | 05:37–05:45 | priming + 8 rounds × 4 configs | 33 of 33 |
+| `2026-11-21_054518_gate-eval2` | `20261121_050715_f24f53`, 519.7 s | 05:45–05:54 | the same | 33 of 33 |
+| `2026-11-21_055612_gate-eval3` | `20261121_050723_bbcc56`, 495.8 s | 05:56–06:04 | the same | 33 of 33 |
+| `2026-11-21_060429_gate-eval4` | `20261121_050723_b75a3a`, 497.3 s | 06:04–06:13 | the same | 33 of 33 |
+
+- **143 of 143 runs valid**, about 36 minutes of queue time.
+- **Determinism held in every run:** start hash `0x7F189215` and end-state hash `0x2C812651` (612 state changes, at 25 s of world time) in all 143.
+- The stored baseline was captured **31 minutes before** the first evaluation batch, with other projects' jobs in between. Batches 2 and 4 started within a second of batches 1 and 3 ended; batches 1 and 3 followed other projects' jobs.
+
+`GameThreadTime` per-run median, median across the runs of each config [min–max], in ms:
+
+| Batch | `X0` | `X025` | `X05` | `X10` |
+|---|---|---|---|---|
+| stored | 5.236 [4.853–5.480] | | | |
+| eval 1 | 5.361 [4.949–5.674] | 5.665 [4.982–5.897] | 5.859 [5.346–6.242] | 6.248 [5.970–6.744] |
+| eval 2 | 5.508 [5.400–5.938] | 5.788 [5.628–7.590] | 6.045 [5.806–8.141] | 6.374 [6.230–6.656] |
+| eval 3 | 5.350 [4.823–5.498] | 5.588 [5.412–5.812] | 5.830 [5.588–5.993] | 6.300 [6.107–6.393] |
+| eval 4 | 5.395 [5.279–5.478] | 5.569 [5.479–5.839] | 5.825 [5.718–5.853] | 6.258 [6.128–6.341] |
+
+**Two things the raw data shows before any rule:**
+- **Within a batch, unchanged runs spread over 0.2–0.7 ms**, which is as large as the smallest injected size (0.25 ms).
+- **The first measured run after a pause is faster.** In batches 1 and 3, which followed other projects' jobs, the runs of round 1 were 0.2–0.7 ms below their config's batch median, most of all the first ones (`X0` 4.95 and 4.82 ms, against batch medians of 5.36 and 5.35). Batches 2 and 4 started on an already busy machine and show no such dip. S2's first run after packaging was also 0.5 ms faster. The likely cause is thermal or clock state after an idle gap **[inferred]**. The single priming run doesn't remove it.
+
 ## Phase 5 · S6: UE5-UpdateBudget "before" (M-P1, 2026-11-21)
 
 **Order note:** S6–S8 need only the runner, so they were queued at the start of Phase 5, while S1 was being written, to use the machine's queue time; their order relative to S1–S5 doesn't affect any result. S6 was captured **before** any new test existed (`03` rule: baselines before the new thing).
