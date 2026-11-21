@@ -1,8 +1,8 @@
 // P03 TestTrust (sample) - automation tests for FTTSampleRules. Run: Tools\run_tests.bat (filter TestTrust.Sample).
 // The mutation runner never mutates this folder (Tests/ is excluded by its configuration).
 //
-// DELIBERATE GAP: no test puts a target exactly at the range limit, so the mutant "<= becomes <" in IsInRange must
-// survive. The Phase 4 smoke test checks that the runner reports it (09, P4 runner smoke test); Phase 7 adds the test.
+// The deliberate gap of Phase 4 (no target exactly at the range limit, so the mutant "<= becomes <" in IsInRange
+// survived, 09 P4-R) is closed by Range.ExactlyAtLimit, added in Phase 7 from that survivor.
 
 #include "Misc/AutomationTest.h"
 #include "TTSampleRules.h"
@@ -41,6 +41,14 @@ bool FTTSampleRangeTest::RunTest(const FString& Parameters)
 {
 	TestTrue(TEXT("5 units away, range 10"), FTTSampleRules::IsInRange(FVector::ZeroVector, FVector(5.0, 0.0, 0.0), 10.0));
 	TestFalse(TEXT("20 units away, range 10"), FTTSampleRules::IsInRange(FVector::ZeroVector, FVector(20.0, 0.0, 0.0), 10.0));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTTSampleRangeLimitTest, "TestTrust.Sample.Range.ExactlyAtLimit", TTSampleTests::Flags)
+bool FTTSampleRangeLimitTest::RunTest(const FString& Parameters)
+{
+	// 10 * 10 = 100 exactly in double, so the boundary is hit without rounding: "at the range" counts as in range.
+	TestTrue(TEXT("exactly 10 units away, range 10"), FTTSampleRules::IsInRange(FVector::ZeroVector, FVector(10.0, 0.0, 0.0), 10.0));
 	return true;
 }
 

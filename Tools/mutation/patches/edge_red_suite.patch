@@ -1,0 +1,11 @@
+--- a/TestTrust/Source/TestTrustSample/Private/Tests/TTSampleEdgeCasesTests.cpp
++++ b/TestTrust/Source/TestTrustSample/Private/Tests/TTSampleEdgeCasesTests.cpp
+@@ -14,7 +14,7 @@
+ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FTTSampleEdgeTotalPriceTest, "TestTrust.Sample.Edge.TotalPrice", TTSampleEdgeTests::Flags)
+ bool FTTSampleEdgeTotalPriceTest::RunTest(const FString& Parameters)
+ {
+-	TestEqual(TEXT("3 items at 2.50 plus a 1.00 fee"), FTTSampleEdgeCases::TotalPrice(FTTSampleMoney{ 250 }, 3, FTTSampleMoney{ 100 }).Cents, 850);
++	TestEqual(TEXT("3 items at 2.50 plus a 1.00 fee"), FTTSampleEdgeCases::TotalPrice(FTTSampleMoney{ 250 }, 3, FTTSampleMoney{ 100 }).Cents, 851);
+ 	return true;
+ }
+ 

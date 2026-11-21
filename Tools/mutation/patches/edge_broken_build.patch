@@ -1,0 +1,10 @@
+--- a/TestTrust/Source/TestTrustSample/Private/TTSampleEdgeCases.cpp
++++ b/TestTrust/Source/TestTrustSample/Private/TTSampleEdgeCases.cpp
+@@ -1,6 +1,7 @@
+ // P03 TestTrust (sample) - FTTSampleEdgeCases. Predicted mutants and fates: 09, Phase 7.
+ 
+ #include "TTSampleEdgeCases.h"
++#error "Phase 7: a deliberately broken target; the runner must refuse to run any mutant on it"
+ 
+ FTTSampleMoney FTTSampleEdgeCases::TotalPrice(FTTSampleMoney Unit, int32 Count, FTTSampleMoney Fee)
+ {

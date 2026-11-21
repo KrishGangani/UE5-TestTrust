@@ -314,7 +314,13 @@ def restore(manifest: dict) -> None:
         with open(os.path.join(pristine_root(manifest), relative), encoding="utf-8", newline="") as handle:
             pristine = handle.read()
         target = os.path.join(project_root(manifest), relative)
-        if read_text(target) != pristine:
+        current = None
+        if os.path.exists(target):
+            # newline="" on both sides: read_text() would turn CRLF into LF, so a CRLF file would never compare
+            # equal and would be rewritten, and so recompiled, at every batch start (found in Phase 7).
+            with open(target, encoding="utf-8", errors="replace", newline="") as handle:
+                current = handle.read()
+        if current != pristine:
             with open(target, "w", encoding="utf-8", newline="") as handle:
                 handle.write(pristine)
 
@@ -522,6 +528,7 @@ def cmd_selftest(_args) -> int:
         print("scores:", s)
     ok = safety_selftest() and ok
     ok = patch_selftest() and ok
+    ok = crash_selftest() and ok
     print("selftest:", "ok" if ok else "FAILED")
     return 0 if ok else 1
 
@@ -585,6 +592,76 @@ def patch_selftest() -> bool:
     os.remove(patch)
     if not ok:
         print("patch selftest: apply_patch did not patch only the snapshot")
+    return ok
+
+
+# A child process that runs `batch` with Unreal replaced by fakes: the baseline is green, and each mutant's test run
+# either passes or, with CRASH set, kills the whole process (os._exit) after the mutated file was written and built,
+# exactly where a power cut, a queue timeout or a Ctrl+C would hit a real batch.
+CRASH_CHILD = """
+import os, sys
+sys.path.insert(0, {tools!r})
+import tt_mutate
+crash = {crash!r}
+def build(manifest, name):
+    return {{"exit_code": 0, "seconds": 0.5, "compile_actions": 1, "compile_error": False}}
+def run_tests(manifest, name, timeout):
+    if crash and not name.startswith("b"):
+        os._exit(9)
+    report = {{"succeeded": 1, "succeededWithWarnings": 0, "failed": 0, "notRun": 0, "failed_tests": []}}
+    return {{"exit_code": 0, "seconds": 0.5, "report": report, "test_complete": True}}
+tt_mutate.build, tt_mutate.run_tests = build, run_tests
+sys.exit(tt_mutate.main(["batch", "--campaign", {campaign!r}]))
+"""
+
+
+def crash_selftest() -> bool:
+    """Runner crash recovery (Phase 7), without Unreal: a batch killed after writing a mutated file leaves a readable
+    manifest and the mutant still pending; the next batch restores the file first, then runs the mutant again."""
+    campaign = "_selftest_crash"
+    root = os.path.join(WORK_DIR, campaign)
+    shutil.rmtree(root, ignore_errors=True)
+    relative = "Source/M/Private/A.cpp"
+    source = "int F(int A)\r\n{\r\n\treturn A + 1;\r\n}\r\n"
+    for folder in (os.path.join(root, "Proj"), os.path.join(root, "_pristine")):
+        os.makedirs(os.path.dirname(os.path.join(folder, relative)))
+        with open(os.path.join(folder, relative), "w", encoding="utf-8", newline="") as handle:
+            handle.write(source)
+    mutant = next(m for m in tt_mutants.generate(relative, source, ("AOR",)))
+    manifest = {"campaign": campaign, "config": {"project_subdir": "Proj", "uproject": "Proj.uproject",
+                                                 "editor_target": "ProjEditor", "test_filter": "StartsWith:M"},
+                "target": {}, "baselines": [], "batches": [],
+                "mutants": [{"id": mutant.id, "file": relative, "operator": mutant.operator, "line": mutant.line,
+                             "col": mutant.col, "start": mutant.start, "end": mutant.end, "original": mutant.original,
+                             "replacement": mutant.replacement, "fate": None, "attempts": 0}]}
+    save(manifest)
+    target = os.path.join(root, "Proj", relative)
+
+    def current() -> str:
+        with open(target, encoding="utf-8", newline="") as handle:   # the bytes, CRLF included
+            return handle.read()
+
+    def child(crash: bool) -> int:
+        code = CRASH_CHILD.format(tools=TOOLS_DIR, crash=crash, campaign=campaign)
+        return subprocess.run([sys.executable, "-I", "-c", code], capture_output=True).returncode
+
+    try:
+        crashed = child(crash=True)
+        after_crash = load(campaign)          # must still be valid JSON: every save is atomic
+        left_mutated = current() == mutant.apply(source)
+        ok = (crashed == 9 and left_mutated and after_crash["mutants"][0]["fate"] is None
+              and after_crash["batches"][0].get("stopped") is None)   # an interrupted batch has no stop reason
+        resumed = child(crash=False)
+        final = load(campaign)
+        ok = ok and resumed == 0 and current() == source and final["mutants"][0]["fate"] == "survived" \
+            and len(final["batches"]) == 2 and final["batches"][1]["stopped"] == "all mutants have a fate"
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+        shutil.rmtree(log_dir(campaign), ignore_errors=True)
+        if os.path.exists(manifest_path(campaign)):
+            os.remove(manifest_path(campaign))
+    if not ok:
+        print("crash selftest: a killed batch did not recover", crashed, left_mutated)
     return ok
 
 

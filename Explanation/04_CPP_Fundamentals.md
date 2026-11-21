@@ -154,3 +154,11 @@ uint32 HashState(int32& OutStateChanges) const;
 ```
 - A non-`const` reference (`int32&`) lets the function write a second result into the caller's variable; the `Out` prefix is Unreal's naming convention for it. The trailing `const` promises the function doesn't change the object.
 - **In our code:** `UTTWorkloadSubsystem::HashState` returns the hash and writes the total state-change count, both logged on one line.
+
+## 17. Operator overloading, and an operator that doesn't exist
+
+```cpp
+struct FTTSampleMoney { int32 Cents = 0; FTTSampleMoney operator+(const FTTSampleMoney& O) const { return { Cents + O.Cents }; } };
+```
+- `A + B` on two `FTTSampleMoney` calls this member function. `A - B` compiles only if an `operator-` exists; here none does, so the expression is a compile error.
+- **In our code:** that is exactly what makes `TotalPrice`'s mutants stillborn (Phase 7): the mutation operator replaces the text `+` with `-`, and the compiler finds no `operator-`.

@@ -29,6 +29,8 @@
 | ⚠ caught (S7): **`git apply` inside another repository's ignored folder.** In a snapshot under `Tools\_work\`, `git apply` resolved the paths against this repository and changed nothing, with exit 0 | An "after" campaign whose score equals the "before" score | `GIT_CEILING_DIRECTORIES` = the snapshot's parent, and a check that every target changed (`tt_mutate.apply_patch`) | `tt_mutate.py selftest` (`patch_selftest`); hash a target before and after |
 | ⚠ caught (code review, S7): **a patch whose line endings differ from the files.** `git diff` ran inside this repository, whose `* text=auto` turned the CRLF test file into an LF patch | `git apply` reports "patch does not apply" | Apply with `--ignore-whitespace`; keep the patch's bytes with `*.patch -text`, so its recorded SHA-256 stays valid | Count CRLF and LF in the patch and in the target |
 | ⚠ caught (code review, S7): **an inherited `GIT_DIR`.** A git hook or wrapper that sets it redirects every git call of the runner to that repository | A snapshot or patch from the wrong repository | `main()` clears `GIT_DIR` and `GIT_WORK_TREE` | The self-test with `GIT_DIR` set |
+| ⚠ caught (Phase 7): **comparing a CRLF file through a reader that normalises newlines.** `restore()` read the target with universal newlines and the pristine copy without, so they never matched | Every batch start rewrites (and so recompiles) the mutated files although nothing changed | Read both sides with `newline=""` | Compare the bytes: `open(path, newline="").read()` |
+| ⚠ caught (Phase 7, while writing the crash self-test): the same normalisation in a test's own check | The test says "not restored" for a file that was restored | Read the bytes | — |
 
 ## Gate tools (Python: `run_bench.py`, `tt_gate.py`)
 
@@ -78,6 +80,7 @@
 | `EditorContext` only on a test | The test is missing from `-game` runs | `EditorContext | ClientContext` | `Automation List` in each mode |
 | Exact float comparison | A rounding difference fails the test | `TestEqual` with its float tolerance | The failure message prints both values |
 | Putting rule constants in the `.cpp` and copying them into tests | A constant changes in one place only | One `static constexpr` in the header, used by both | — |
+| Two test files defining the same helper in the same namespace | A unity build fails with a redefinition error, a non-unity build doesn't (so it can appear only on another machine or after adding a file) | One namespace per test file (`TTSampleTests`, `TTSampleEdgeTests`) | Build with `-DisableUnity` and without |
 
 ## Build and project files
 

@@ -5,7 +5,7 @@
 | Part | Step | Files |
 |---|---|---|
 | A | Phase 4, F1 (project and modules) | `.uproject`, two `Target.cs`, three `Build.cs`, three module `.cpp`, `.uplugin`, three `.ini` |
-| B | Phase 4, F2 (sample rules and tests) | `TTSampleRules.h`, `TTSampleRules.cpp`, `TTSampleRulesTests.cpp` |
+| B | Phase 4, F2 (sample rules and tests); Phase 7 (edge cases) | `TTSampleRules.h`, `TTSampleRules.cpp`, `TTSampleRulesTests.cpp`; `TTSampleEdgeCases.h/.cpp`, `TTSampleEdgeCasesTests.cpp` |
 | C | Phase 4, F3 (scripts) | `Tools\*.bat` |
 | D | Phase 2, Phase 4 F4, Phase 5 S6/S8 (Python and campaign configs) | `probe_build_cost.py`, `tt_common.py`, `tt_mutants.py`, `tt_mutate.py`, `mutation\sample.json`, `mutation\sample_review.json`, `mutation\sample_repeat.json`, `mutation\updatebudget.json`, `mutation\updatebudget_review.json` |
 | E | Phase 5, S1 (the probe plugin) | `TTProbeWindow.h/.cpp`, `TTProbeSubsystem.h/.cpp`, `Tests\TTProbeTests.cpp`, `Tools\csv_stats.py`, `Tools\run_checks.py` |
@@ -233,6 +233,20 @@ float FTTSampleRules::TickCooldown(float Remaining, float DeltaSeconds)
 | `Cooldown.CountsDown`: `TickCooldown(1.0f, 0.25f) == 0.75f` | `TestEqual` for `float` uses a tolerance (`AutomationTest.h:1988`). Kills `-`→`+` (1.25) and `>`→`<=` (0) |
 | `Cooldown.StopsAtZero`: `TickCooldown(0.1f, 0.5f) == 0.0f` | Checks the clamp |
 
+### B4. *Phase 7:* `TTSampleEdgeCases.h`, `TTSampleEdgeCases.cpp`, `Tests\TTSampleEdgeCasesTests.cpp`
+
+Two functions written so that the runner's rarer fates really happen on a real build, instead of only in the self-test. They live in the sample module, so the campaign that exercises them (`09` Phase 7) can't touch the probe or the workload.
+
+| Line | What it does, and why |
+|---|---|
+| `struct FTTSampleMoney { int32 Cents; operator+; operator*(int32) }` (header) | Money that can be added and multiplied by a count, **and nothing else**. A mutant that turns `+` into `-` or `*` into `/` then names an operator that doesn't exist: it fails to compile, so it is *stillborn*. The struct is in the header, which the runner never mutates, so its own operators stay intact |
+| `TotalPrice`: `return Unit * Count + Fee;` | Two AOR mutants (`*` → `/`, `+` → `-`), both stillborn by construction. They show that a compile failure is excluded from M1, not counted as a kill (M1-naive counts it) |
+| `TicksToDrain`: `while (Remaining > 0.0f) { Remaining -= Step; ++Ticks; }` | Six mutants. Two of them never end: `-=` → `+=` (the amount grows) and deleting `Remaining -= Step;` (it never shrinks). Their test run must be stopped by the runner's test timeout, max(120 s, 3 × the baseline's test time), and classified *timeout*. The other four (`>=`, `<=`, the inverted condition, deleting `++Ticks;`) change the count and are killed |
+| `TestTrust.Sample.Edge.TotalPrice`: 3 × 250 + 100 = 850 cents | Kills nothing (both mutants are stillborn) but makes the baseline exercise the function |
+| `TestTrust.Sample.Edge.TicksToDrain`: (1.0, 0.25) → 4 and (0.0, 0.25) → 0 | 0.25 is an exact binary fraction, so 1.0 reaches exactly 0.0 after four steps: `>=` then gives 5. The second case kills `<=` and the inverted condition without relying on the first |
+| `namespace TTSampleEdgeTests` | Its own namespace for `Flags`: in a unity build this file and `TTSampleRulesTests.cpp` can share one translation unit, and two definitions of `TTSampleTests::Flags` would not compile |
+| *Phase 7:* `TestTrust.Sample.Range.ExactlyAtLimit` (in `TTSampleRulesTests.cpp`) | The deliberate gap of Phase 4 closed from its survivor (`62c038c366`, `<=` → `<` in `IsInRange`): a target exactly 10 units away with range 10 (10 × 10 = 100 exactly in `double`) is in range |
+
 ## Part C · Scripts (Phase 4, F3)
 
 All of them are adapted from UE5-UpdateBudget's scripts and must be run **through the machine queue**.
@@ -316,7 +330,7 @@ All of them are adapted from UE5-UpdateBudget's scripts and must be run **throug
 | `run_tests()` | A fresh `UnrealEditor-Cmd` per mutant, pinned (`tt_common.pinned(..., console=True)`), with `-ExecCmds="Automation Now;RunTests <filter>;Quit"`: `Now` first skips the controller's fixed 5 s start delay (`01b #9`; the probe measured it in every launch), and its report in the snapshot's `Saved\TestTrustReports\` folder (git-ignored, and skipped by the portfolio link checker, because the engine also writes an HTML page with absolute asset links). Reads `succeeded`, `succeededWithWarnings`, `failed`, `notRun` and the names of failed tests from `index.json` (`01b #5`) |
 | *Phase 6:* the engine log | `-abslog=<campaign>/<id>_a<n>_engine.log` keeps each launch's full engine log next to its build log (Rule 12's cross-check read them). `test_complete` records whether it contains `TEST COMPLETE`; it is stored, not used for the fate |
 | `classify()` | The fate table of `02` §9 as a pure function. Order matters: a hung build is an error; no test result after a good build (the mutant couldn't be applied) is an error; a non-zero build exit is stillborn only with a compile error; a test timeout beats everything else; a missing report is a crash; then killed if anything failed, fewer tests completed than in the baseline, or the exit code was non-zero; otherwise survived |
-| `restore()` | Writes every target file back from `_pristine/` if it differs. Called at the start of every batch (undoes a batch killed mid-mutant) and after every mutant (in a `finally`) |
+| `restore()` | Writes every target file back from `_pristine/` if it differs, comparing the bytes (`newline=""` on both sides). **Fixed in Phase 7:** it compared through `read_text()`, which turns CRLF into LF, so a CRLF file never compared equal and was rewritten, with a new timestamp, at every batch start; UBT then recompiles it (`01b #1`) **[inferred; no campaign so far had more than one batch]**. Called at the start of every batch (undoes a batch killed mid-mutant) and after every mutant (in a `finally`) |
 | `pending()` | Mutants without a fate, plus *error* fates with fewer than two attempts |
 | `estimate_seconds()` | The median cost of mutants already run, or baseline + 60 s before any has run; used to stop **before** the budget would be exceeded |
 | `cmd_batch()` | Restore → build and test the unmutated snapshot → refuse (exit 3) unless it built, exited 0, ran ≥ 1 test and failed none → test timeout = max(120 s, 3 × baseline) → for each pending mutant while the budget allows: apply, build, test, restore, classify, save. The build result starts as "nothing ran", and `OSError`/`ValueError` (a locked file, a file that changed since planning) are caught and stored in `detail`, so such a mutant becomes an *error* (retried once) instead of crashing the batch (found in the Phase 4 self-review, `07`) |
@@ -327,7 +341,7 @@ All of them are adapted from UE5-UpdateBudget's scripts and must be run **throug
 | `cmd_report()` | The summary page: fates, the three scores, a per-operator table, cost per mutant and per batch, and the survivor table with review verdicts from `Tools/mutation/<name>_review.json` |
 | `main()` | Reconfigures `stdout` to UTF-8 with `errors="replace"`. **Fixed after P4-R:** the Windows console's cp1252 couldn't print the report's `→`, and the driver crashed *after* a successful batch |
 | *Phase 6:* defaults | `batch --max-seconds 1800`, `queue --batch-seconds 1800` (`02` §7). `main()` also clears an inherited `GIT_DIR`/`GIT_WORK_TREE` (H2) |
-| `cmd_selftest()` / `safety_selftest()` / `patch_selftest()` | Eight classification cases (including the 4294967295 exit code of a failed run); the three scores on a known example; SC2: a throwaway repository with an **uncommitted edit** is snapshotted, and its tree hash, status and file time must be unchanged and the edit must not appear in the snapshot; the patch path (H2) |
+| `cmd_selftest()` / `safety_selftest()` / `patch_selftest()` / `crash_selftest()` | Eight classification cases (including the 4294967295 exit code of a failed run); the three scores on a known example; SC2: a throwaway repository with an **uncommitted edit** is snapshotted, and its tree hash, status and file time must be unchanged and the edit must not appear in the snapshot; the patch path (H2); and **crash recovery** (Phase 7): a child process runs `batch` with Unreal replaced by fakes and is killed (`os._exit`) right after a mutant was written and built. Then the manifest must still load, the mutant must still be pending, the file must still be mutated, and the interrupted batch must have no stop reason; a second child must restore the file first, run the mutant again and finish with "all mutants have a fate" |
 
 ### D5. `Tools\mutation\sample.json`
 
