@@ -4,11 +4,11 @@
 
 **Domain:** Debugging & automated testing · **Difficulty:** ★★★★☆ · **Engine:** UE 5.8.4
 
-> **Status: in progress. There are no results yet.** Phases 1–4 are done. Sections marked *(pending)* are filled in only from real measurements, in the phase named. The success criteria are **targets fixed before the code they judge**, not results.
+> **Status: in progress.** Phases 1–4 are done; Phase 5 (implementation) is done, with its first measured results below. Sections marked *(pending)* are filled in only from real measurements, in the phase named. The success criteria are **targets fixed before the code they judge**, not results.
 
 | Phase | 1 Problem | 2 Research | 3 Architecture | 4 Foundation | 5 Implementation | 6 Explanation | 7 Testing | 8 Profiling | 9 Review | 10 Portfolio |
 |---|---|---|---|---|---|---|---|---|---|---|
-| State | ✓ | ✓ | ✓ final | ✓ | next | ongoing | — | — | — | — |
+| State | ✓ | ✓ | ✓ final | ✓ | ✓ | ongoing | next | — | — | — |
 
 ---
 
@@ -32,7 +32,10 @@ Final (v1.0): [Explanation/02_System_Architecture.md](Explanation/02_System_Arch
 
 ## Before / after comparison
 
-*(pending, Phases 5–8)*. Mutation: UE5-UpdateBudget's scheduler suite before and after tests aimed at its survivors. Gate: false-positive and detection rates of the TestTrust gate against three naive gates on the same runs.
+*(Phase 5 results; the full write-up follows in Phases 7–8.)*
+
+- **Mutation, UE5-UpdateBudget's scheduler** (`b890bc6`, 39 mutants): M1 **92.1%** with its own 8 tests; three survivors were real boundary gaps. Three tests written from the survivor list, applied as a patch to a snapshot only, raise it to **100%** (one survivor left, reviewed as equivalent). Median cost **13.9 s per mutant** over 106 mutants. [09 S6–S8](Explanation/09_Testing_And_Benchmarks.md).
+- **Gate:** single-run detection 100% at +1.0 ms, 94% / 88% at +0.5 ms and 56% / 41% at +0.25 ms (interleaved / stored baseline), with 15.6% / 3.1% false positives on 32 unchanged runs. The ≤ 5% target holds only against the stored baseline, and the TestTrust rule does not beat the naive gates on every rate: SC5–SC7 are partly **not met**, reported as measured. [09 S5](Explanation/09_Testing_And_Benchmarks.md).
 
 ## Benchmark results
 
@@ -45,7 +48,7 @@ Final (v1.0): [Explanation/02_System_Architecture.md](Explanation/02_System_Arch
 ## Source code
 
 - The UE project is in [TestTrust/](TestTrust/) (UE 5.8.4, C++): the reusable probe is the plugin `TestTrustProbe`; the workload is the game module `TestTrust`; the runner's sample target is the module `TestTrustSample`.
-- The runner and the statistics are Python, in [Tools/](Tools/) (`tt_mutate.py`, `tt_mutants.py`, `tt_common.py`).
+- The runner and the statistics are Python, in [Tools/](Tools/) (`tt_mutate.py`, `tt_mutants.py`, `tt_common.py`; the gate: `run_bench.py`, `csv_stats.py`, `tt_gate.py`; step checks: `run_checks.py`).
 
 ## Documentation
 
@@ -56,8 +59,8 @@ Final (v1.0): [Explanation/02_System_Architecture.md](Explanation/02_System_Arch
 | [01b_Research_Findings](Explanation/01b_Research_Findings.md) | Phase 2: verified engine behaviour (UE 5.8.4), the measured cost of a mutant, and what it changed in the design |
 | [02_System_Architecture](Explanation/02_System_Architecture.md) | Final v1.0: modules, components, flows, defaults, safety rules, fates and scores, rejected alternatives |
 | [03_Implementation_Roadmap](Explanation/03_Implementation_Roadmap.md) | The ordered build steps; baselines captured before the new system is evaluated |
-| [04](Explanation/04_CPP_Fundamentals.md) · [05](Explanation/05_Line_By_Line_Code_Explanation.md) · [06](Explanation/06_Unreal_APIs_And_Macros.md) · [07](Explanation/07_Common_Mistakes.md) | C++ fundamentals, line-by-line code, APIs and macros, common mistakes (current to Phase 4) |
-| [09](Explanation/09_Testing_And_Benchmarks.md) | Every check so far: the build-cost probe, the Phase 4 checks, the runner smoke test |
+| [04](Explanation/04_CPP_Fundamentals.md) · [05](Explanation/05_Line_By_Line_Code_Explanation.md) · [06](Explanation/06_Unreal_APIs_And_Macros.md) · [07](Explanation/07_Common_Mistakes.md) | C++ fundamentals, line-by-line code, APIs and macros, common mistakes (current to Phase 5) |
+| [09](Explanation/09_Testing_And_Benchmarks.md) | Every check so far: the build-cost probe, the Phase 4 checks, the runner smoke test, and Phase 5's step checks, mutation campaigns and gate batches |
 | [08](Explanation/08_Debugging_And_Profiling.md) · [10](Explanation/10_Interview_Questions.md) · [11](Explanation/11_Optimization_Decisions.md) · [12](Explanation/12_Future_Scalability.md) | Debugging and profiling, interview questions, optimisation decisions, future scalability. Filled in during Phases 7–10 |
 | [Research/](Explanation/Research/) | The portfolio-wide research this project draws on: job market, technical challenges, existing solutions, local engine verification |
 

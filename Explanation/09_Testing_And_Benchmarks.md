@@ -258,6 +258,50 @@ Protocol of `01` §7 and `02` §7, unchanged: packaged Development, `-determinis
 - **Within a batch, unchanged runs spread over 0.2–0.7 ms**, which is as large as the smallest injected size (0.25 ms).
 - **The first measured run after a pause is faster.** In batches 1 and 3, which followed other projects' jobs, the runs of round 1 were 0.2–0.7 ms below their config's batch median, most of all the first ones (`X0` 4.95 and 4.82 ms, against batch medians of 5.36 and 5.35). Batches 2 and 4 started on an already busy machine and show no such dip. S2's first run after packaging was also 0.5 ms faster. The likely cause is thermal or clock state after an idle gap **[inferred]**. The single priming run doesn't remove it.
 
+## Phase 5 · S5: gate evaluation, SC5–SC8 and H3–H5 (2026-11-21)
+
+`tt_gate.py evaluate --stored <gate-stored> --batches <gate-eval1..4> --label 2026-11-21_s5` (4.1 s) → `Benchmarks\Summaries\2026-11-21_s5_gate_evaluation.md`. Counts are flagged / judged runs.
+
+| Rule | (a) interleaved: `X0` FP | `X025` | `X05` | `X10` | (b) stored: `X0` FP | `X025` | `X05` | `X10` |
+|---|---|---|---|---|---|---|---|---|
+| **TT** | **5/32 (15.6%)** | 18/32 (56%) | 30/32 (94%) | 32/32 | **1/32 (3.1%)** | 13/32 (41%) | 28/32 (88%) | 32/32 |
+| N1 (+5% mean `FrameTime`) | 3/32 (9%) | 12/32 (38%) | 29/32 (91%) | 32/32 | 4/32 (12%) | 22/32 (69%) | 30/32 (94%) | 32/32 |
+| N2 (mean + 2 sd) | 2/32 (6%) | 9/32 (28%) | 22/32 (69%) | 32/32 | 7/32 (22%) | 23/32 (72%) | 30/32 (94%) | 32/32 |
+| N3 (frame-level Mann–Whitney) | 15/32 (47%) | 31/32 (97%) | 32/32 | 32/32 | 29/32 (91%) | 30/32 (94%) | 32/32 | 32/32 |
+
+**Success criteria, as measured against the targets fixed in `01` §6.4:**
+
+| # | Target | (a) interleaved | (b) stored |
+|---|---|---|---|
+| SC5 false positives | ≤ 5% of ≥ 30 unchanged runs | ❌ **not met**: 15.6% (5/32) | ✅ met: 3.1% (1/32) |
+| SC6 detection 1.0 ms | 100% | ✅ 100% | ✅ 100% |
+| SC6 detection 0.5 ms | ≥ 95% | ❌ 93.8% | ❌ 87.5% |
+| SC6 detection 0.25 ms | ≥ 80% | ❌ 56.2% | ❌ 40.6% |
+| SC7 better than N1–N3 | FP ≤ and detection ≥ every naive rule | ❌ TT has more false positives than N1 and N2 | ❌ TT has the fewest false positives, but detects less than N1 and N2 at 0.25 and 0.5 ms |
+| SC8 fast enough | ≤ 90 s per decision | ✅ **about 12 s**: one run takes 11.1–16.3 s from launch to exit (median 12.2 s), `decide` 0.08 s | |
+
+The M-P1 mutation batches' wall times (SC8's second part): 687.7 s (S6) and 656.9 s (S7).
+
+**Honest reading:** the TestTrust gate is **not** the better gate that SC5–SC7 asked for. It is reliable at 1.0 ms (17% of the frame's game-thread time), nearly reliable at 0.5 ms, and not reliable at 0.25 ms (4.3%), on either baseline. Its false-positive rate meets the target only against the stored baseline.
+
+**Why** (analysis of the same data; the verdict above stands as measured):
+- **The interleaved false positives come from the p95.** All 5 `X0` flags under (a) involve the p95 statistic (3 p95 only, 2 both). Seven runs give a tight median and MAD, and a single run's p95 (its slowest 60 frames) moves more than that. The stored batch's p95 values spread more (6.09–7.03 ms), which made its p95 limit wide (7.86 ms). That is why (b) has fewer false positives and less detection.
+- **The noise floor is the same size as the smallest regression.** Within one batch the `X0` medians spread over 0.2–0.7 ms. One 20 s run can't separate a 0.25 ms shift from that with a 3-sigma rule.
+- **Exploratory re-counts, not results.** These choices were not fixed before the data, so they can't change a verdict. They only show the size of the effects:
+  - A median-only TT gives (a) 2/32 false positives (6.3%) with 12/32 detection at 0.25 ms, and (b) the same as now.
+  - Leaving out each batch's round 1 (the post-pause dip) gives (a) 3/28 (10.7%), (b) 1/28.
+  - Neither variant reaches SC5a and SC6 together. A real change would need its own pre-registered batch (`11`).
+
+**Hypotheses:**
+- **H3 (naive checks are noise-dominated): supported, and it limits TT too.**
+  - N1 flags 9–12% of unchanged runs and misses 62% of 0.25 ms regressions with the interleaved reference.
+  - N2 flags 22% against the stored baseline.
+  - Every rule is limited by the same spread; TT trades between false positives and detection, and doesn't escape it.
+- **H4 (stored baselines drift and raise the false-positive rate): the drift is real, the effect depends on the rule.**
+  - The evaluation batches' `X0` level was 0.11–0.27 ms above the stored batch's.
+  - With the stored baseline, the false-positive rate rose for N1 (9 → 12%), N2 (6 → 22%) and N3 (47 → 91%), but fell for TT (16 → 3%), because the stored batch's own spread widened TT's limits.
+- **H5 (frames are not independent samples): strongly supported.** The frame-level test flags 47% (interleaved) and 91% (stored) of unchanged runs at a nominal α of 5%: thousands of autocorrelated frames are not thousands of samples.
+
 ## Phase 5 · S6: UE5-UpdateBudget "before" (M-P1, 2026-11-21)
 
 **Order note:** S6–S8 need only the runner, so they were queued at the start of Phase 5, while S1 was being written, to use the machine's queue time; their order relative to S1–S5 doesn't affect any result. S6 was captured **before** any new test existed (`03` rule: baselines before the new thing).
