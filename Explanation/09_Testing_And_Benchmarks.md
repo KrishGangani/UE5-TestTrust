@@ -415,3 +415,15 @@ The remaining survivor is `fbd237213c`, the tie-break already reviewed as **equi
   - Each mutant's engine log matches its fate: 11 survivors with `TEST COMPLETE. EXIT CODE: 0`, 73 kills with `EXIT CODE: -1`, and 22 crashes with no `TEST COMPLETE` line.
   - Even a falsely zero test exit couldn't turn a failing run into a survivor: the fate also needs `index.json` to report every test passed (`02` §4.1).
 - **The game's own exit code:** the probe quits with `RequestExit(false, …)`, which on Windows drops any code (brief rule 12). The gate never needs a failure code from the game: a run is judged valid on its capture and log as well as exit 0 (`05` G1), and a crash still ends non-zero.
+
+
+## Phase 6 · Explanation pass (2026-11-21)
+
+Two read-only audits against the code and the engine, then the fixes:
+- **Docs against code:** 22 stale statements in 02 and 04–07 corrected (for example a removed getter in `04` §13, "Game and PIE" for the probe in `07`, six tests where there are thirteen in `06` §3, a k = 3 option that doesn't exist in `02` §7), and every file and non-trivial function that 05 had not explained is now covered (rows marked *Phase 6*; new `05` D7 for the other campaign configs).
+- **Engine citations:** 183 `file:line` references in 01b and 05–07 re-checked against the 5.8.4 source: 172 exact; 11 corrected (small line drifts, one range that missed its member, and `Build.bat`'s lock described as machine-wide when it is per user and per install).
+- **Three small code changes the pass found:**
+  - `tt_common.sanitize()` existed but nothing called it. Every manifest is now written by `tt_common.write_json()`: sanitised (the user profile path in all three spellings, including JSON's doubled backslashes) and atomic. `run_checks.py` gained the atomic write it lacked; the summary's environment block is sanitised too. Checked: a test file with the profile path in each spelling comes out with none.
+  - `tt_mutants.py`'s command line read files with universal newlines, so on a CRLF file it printed ids that differ from the campaign's. It now reads them as the runner does (`newline=""`); run on the P4-R snapshot, it prints the three reviewed ids.
+  - Self-tests after the changes: `tt_mutants`, `tt_mutate`, `csv_stats` and `tt_gate` all ok.
+- **`08` written:** where every log is, how to read a mutant's fate from its logs, reproducing one mutant by hand, the gate's validity reasons and capture contents, profiling the workload (`stat unit`, Insights), and the runner's own failure modes.

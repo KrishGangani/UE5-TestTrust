@@ -60,7 +60,7 @@
 3. **How it works.**
    - The static instance's constructor registers the test when the module loads (`04` §9).
    - At run time the framework keeps only tests whose **context** flags match the running application (editor, client, server, commandlet; `Runtime/Core/Private/Misc/AutomationTest.cpp:805–830`) and whose **filter** flag matches the request.
-   - The macro `static_assert`s at least one context flag and exactly one filter flag (`AutomationTest.h:4127–4133`).
+   - The macro `static_assert`s at least one context flag and exactly one filter flag (`AutomationTest.h:4126–4133`).
 4. **When to use it.** Small, synchronous tests: one function, no frames to wait for. For fixtures and per-test reset, CQTest; for "given/when/then" structure, Spec; for tests that need frames to pass, latent commands or functional tests.
 5. **When not to.** Anything that must wait for the world to tick; tests sharing state through statics (registration order is not a contract).
 6. **Common mistakes.**
@@ -73,7 +73,7 @@
    IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMyTest, "Game.Rules.Damage", EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
    bool FMyTest::RunTest(const FString& Parameters) { TestEqual(TEXT("damage"), Damage(10, 3), 7); return true; }
    ```
-8. **In this project.** Six tests named `TestTrust.Sample.*` with `EditorContext | ClientContext | ProductFilter` (the same flags as UE5-UpdateBudget's scheduler suite, the runner's first external target).
+8. **In this project.** 13 tests: six `TestTrust.Sample.*` and seven `TestTrust.Probe.*` (S1), all with `EditorContext | ClientContext | ProductFilter` (the same flags as UE5-UpdateBudget's scheduler suite, the runner's first external target).
 
 ## 4. `TestEqual` / `TestTrue` / `TestFalse`
 
@@ -127,7 +127,7 @@
 
 1. **What it is.** `Engine/Build/BatchFiles/Build.bat <Target> <Platform> <Configuration> -Project=<uproject> [options]`, which runs `UnrealBuildTool.dll` with the bundled .NET.
 2. **Why it exists.** Reproducible builds without an IDE, scriptable by a runner.
-3. **How it works.** UBT loads the target and module rules, builds or loads a cached makefile, decides which actions are out of date by **timestamps** (`Programs/UnrealBuildTool/Actions/ActionGraph.cs:752–773`), runs UHT only if reflected headers changed (`System/UHTExecution.cs:1013–1030`), compiles and links. `Build.bat` holds a machine-wide lock file while it runs (`Engine/Build/BatchFiles/Build.bat:17–30`).
+3. **How it works.** UBT loads the target and module rules, builds or loads a cached makefile, decides which actions are out of date by **timestamps** (`Programs/UnrealBuildTool/Actions/ActionGraph.cs:752–773`), runs UHT only if reflected headers changed (`System/UHTExecution.cs:1013–1030`), compiles and links. `Build.bat` holds a lock file while it runs, `%tmp%\<its own path, mangled>.lock`: per user and per engine install (`Engine/Build/BatchFiles/Build.bat:17–30`).
 4. **When to use it.** Every build in this project, always through the machine queue.
 5. **When not to.** With an editor of the same project running: Live Coding or a loaded DLL can block the link.
 6. **Common mistakes.** Faking timestamps to "skip" a rebuild (links stale objects, `01b #1`); putting a mutation target under git so that adaptive unity keeps changing its working set (`01b #3`).
@@ -154,7 +154,7 @@
 5. **When not to.** Plain data and helpers (`FTTProbeWindow`, `FTTProbeOptions`): no reflection, no GC, cheaper and testable without a world.
 6. **Common mistakes.** Including another header after `.generated.h`; forgetting `GENERATED_BODY()`; exporting a whole class with `<MODULE>_API` when only a few members are called from outside.
 7. **Example.** `UCLASS(MinimalAPI) class UMySubsystem : public UWorldSubsystem { GENERATED_BODY() public: UE_API virtual void OnWorldBeginPlay(UWorld& W) override; };`
-8. **In this project.** `UTTProbeSubsystem` (S1). Every change to its header re-runs UHT; changes to `TTProbeSubsystem.cpp` don't (the same rule the mutation runner exploits).
+8. **In this project.** `UTTProbeSubsystem` (S1, `MinimalAPI`), `UTTWorkloadSubsystem`, `UTTWorkloadBrainComponent` and `ATTWorkloadAgent` (S2, not exported: nothing outside the game module uses them). Every change to a reflected header re-runs UHT; changes to `TTProbeSubsystem.cpp` don't (the same rule the mutation runner exploits).
 
 ## 11. `UWorldSubsystem` and `UTickableWorldSubsystem`
 
@@ -209,7 +209,7 @@
 5. **When not to.** Inside hot per-frame loops (formatting costs time); `Warning` or `Error` for normal events, because the smoke checks count them.
 6. **Common mistakes.** `%s` with an `FString` instead of `*MyString`; a `Warning` that fires every run and hides real ones.
 7. **Example.** `UE_LOG(LogTTProbe, Display, TEXT("BenchStart on frame %lld"), FrameIndex);`
-8. **In this project.** `LogTTProbe`: `Probe active…`, `BenchStart on frame…`, `BenchEnd on frame…`, all at `Display`, which `run_checks.py` reads back.
+8. **In this project.** `LogTTProbe`: `Probe active…`, `BenchStart on frame…`, `BenchEnd on frame…`; `LogTTWorkload`: `Spawned N agents…; start-position hash…`, `End-state hash…`. All at `Display`; `run_checks.py` and `run_bench.py` read them back.
 
 ## 16. `GFrameCounter`
 

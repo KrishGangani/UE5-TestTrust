@@ -51,12 +51,12 @@
 | ⚠ caught (code review): **`FMath::Max(0.0, NaN)` is NaN.** `-TTWarmup=inf` or `nan` passed the clamp, the window never opened, and the run never ended | A gate batch that hangs until its timeout | `FMath::IsFinite` first, then clamp to a cap; fall back to the default | The `Options.Parse` test feeds `inf` and `nan` |
 | ⚠ caught (code review): **injection after the window.** The spin kept running after `BenchEnd`, forever without `-TTExit` | Frame time stays high after the capture | Inject only while the window isn't done | — |
 | ⚠ caught (code review): **a second window after a map change** | A second `BenchStart` in the log | One window per process | The `Probe already ran its window` log line |
-| ⚠ caught (simplify pass): **a log line inside the last captured frame.** `CSV_EVENT` writes a log line (`CsvProfiler.cpp:4797`), a variable cost in the measured `BenchEnd` frame | A max/p99 outlier on the last frame | `CSV_EVENT_NOLOG` there; log on the next frame | Compare the last frame's time with the rest |
+| ⚠ caught (simplify pass): **a log line inside the last captured frame.** `CSV_EVENT` writes a log line (`CsvProfiler.cpp:4797–4799`), a variable cost in the measured `BenchEnd` frame | A max/p99 outlier on the last frame | `CSV_EVENT_NOLOG` there; log on the next frame | Compare the last frame's time with the rest |
 | Comparing accumulated float deltas with plain `>=` | The window opens one frame early or late (299 or 301 instead of 300) | The half-frame rule in `FTTProbeWindow::Advance` | The `FixedStepFrames` test; `BenchStart on frame N` in the game log |
 | Injecting with a loop count instead of wall time | The injected "1 ms" differs between machines and clock states | Spin on `FPlatformTime::Seconds()` | Compare `TestTrustProbe/GameThread/Injected` with the requested value |
 | Quitting on the `BenchEnd` frame | A CSV without its trailing header and metadata rows (`finalised: false` in `csv_stats.py`) | Exit `ExitDelayFrames` frames later | `csv_stats.py` flags unfinalised captures |
 | A probe that runs in every game | Normal play gets the injected cost or an unexpected exit | Off unless `-TTProbe` is on the command line | The `Options.Parse` test: no `-TTProbe`, not enabled |
-| Accepting editor worlds in `DoesSupportWorldType` | Events and spins while someone edits a map | Game and PIE only | — |
+| Accepting editor worlds in `DoesSupportWorldType` | Events and spins while someone edits a map | The probe: Game only; the workload: Game and PIE | — |
 
 ## Workload (`Source\TestTrust\`)
 

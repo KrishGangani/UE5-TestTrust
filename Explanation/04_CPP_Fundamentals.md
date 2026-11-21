@@ -129,7 +129,7 @@ private:
 };
 ```
 - The compiler reads inline member-function bodies as if they were written after the whole class, so they may use members and nested types declared later. (A *declaration*, such as a member's type, still needs the name declared before it.)
-- **In our code:** `FTTProbeWindow::IsCapturing()` sits in the public section, above the private `EPhase` it compares against, so the public interface reads first.
+- **In our code:** `FTTProbeWindow::IsDone()` sits in the public section, above the private `EPhase` it compares against, so the public interface reads first.
 
 ## 14. `switch` with a `default`
 
@@ -137,7 +137,7 @@ private:
 switch (Event) { case E::Start: Begin(); break; case E::Stop: End(); break; default: Idle(); break; }
 ```
 - Each `case` needs its `break`, or execution falls through into the next one.
-- **In our code:** `UTTProbeSubsystem::Tick` switches on the window's event; the exit countdown lives in `default`, so it runs on ordinary frames only, never on the `BenchEnd` frame itself.
+- **In our code:** `UTTProbeSubsystem::Tick` switches on the window's event; the after-window work (the log line and the exit, timed by `GFrameCounter - EndFrame`) lives in `default`, so it runs on ordinary frames only, never on the `BenchEnd` frame itself.
 
 ## 15. A function-local `static`
 

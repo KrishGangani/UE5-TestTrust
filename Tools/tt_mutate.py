@@ -74,10 +74,7 @@ def load(campaign: str) -> dict:
 
 def save(manifest: dict) -> None:
     """Atomic rewrite, so a batch killed by the queue never leaves a half-written manifest."""
-    path = manifest_path(manifest["campaign"])
-    with open(path + ".tmp", "w", encoding="utf-8") as handle:
-        json.dump(manifest, handle, indent=1)
-    os.replace(path + ".tmp", path)
+    tt_common.write_json(manifest_path(manifest["campaign"]), manifest)
 
 
 def project_root(manifest: dict) -> str:

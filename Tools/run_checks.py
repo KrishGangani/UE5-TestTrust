@@ -196,8 +196,8 @@ def main(argv: list[str]) -> int:
                                                {"gate_args": GATE_ARGS})
 
     def save() -> None:
-        with open(os.path.join(RAW_DIR, batch + "_manifest.json"), "w", encoding="utf-8") as handle:
-            json.dump({"batch": batch, "step": step, "environment": environment, "results": results}, handle, indent=1)
+        tt_common.write_json(os.path.join(RAW_DIR, batch + "_manifest.json"),
+                             {"batch": batch, "step": step, "environment": environment, "results": results})
 
     if common(batch, results, save):
         STEPS[step](batch, results, save)

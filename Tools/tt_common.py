@@ -126,9 +126,22 @@ def affinity_description() -> str:
 
 
 def sanitize(text: str) -> str:
-    """Replaces the user's profile path, so a committed manifest never contains a personal path."""
+    """Replaces the user's profile path, so a committed manifest never contains a personal path.
+
+    Three spellings: as JSON escapes it (doubled backslashes), as Windows writes it, and with forward slashes.
+    """
     home = os.path.expanduser("~")
-    return text.replace(home, "%USERPROFILE%").replace(home.replace("\\", "/"), "%USERPROFILE%")
+    for spelling in (home.replace("\\", "\\\\"), home, home.replace("\\", "/")):
+        text = text.replace(spelling, "%USERPROFILE%")
+    return text
+
+
+def write_json(path: str, data: dict) -> None:
+    """Every committed manifest is written here: sanitised, then atomically (a temporary file and os.replace), so a
+    run killed by the queue never leaves half a manifest and no manifest ever contains a personal path."""
+    with open(path + ".tmp", "w", encoding="utf-8") as handle:
+        handle.write(sanitize(json.dumps(data, indent=1)))
+    os.replace(path + ".tmp", path)
 
 
 def powershell(command: str) -> str:

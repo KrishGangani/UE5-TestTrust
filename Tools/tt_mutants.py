@@ -374,6 +374,8 @@ if __name__ == "__main__":
     if "--selftest" in sys.argv:
         sys.exit(_selftest())
     for file_path in sys.argv[1:]:
-        with open(file_path, encoding="utf-8") as handle:
+        # newline="" keeps CRLF, as the runner reads files: ids hash byte offsets, so they match a campaign's only on
+        # the same bytes (a git-archive snapshot) and the same relative path.
+        with open(file_path, encoding="utf-8", newline="") as handle:
             for m in generate(file_path, handle.read()):
                 print(f"{m.id} {m.file}:{m.line}:{m.col} {m.operator:4} {m.original!r} -> {m.replacement!r}")

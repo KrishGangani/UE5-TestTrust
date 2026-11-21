@@ -107,14 +107,14 @@ D:\UNREAL PORTFOLIO\P03_TestTrust\
 | **Classifier** | `classify()` (pure function, self-tested) | Fate from the build result, the test exit code and the JSON report, compared with the baseline test count | Both channels are needed: the exit code alone misses "fewer tests ran"; the report alone misses errors outside a test. A mutant survives only if exit = 0, no test failed, and every baseline test ran |
 | **Queue driver** | `tt_mutate.py queue` | Submits batches until every mutant has a fate; stops if a batch makes no progress | Waiting in the queue costs no CPU, so the driver can run in the background |
 | **Report** | `tt_mutate.py report` → `Benchmarks/Summaries/<campaign>_summary.md` | Fates, M1, M1 before review, M1-naive, per operator, cost per mutant, the survivor table with review verdicts | Survivors are the actionable output: each is a line no test protects |
-| **Reviews** | `Tools/mutation/<name>_review.json` | `{mutant id: {verdict, reason}}` for survivors judged equivalent | Equivalence is undecidable in general; a written reason makes each exclusion auditable |
-| **Shared helpers** | `tt_common.py` | P-core affinity mask and pinned launch (copied from UE5-UpdateBudget), environment record, path sanitising | One place for protocol rules used by both halves |
+| **Reviews** | `Tools/mutation/<name>_review.json` | `{mutant id: {verdict, reason}}` for every reviewed survivor: `equivalent` (excluded from M1) or `real gap` (kept) | Equivalence is undecidable in general; a written reason makes each exclusion auditable |
+| **Shared helpers** | `tt_common.py` | P-core affinity mask, `pin_self` and the environment record (copied from UE5-UpdateBudget); `pinned()` (added here); the packaged build's paths and the gate's command line (`GATE_ARGS`); `write_json()` (atomic, sanitised manifests) | One place for protocol rules used by both halves |
 
 ### 4.2 Perf gate (UE side, Phase 5)
 
 | Class | Kind / base | Responsibility | Why it exists, and what we rejected |
 |---|---|---|---|
-| `UTTProbeSubsystem` (plugin) | `UTickableWorldSubsystem`; created only with `-TTProbe`, in Game worlds only (never PIE), and runs one window per process | Parses `-TTWarmup=`, `-TTCapture=`, `-TTInjectMs=`, `-TTInjectEvery=`, `-TTRunTag=`, `-TTExit` (finite values, clamped). A pure `FTTProbeWindow` measures the window in the frames' own delta times with a half-frame tolerance; the subsystem fires `CSV_EVENT(BenchStart)` after warm-up and `CSV_EVENT_NOLOG(BenchEnd)` after the capture, writes `CSV_METADATA`, and requests exit. Until `BenchEnd`, on every `-TTInjectEvery`-th frame, it spins the game thread for exactly X ms inside `CSV_SCOPED_TIMING_STAT(TestTrustProbe, Injected)` | One tickable subsystem has the right lifetime (the world) and runs on the game thread inside the frame, so injected time lands in `GameThreadTime` (`01b #12`). *Rejected:* a custom `FTickFunction` (not needed: the injection doesn't need a specific tick group), an actor (must be placed or spawned; can be destroyed) |
+| `UTTProbeSubsystem` (plugin) | `UTickableWorldSubsystem`; created only with `-TTProbe`, in Game worlds only (never PIE), and runs one window per process | Parses `-TTWarmup=`, `-TTCapture=`, `-TTInjectMs=`, `-TTInjectEvery=`, `-TTRunTag=`, `-TTExit` (finite values, clamped). A pure `FTTProbeWindow` measures the window in the frames' own delta times with a half-frame tolerance; the subsystem fires `CSV_EVENT(BenchStart)` after warm-up and `CSV_EVENT_NOLOG(BenchEnd)` after the capture, writes `CSV_METADATA`, and requests exit. Until `BenchEnd`, on every `-TTInjectEvery`-th frame, it spins the game thread for at least X ms inside `CSV_SCOPED_TIMING_STAT(TestTrustProbe, Injected)` | One tickable subsystem has the right lifetime (the world) and runs on the game thread inside the frame, so injected time lands in `GameThreadTime` (`01b #12`). *Rejected:* a custom `FTickFunction` (not needed: the injection doesn't need a specific tick group), an actor (must be placed or spawned; can be destroyed) |
 | `UTTWorkloadSubsystem` (game) | `UTickableWorldSubsystem`, Game and PIE, created only with `-TTAgents=` | Spawns N agents from a fixed seed in `OnWorldBeginPlay` (deferred spawn so state is set before `BeginPlay`), drives the camera along a fixed analytic path, logs start-position and end-state hashes for the determinism check | Copied and adapted from UE5-UpdateBudget's `UUBBenchmarkSubsystem`: no map has to be authored, and spawning from a seed is deterministic. Tickable because the camera moves every frame. In the game module, not the plugin: the plugin is the reusable part, and each project brings its own workload |
 | `ATTWorkloadAgent` (game) | `AActor` | A mesh plus one brain component | Nothing else |
 | `UTTWorkloadBrainComponent` (game) | `UActorComponent`, native tick in `TG_PrePhysics` | Sense (distance and view cone to the camera) → decide (patrol / alert) → act (move along a patrol circle from accumulated time) → a calibrated compute step | Adapted from UE5-UpdateBudget's `UUBDemoBrainComponent`, minus the budget base class: here the workload only needs to be deterministic and game-thread bound |
@@ -211,10 +211,13 @@ sequenceDiagram
 ### 6.2 One gate run (Phase 5–6)
 
 ```text
-run_bench.py → pinned packaged TestTrust.exe -deterministic -FPS=60 -windowed 1280x720 -novsync -nosound -traceautostart=0
-               -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTWarmup=5 -TTCapture=20 [-TTInjectMs=X] -TTExit
+run_bench.py (pinned to the P-cores) → packaged Binaries\Win64\TestTrust.exe, GATE_ARGS:
+               -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync
+               -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit
+               + -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=5 -TTCapture=20 -TTRunTag=<run> [-TTInjectMs=X]
    game:  OnWorldBeginPlay → spawn N agents (seed) ; every frame: agents tick (TG_PrePhysics) → probe Tick (after PostPhysics)
-          probe: frame == warm-up end → CSV_EVENT(BenchStart) ; [spin X ms] ; frame == capture end → CSV_EVENT(BenchEnd) → exit
+          probe: [spin X ms] ; window: warm-up end → CSV_EVENT(BenchStart) ; capture end → CSV_EVENT_NOLOG(BenchEnd)
+          next frame: end-state hash, "BenchEnd on frame" line ; 3 frames later: RequestExit
    after: CSV moved to Benchmarks/Raw → csv_stats.py per-run median/p95/p99 → tt_gate.py decide / evaluate
 ```
 
@@ -252,7 +255,7 @@ run_bench.py → pinned packaged TestTrust.exe -deterministic -FPS=60 -windowed 
 | Metric | `GameThreadTime`, per-run median **and** p95 | Gameplay cost lives on the game thread; the median catches shifts, the p95 catches broader slowdowns |
 | Baseline size m | 10 runs for the stored baseline (condition b). Under (a), the batch's other `X0` runs: 7 for an `X0` candidate (left out of its own baseline), 8 for an injected one | Enough for a robust centre and spread; about 7 minutes of queue time. Under (a) the size follows from the 8-round batches of `01` §7; it is stated here before any gate data (code review, S3) |
 | Rule | median + max(0.10 ms, 3 × 1.4826 × MAD) | Robust three-sigma limit; 0.10 ms floor = 0.6% of a 60 fps frame, below the smallest injected size |
-| Candidate runs k | 1 | The success criteria judge single runs; k = 3 (median of three) is offered as an option |
+| Candidate runs k | 1 | The success criteria judge single runs. k = 3 (median of three) is a possible extension, not implemented in v1 (`11`) |
 | Run length | 5 s warm-up + 20 s capture (1,200 frames at the fixed 60 fps) | A 1,200-frame median is stable; a short run keeps 128-run evaluations inside a few queue batches |
 | Workload | N = 1,000 agents, compute step 128 iterations, seed 1 | Game-thread bound near 5 ms in UE5-UpdateBudget's calibration; re-calibrated here in Phase 5 before any gate data |
 | Injected sizes | 0, 0.25, 0.5, 1.0 ms | The roadmap's sizes: 5%, 10% and 20% of a ~5 ms game thread |
@@ -268,7 +271,7 @@ run_bench.py → pinned packaged TestTrust.exe -deterministic -FPS=60 -windowed 
 | A mutant hangs the editor | Test timeout; the whole process tree is killed (`taskkill /T /F`) | `run_step()` |
 | A pinned launch hides the exit code | `cmd /v:on /s /c "start … & exit !errorlevel!"`; a plain `cmd /c start /wait` always returns 0 (tested) | `tt_common.pinned()`; `01b #14` |
 | UBT links a stale mutant object | Timestamps are never faked; restored files are recompiled | `01b #1` |
-| Committed files leak personal paths | Manifests store paths relative to the project; `sanitize()` replaces the user profile path | `tt_common.sanitize()` |
+| Committed files leak personal paths | Manifests store paths relative to the project, and every manifest is written through `write_json()`, which replaces the user profile path (in all three spellings) | `tt_common.sanitize()`, `write_json()` |
 | (Gate) the probe runs in an editor or PIE world | `DoesSupportWorldType`: Game only; not created at all without `-TTProbe` | In PIE, `-TTExit` would quit the whole editor (S1 code review) |
 | (Gate) a second world opens a second window | One window per process; map travel during a run is unsupported | S1 code review |
 | (Gate) logging inside the last captured frame | `BenchEnd` uses `CSV_EVENT_NOLOG`; the log line moves to the next frame | `CsvProfiler.cpp:4797` (S1 simplify pass) |

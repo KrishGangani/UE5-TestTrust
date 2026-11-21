@@ -125,10 +125,8 @@ def problems(record: dict, expected_frames: int) -> list[str]:
 
 
 def write_manifest(batch: str, environment: dict, settings: dict, records: list[dict]) -> None:
-    path = os.path.join(RAW_DIR, batch + "_manifest.json")
-    with open(path + ".tmp", "w", encoding="utf-8") as handle:
-        json.dump({"batch": batch, "environment": environment, "settings": settings, "runs": records}, handle, indent=1)
-    os.replace(path + ".tmp", path)
+    tt_common.write_json(os.path.join(RAW_DIR, batch + "_manifest.json"),
+                         {"batch": batch, "environment": environment, "settings": settings, "runs": records})
 
 
 def write_summary(batch: str, environment: dict, records: list[dict]) -> str:
@@ -150,7 +148,7 @@ def write_summary(batch: str, environment: dict, records: list[dict]) -> str:
     invalid = [r["name"] for r in records if not r.get("valid")]
     lines += ["", f"Invalid runs (never judged): {invalid or 'none'}.", "",
               f"Raw files: `Benchmarks/Raw/{batch}_*`; environment and per-run statistics in `{batch}_manifest.json`.",
-              "", "```json", json.dumps(environment, indent=1), "```"]
+              "", "```json", tt_common.sanitize(json.dumps(environment, indent=1)), "```"]
     path = os.path.join(SUMMARY_DIR, batch + "_summary.md")
     with open(path, "w", encoding="utf-8") as handle:
         handle.write("\n".join(lines) + "\n")
