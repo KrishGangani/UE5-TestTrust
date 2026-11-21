@@ -32,3 +32,6 @@ Tools/_work/
 
 # Parked work in progress (code waiting for its step); never committed (portfolio brief, rule 11).
 _wip/
+
+# Portfolio export for Google Drive (images, video, description); not part of the repository.
+Portfolio/
