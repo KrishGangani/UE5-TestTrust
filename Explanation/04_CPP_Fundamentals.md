@@ -1,6 +1,6 @@
 # 04 · C++ Fundamentals: TestTrust
 
-**Rule:** only the C++ ideas this project's code actually relies on, each with a tiny example first and then where it appears in our code. This file grows with every step. (Current to S1.)
+**Rule:** only the C++ ideas this project's code actually relies on, each with a tiny example first and then where it appears in our code. This file grows with every step. (Current to S2.)
 
 ---
 

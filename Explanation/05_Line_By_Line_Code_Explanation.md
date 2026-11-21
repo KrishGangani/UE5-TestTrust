@@ -239,9 +239,9 @@ All of them are adapted from UE5-UpdateBudget's scripts and must be run **throug
 | `build.bat` | `call "%UE_ROOT%\Engine\Build\BatchFiles\Build.bat" %TARGET% Win64 %CONFIG% -Project="%PROJECT%" -WaitMutex -NoHotReloadFromIDE` | Builds from the command line, reproducibly. `-WaitMutex` waits for UBT's single-instance mutex instead of failing; `-NoHotReloadFromIDE` keeps a running editor from being patched. `Build.bat` also holds its own machine-wide lock file (`01b` B4) |
 | `package.bat` | `RunUAT.bat BuildCookRun ... -clientconfig=%CONFIG% -build -cook -stage -pak -archive` | Packaged Development is the gate's build (the launcher engine can't build Test) |
 | `smoke_game.bat` | `UnrealEditor-Cmd.exe "%PROJECT%" -game -nullrhi -nosound -unattended -nosplash -traceautostart=0 -ExecCmds="quit"` | The uncooked project loads its modules and the default map, then quits. UE5-UpdateBudget's version also passed `-ExitAfterSeconds=0`; nothing in 5.8.4's `Engine/Source/Runtime`, `Editor` or `Developer` reads that switch (grep, 2026-11-21), so it was dropped: the run exits because of `quit` |
-| `smoke_packaged.bat` | `nullrhi`: `TestTrust.exe -nullrhi ... -ExecCmds="quit"`; `gpu`: `-windowed -ResX=960 -ResY=540 ...` | The packaged build starts with and without the GPU; the GPU run's log names the chosen adapter |
+| `smoke_packaged.bat` | `nullrhi`: `TestTrust.exe -nullrhi ... -ExecCmds="quit"`; `gpu`: `-windowed -ResX=960 -ResY=540 ...` | The packaged build starts with and without the GPU; the GPU run's log names the chosen adapter. It launches the real game `Build\Windows\TestTrust\Binaries\Win64\TestTrust.exe`, not the bootstrap `Build\Windows\TestTrust.exe`, so the exit code is the game's own (changed with the rule-12 fix below; the Phase 4 runs used the bootstrap, and their pass rests on the game log's 0 errors, `09`) |
 | `run_tests.bat` | `UnrealEditor-Cmd.exe "%PROJECT%" -ExecCmds="Automation RunTests %FILTER%;Quit" -unattended -nullrhi ... -ReportExportPath="%REPORT%"` | The suite by hand. Exit 0 = all passed (`01b #4`). Default filter `StartsWith:TestTrust` |
-| `phase4_checks.bat` | `call :step F-1 ... \|\| exit /b` seven times | Every foundation check in one queue job, stopping at the first failure. `:step` prints start/end and the exit code so the queue log is self-explanatory |
+| `phase4_checks.bat` | `call :step F-1 ...` then `if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%`, seven times | Every foundation check in one queue job, stopping at the first failure. `:step` prints start/end and the exit code so the queue log is self-explanatory. **Fixed (portfolio brief rule 12, found by a sibling project):** the first version wrote `call :step ... \|\| exit /b`. Started as `cmd /c script.bat`, which is how the queue runs it, that form stops the chain but exits with **0**: reproduced here with a step that returns 3 or −1 (`09` Phase 5 · rule 12). The explicit check returns the step's code, negative crash codes included |
 
 ## Part D · Python tools
 
@@ -450,6 +450,41 @@ The gate needs a workload whose frames cost the same in every run and whose cost
 | `UpdateCamera`: a circle of `CameraRadius`, 4 m up, pitch −15°, one lap per 20 s | Spawned as an `ACameraActor` and made the view target. Re-applied each frame only if something else changed the view target (`APlayerController::SetViewTarget`, `Runtime/Engine/Classes/GameFramework/PlayerController.h:2154`), so the default pawn can't take the view back |
 | `GetStatId()` | As in the probe: required by `FTickableGameObject` |
 
+
+---
+
+## Part G · Step S3: the gate tools (`Tools\run_bench.py`, `Tools\tt_gate.py`)
+
+### G1. `Tools\run_bench.py` (copied and adapted from UE5-UpdateBudget's, `b890bc6`)
+
+| Part | What, why |
+|---|---|
+| `EXE`, `SAVED`, `COMMON_ARGS` = `tt_common.PACKAGED_EXE`, `PACKAGED_SAVED`, `GATE_ARGS` | The **real** game `Build\Windows\TestTrust\Binaries\Win64\TestTrust.exe`, not the bootstrap `Build\Windows\TestTrust.exe`, which only starts it: launching the real one makes the game a direct child, so its exit code and its kill are reliable (UE5-UpdateBudget's finding). The arguments: fixed step 60, 1280×720 windowed, `-novsync`, `-nosound`, `-unattended`, `-traceautostart=0`, CSV start and stop on the probe's events, `-TTProbe -TTExit`. **Simplify pass:** one definition in `tt_common.py`, shared with `run_checks.py`, so the gate measures under exactly the string the S1/S2 checks proved |
+| `COLUMNS` = `csv_stats.DEFAULT_COLUMNS` | The columns every run's statistics are kept for |
+| `CONFIGS` | `X0`, `X025`, `X05`, `X10`: 0, 0.25, 0.5 and 1.0 ms of injected game-thread time per frame, passed as `-TTInjectMs=` |
+| `SetThreadExecutionState(ES_CONTINUOUS \| ES_SYSTEM_REQUIRED \| ES_DISPLAY_REQUIRED)` | The laptop must not sleep or blank the display during a 20-minute batch (copied from UE5-UpdateBudget) |
+| `pin_self(mask)` before anything else | Every child inherits the P-core mask from its first instruction; `applied_mask()` (read back from Windows) goes into the environment record. Refuses to measure if pinning fails, **or if the mask is unknown** (code review: the first version then ran unpinned without a word) |
+| `launch()` | `Popen` the real exe, `wait(timeout)`, and in `finally` kill the tree if it is still alive, so a hung run can't run into the next one |
+| Rotation | In round r the configs start at position (r − 1) mod k, so with a multiple of k rounds every config sits in every position equally often |
+| `collect()` / `problems()` | Moves the CSV and the game log into `Benchmarks\Raw\<batch>_<Config>_r<round>.*` (never overwriting), analyses the capture with `csv_stats.py`, keeps the workload's start-position and end-state hash lines. `problems()` is **the one definition of validity**: a run is valid only if it exited 0 (else `exit code N` or `timed out`), its capture is readable, finalised, has exactly the expected frame count and contains `BenchEnd` (`BenchStart` starts the capture, so it is never inside it: `09` S1), and its log has no errors. Invalid runs stay in the manifest, with their reasons, and are never judged. **Code review:** a crashed run's stub CSV made the analysis raise and stopped the whole batch; it is now one more reason (`capture unreadable`). **Altitude review:** the exit code was checked outside `problems()`, so a run could be invalid with no reason listed |
+| `write_manifest()` | Rewritten atomically after every run, so a killed batch loses nothing |
+
+### G2. `Tools\tt_gate.py`
+
+| Part | What, why |
+|---|---|
+| `Z = 3.0`, `FLOOR_MS = 0.10`, `MAD_TO_SIGMA = 1.4826`, `N1_RATIO = 1.05`, `N2_SIGMAS = 2.0`, `N3_ALPHA = 0.05` | The rule parameters of `01` §6.2 and `02` §7, **fixed in code before any gate data exists** |
+| `robust_limit(values)` | median + max(floor, Z × 1.4826 × MAD). The median and the MAD ignore one bad run; 1.4826 makes MAD estimate σ for normal noise |
+| `rule_tt(baseline, run)` | TestTrust's gate: flagged if the run's median **or** p95 `GameThreadTime` is above the baseline's robust limit for that statistic. Returns the values and limits, so a verdict can be explained |
+| `rule_n1`, `rule_n2` | The naive comparisons: "+5% average `FrameTime` vs one reference run" and "mean + 2 sd of the baseline runs' means" |
+| `mann_whitney_greater(sample, reference)` | One-sided Mann–Whitney U with average ranks for ties, the tie-corrected variance and a continuity correction; p from the normal tail (`erfc`). Written out because no statistics package is assumed; checked by the self-test on shifted and identical samples |
+| `rule_n3` | The frame-level test (H5): every frame of the run against every frame of one reference run |
+| `evaluate(stored, batches)` and `judge()` | **(a) interleaved:** the batch's other `X0` runs are the baseline (7 for an `X0` candidate, which is left out of its own baseline, 8 for an injected one; `02` §7); N1 and N3 use the last `X0` run before the candidate, or, for a run before the batch's first `X0`, the next one (`reference_x0`). **(b) stored:** the earlier baseline batch, `X0` only; its last run is the N1/N3 reference. `judge()` runs every rule on one run, so **every rule judges the same runs** and their rates share denominators. **Code review:** N1 and N3 used to skip the runs before a batch's first `X0` while TT and N2 judged them. Counts are kept as [flagged, judged] |
+| `baseline_runs(path)` | A baseline manifest's valid `X0` runs. **Code review:** refuses a manifest with injected runs (they would raise the baseline) or with fewer than `MIN_BASELINE` (3) runs |
+| `criteria(table)` | SC5 (false positives ≤ 5% **of ≥ 30 judged unchanged runs**), SC6 (detection 100% / 95% / 80% at 1.0 / 0.5 / 0.25 ms) and SC7 (TT no worse than any naive rule on every rate), **for both conditions**. **Code review:** SC5 used to pass on any number of runs (0 of 8 printed PASS) |
+| `decide` | The everyday use: one candidate run against a baseline manifest; exit code 3 means "regression". **Code review:** the candidate is left out of the baseline by name (so a run from the baseline's own batch never judges against itself), and a missing run name is a clear error |
+| `counts()`, `INJECTED`, `CONDITIONS` | **Simplify pass:** one lookup for [flagged, judged], and the configuration and condition lists once, instead of repeated literals |
+| `selftest` | The robust limit on two hand-worked samples (floor-bound and spread-bound), Mann–Whitney on identical, shifted and reversed samples, the four rules on synthetic runs (a 0.25 ms shift is caught by TT and missed by N1), the evaluation tally, the reference fallback before a batch's first `X0` (every rule judges every run), and SC5 failing on fewer than 30 runs |
 
 ---
 

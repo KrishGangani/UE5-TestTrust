@@ -194,6 +194,40 @@ The prediction was committed (`c18936d`) before the run.
 
 **Audit (before the commit).** Code review (medium): no subsystem without `-TTAgents` (`ShouldCreateSubsystem`); the compute-step value in the metadata is the one actually used, also from the class default; the hash covers rotation and state changes, not only positions; the end-of-run report stays out of the capture. Simplify (4 reviewers): one options struct with the resolved compute value instead of a sentinel plus a second member; one `bEndReported` flag; the camera radius computed once; an unused getter removed. Altitude: `IsCaptureDone()` moved onto `GFrameCounter` in the probe, instead of a three-state counter in the workload (`05` E2, F3). Skipped: caching the probe subsystem and the player controller (tens of nanoseconds per frame); spawning at the start position directly (warm-up only); `bAutoManageActiveCameraTarget` instead of re-applying the view target (a behaviour change with no measured benefit). Reuse: nothing to change.
 
+## Phase 5 · S3: the gate tools, end to end on one short real batch (2026-11-21)
+
+**Self-tests:** `csv_stats.py --selftest` OK (percentiles, summary and events against hand-worked values); `tt_gate.py selftest` ok (robust limit, Mann–Whitney, the four rules, the evaluation tally, the reference fallback, SC5 on fewer than 30 runs).
+
+**The smoke batches.** These test the pipeline only, not the gate: short runs (3 s warm-up, 10 s capture, 600 frames), far too few to judge SC5–SC7. The parameters were fixed before them (`02` §7), and nothing was changed after them.
+
+| Batch | Queue job | What | Result |
+|---|---|---|---|
+| `2026-11-21_045922_s3smoke-stored` | `20261121_041405_eb9e39`, ok, 44.5 s | priming + 3 × `X0` | 4 of 4 valid; `GameThreadTime` median 4.98–5.03 ms; start and end-state hashes equal in all runs |
+| `2026-11-21_052824_s3smoke-eval` | `20261121_050006_fcba62`, ok, 178.8 s | priming + 4 rounds × `X0`/`X025`/`X05`/`X10`, rotated | 17 of 17 valid; every config in every position once; `Injected` median exactly 0.250 / 0.500 / 1.000 ms; `GameThreadTime` medians: `X0` 4.85–4.95, `X025` 5.17–5.37, `X05` 5.32–5.54, `X10` 5.83–5.99 ms |
+
+Every run was pinned (`0xFFFF`) and took 7.1–8.6 s of wall time from launch to exit.
+
+**End to end:** `tt_gate.py evaluate --stored <smoke-stored> --batches <smoke-eval>` wrote `Benchmarks\Summaries\2026-11-21_052824_s3smoke_gate_evaluation.md` in 0.33 s, with both conditions, all four rules and the criteria rows. It correctly reports **SC5 not met: 4 unchanged runs, not ≥ 30**. Its detection rows (TT 4/4 at every size) are counts on 4 short runs, not a result. `tt_gate.py decide` on one smoke run printed both statistics against their limits, gave `pass` with exit 0 in 0.08 s, and gave a clear error with exit 1 for a run name that doesn't exist.
+
+**Audit (before the commit).**
+- **Code review (medium), 9 findings, all fixed:**
+  - SC5 passed on any number of runs; it now needs ≥ 30.
+  - N1/N3 judged fewer runs than TT/N2, so SC7 compared different denominators; now every rule judges the same runs.
+  - A baseline could contain injected runs; it must now be `X0` only, with at least 3 runs.
+  - The interleaved baseline is 7–8 runs, not m = 10; this is now stated in `02` §7 before the data.
+  - A crashed run's stub CSV stopped the batch; it is now recorded as an invalid run.
+  - An unknown P-core mask meant an unpinned batch; the batch is now refused.
+  - `decide` gives a clear error for a missing run and leaves the candidate out of its own baseline.
+  - The stored-baseline size is checked.
+  - The docs described a `start /affinity` launch for `run_bench.py`; `01` §7 now describes `pin_self`.
+- **Simplify (4 reviewers):**
+  - One `GATE_ARGS` and one set of packaged paths in `tt_common.py`, shared by `run_checks.py` and `run_bench.py`.
+  - The columns come from `csv_stats.DEFAULT_COLUMNS`.
+  - Validity has one definition (`problems()` also judges the exit code: altitude).
+  - One `judge()` per condition, one `counts()` lookup, and constants instead of repeated literals.
+  - Unused parameters and a dead branch removed.
+  - Efficiency: nothing material. N3 costs about 1.2 ms per call; the whole evaluation of 128 runs is estimated at about 3 s, mostly CSV loading.
+
 ## Phase 5 · S6: UE5-UpdateBudget "before" (M-P1, 2026-11-21)
 
 **Order note:** S6–S8 need only the runner, so they were queued at the start of Phase 5, while S1 was being written, to use the machine's queue time; their order relative to S1–S5 doesn't affect any result. S6 was captured **before** any new test existed (`03` rule: baselines before the new thing).
@@ -283,3 +317,27 @@ The remaining survivor is `fbd237213c`, the tie-break already reviewed as **equi
 - **4 of 4 batches (100%)** finished inside their queue timeout, every one with "all mutants have a fate".
 
 **H6 (each mutant costs a full C++ rebuild and an editor start): the rebuild half is rejected, the editor-start half holds.** For `.cpp` mutants in a game module (M-S) and a plugin module (M-P1), every mutant compiled exactly one file (2–4 s); the editor launch (about 10 s) is real and sets the floor. Across 106 mutants that is about 14 s each, practical for suites of this size.
+
+
+## Phase 5 · Rule 12: batch-script exit codes (2026-11-21)
+
+**The bug (portfolio brief §2 rule 12, found by a sibling project):** under `cmd /c`, a chain step written as `call step.bat || exit /b` can exit with 0 after a failure. `Tools\phase4_checks.bat` used that form, and the queue starts it as `cmd /c "...\phase4_checks.bat"` (its `history.jsonl` records the bare script path).
+
+**Reproduced here** (throwaway scripts, outside the repository): a step that returns 3, or −1 as a crash would, run through the old chain:
+
+| Started as | Old chain (`\|\| exit /b`) | New chain (`if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%`) | A one-command wrapper (`call X` then `exit /b %ERRORLEVEL%`) |
+|---|---|---|---|
+| `cmd /c script.bat` (the queue's form) | **0** for both; the chain does stop | 3 and 4294967295 (−1) | 3 and 4294967295 |
+| `cmd /c call script.bat` (`run_checks.py`, `tt_mutate.py`) | 3 and 4294967295 | 3 and 4294967295 | 3 and 4294967295 |
+
+**Fixed:** `phase4_checks.bat` now checks `%ERRORLEVEL%` after every step. `smoke_packaged.bat` now launches the real game executable rather than the bootstrap, so its exit code is the game's own.
+
+**Were past results false passes? No.**
+- **Phase 4 checks** (jobs `20261121_011632_7422f2` and `20261121_015125_fbc4d1`): in both queue logs every step F-1 to F-7 printed `exit=0` itself, and the chain reached `all checks passed`. The broken path only matters after a failing step, and no step failed. The steps' own evidence agrees: both builds `Result: Succeeded`; package `BUILD SUCCESSFUL` and `AutomationTool exiting with ExitCode=0`; F-3, F-4, F-6 and F-7 were judged from their own logs, as recorded above (0 errors; `TEST COMPLETE. EXIT CODE: 0`).
+- **The other `.bat` files** (`build.bat`, `package.bat`, `run_tests.bat`, `smoke_game.bat`, `smoke_packaged.bat`) are one command followed by `exit /b %ERRORLEVEL%`, which passes the code through in both forms (table above).
+- **The step checks** (`run_checks.py`) start each script as `cmd /d /c call ...`, the safe form. They also judge builds by `Result: Succeeded`, tests by `index.json` and packaging by `BUILD SUCCESSFUL`, not by the exit code alone.
+- **The mutation runner** (`tt_mutate.py`): builds run as `cmd /d /c call <engine Build.bat>` (safe form), tests through `tt_common.pinned()`, whose `& exit !errorlevel!` passes 3 and −1 through (re-checked now: 3 → 3, −1 → 4294967295, 0 → 0; `01b #14`). A cross-check of all four campaigns found no false pass:
+  - All 110 build logs (4 baselines and 106 mutant builds) contain `Result: Succeeded`, which matches every recorded build exit 0 and the 0 stillborn mutants.
+  - Each mutant's engine log matches its fate: 11 survivors with `TEST COMPLETE. EXIT CODE: 0`, 73 kills with `EXIT CODE: -1`, and 22 crashes with no `TEST COMPLETE` line.
+  - Even a falsely zero test exit couldn't turn a failing run into a survivor: the fate also needs `index.json` to report every test passed (`02` §4.1).
+- **The game's own exit code:** the probe quits with `RequestExit(false, …)`, which on Windows drops any code (brief rule 12). The gate never needs a failure code from the game: a run is judged valid on its capture and log as well as exit 0 (`05` G1), and a crash still ends non-zero.

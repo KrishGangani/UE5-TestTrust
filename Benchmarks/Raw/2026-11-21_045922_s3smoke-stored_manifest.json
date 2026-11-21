@@ -1,0 +1,328 @@
+{
+ "batch": "2026-11-21_045922_s3smoke-stored",
+ "environment": {
+  "date": "2026-11-21T04:59:22",
+  "engine": "5.8.4 (CL 58902052)",
+  "build_config": "Development (packaged)",
+  "compiler": "MSVC 14.44.35229, Windows SDK 10.0.22621.0",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "gpus": "Intel(R) UHD Graphics (driver 32.0.101.7088); NVIDIA GeForce RTX 5070 Laptop GPU (driver 32.0.16.1047)",
+  "ram_gb": "31.6",
+  "os": "Microsoft Windows 11 Home Single Language build 26200",
+  "power_plan": "Power Scheme GUID: 6fecc5ae-f350-48a5-b669-b472cb895ccf  (Turbo)",
+  "on_ac_power": true,
+  "cpu_affinity": "0xFFFF (performance cores only; hybrid CPU)",
+  "common_args": "-windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit",
+  "resolution": "1280x720 windowed, default scalability"
+ },
+ "settings": {
+  "configs": "X0",
+  "rounds": 3,
+  "agents": 1000,
+  "work": 128,
+  "seed": 1,
+  "warmup": 3.0,
+  "capture": 10.0,
+  "cooldown": 3.0,
+  "label": "s3smoke-stored",
+  "no_prime": false
+ },
+ "runs": [
+  {
+   "name": "2026-11-21_045922_s3smoke-stored_X0_r0_prime",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 0,
+   "position": 0,
+   "priming": true,
+   "exit_code": 0,
+   "wall_seconds": 8.6,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=3.0 -TTCapture=10.0 -TTRunTag=2026-11-21_045922_s3smoke-stored_X0_r0_prime",
+   "capture": "2026-11-21_045922_s3smoke-stored_X0_r0_prime.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 5.166953666666666,
+     "min": 4.5454,
+     "median": 5.0492,
+     "p95": 5.827464999999998,
+     "p99": 6.978634,
+     "max": 9.5522
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 5.158539666666666,
+     "min": 4.5007,
+     "median": 5.033849999999999,
+     "p95": 5.766595,
+     "p99": 6.7996929999999995,
+     "max": 9.3872
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 2.9881881666666668,
+     "min": 2.5926,
+     "median": 2.90365,
+     "p95": 3.4108649999999994,
+     "p99": 4.6063019999999995,
+     "max": 7.1857
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 2.9894136666666666,
+     "min": 2.6505,
+     "median": 2.9627499999999998,
+     "p95": 3.4220800000000002,
+     "p99": 3.5575140000000003,
+     "max": 4.1371
+    }
+   },
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_045922_s3smoke-stored_X0_r0_prime",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 37.7 ms; start-position hash 0x7F189215",
+    "End-state hash 0x5CA911B4 (329 state changes) at world time 13.016667 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_045922_s3smoke-stored_X0_r1",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 1,
+   "position": 0,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 7.1,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=3.0 -TTCapture=10.0 -TTRunTag=2026-11-21_045922_s3smoke-stored_X0_r1",
+   "capture": "2026-11-21_045922_s3smoke-stored_X0_r1.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 5.5157549999999995,
+     "min": 4.4421,
+     "median": 5.02305,
+     "p95": 7.606519999999999,
+     "p99": 9.838373999999995,
+     "max": 13.505
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 5.498491666666666,
+     "min": 4.4666,
+     "median": 5.0276,
+     "p95": 7.547639999999999,
+     "p99": 9.864445,
+     "max": 11.6921
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 3.2606335,
+     "min": 2.2959,
+     "median": 2.8152,
+     "p95": 5.125345,
+     "p99": 6.144215999999995,
+     "max": 7.4137
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 3.239224333333333,
+     "min": 2.6857,
+     "median": 3.07355,
+     "p95": 4.172924999999998,
+     "p99": 5.103097,
+     "max": 5.4615
+    }
+   },
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_045922_s3smoke-stored_X0_r1",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 35.7 ms; start-position hash 0x7F189215",
+    "End-state hash 0x5CA911B4 (329 state changes) at world time 13.016667 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_045922_s3smoke-stored_X0_r2",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 2,
+   "position": 0,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 7.1,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=3.0 -TTCapture=10.0 -TTRunTag=2026-11-21_045922_s3smoke-stored_X0_r2",
+   "capture": "2026-11-21_045922_s3smoke-stored_X0_r2.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 5.293308000000001,
+     "min": 4.4809,
+     "median": 4.97415,
+     "p95": 7.033244999999999,
+     "p99": 7.653839,
+     "max": 9.8361
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 5.281773333333333,
+     "min": 4.4308,
+     "median": 4.9788,
+     "p95": 6.998094999999999,
+     "p99": 7.489940999999998,
+     "max": 8.7714
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 3.047754,
+     "min": 2.3249,
+     "median": 2.72775,
+     "p95": 4.77529,
+     "p99": 5.2026840000000005,
+     "max": 5.8115
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 3.140127,
+     "min": 2.676,
+     "median": 3.03905,
+     "p95": 3.907534999999999,
+     "p99": 4.317,
+     "max": 5.0601
+    }
+   },
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_045922_s3smoke-stored_X0_r2",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 35.5 ms; start-position hash 0x7F189215",
+    "End-state hash 0x5CA911B4 (329 state changes) at world time 13.016667 s"
+   ],
+   "problems": [],
+   "valid": true
+  },
+  {
+   "name": "2026-11-21_045922_s3smoke-stored_X0_r3",
+   "config": "X0",
+   "inject_ms": 0.0,
+   "round": 3,
+   "position": 0,
+   "priming": false,
+   "exit_code": 0,
+   "wall_seconds": 7.1,
+   "command": "\"D:\\UNREAL PORTFOLIO\\P03_TestTrust\\Build\\Windows\\TestTrust\\Binaries\\Win64\\TestTrust.exe\" -windowed -ResX=1280 -ResY=720 -nosound -unattended -traceautostart=0 -deterministic -FPS=60 -novsync -csvStartOnEvent=BenchStart -csvStopOnEvent=BenchEnd -TTProbe -TTExit -TTAgents=1000 -TTSeed=1 -TTWork=128 -TTWarmup=3.0 -TTCapture=10.0 -TTRunTag=2026-11-21_045922_s3smoke-stored_X0_r3",
+   "capture": "2026-11-21_045922_s3smoke-stored_X0_r3.csv",
+   "stats": {
+    "FrameTime": {
+     "n": 600,
+     "mean": 5.284155666666666,
+     "min": 4.3729,
+     "median": 5.01035,
+     "p95": 6.94285,
+     "p99": 7.908076999999995,
+     "max": 11.1259
+    },
+    "GameThreadTime": {
+     "n": 600,
+     "mean": 5.2732486666666665,
+     "min": 4.4486,
+     "median": 4.99845,
+     "p95": 6.918559999999999,
+     "p99": 7.610601,
+     "max": 9.0728
+    },
+    "RenderThreadTime": {
+     "n": 600,
+     "mean": 3.037764,
+     "min": 2.3471,
+     "median": 2.7315500000000004,
+     "p95": 4.747335,
+     "p99": 5.061832,
+     "max": 6.8566
+    },
+    "GPUTime": {
+     "n": 600,
+     "mean": 3.0446340000000003,
+     "min": 2.6508,
+     "median": 2.93885,
+     "p95": 3.79404,
+     "p99": 4.164023,
+     "max": 4.7538
+    }
+   },
+   "frames": 600,
+   "finalised": true,
+   "events": {
+    "PSO": 2,
+    "TestTrustProbe/BenchEnd": 1
+   },
+   "metadata": {
+    "ttruntag": "2026-11-21_045922_s3smoke-stored_X0_r3",
+    "ttwarmup": "3.0",
+    "ttcapture": "10.0",
+    "ttinjectms": "0.0",
+    "ttinjectevery": "1",
+    "ttagents": "1000",
+    "ttseed": "1",
+    "ttwork": "128"
+   },
+   "log_errors": 0,
+   "log_warnings": 0,
+   "hashes": [
+    "Spawned 1000 agents (seed 1, work 128) in 36.7 ms; start-position hash 0x7F189215",
+    "End-state hash 0x5CA911B4 (329 state changes) at world time 13.016667 s"
+   ],
+   "problems": [],
+   "valid": true
+  }
+ ]
+}

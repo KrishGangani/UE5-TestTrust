@@ -250,7 +250,7 @@ run_bench.py → pinned packaged TestTrust.exe -deterministic -FPS=60 -windowed 
 | Setting | Default | Reasoning |
 |---|---|---|
 | Metric | `GameThreadTime`, per-run median **and** p95 | Gameplay cost lives on the game thread; the median catches shifts, the p95 catches broader slowdowns |
-| Baseline size m | 10 runs | Enough for a robust centre and spread; about 7 minutes of queue time |
+| Baseline size m | 10 runs for the stored baseline (condition b). Under (a), the batch's other `X0` runs: 7 for an `X0` candidate (left out of its own baseline), 8 for an injected one | Enough for a robust centre and spread; about 7 minutes of queue time. Under (a) the size follows from the 8-round batches of `01` §7; it is stated here before any gate data (code review, S3) |
 | Rule | median + max(0.10 ms, 3 × 1.4826 × MAD) | Robust three-sigma limit; 0.10 ms floor = 0.6% of a 60 fps frame, below the smallest injected size |
 | Candidate runs k | 1 | The success criteria judge single runs; k = 3 (median of three) is offered as an option |
 | Run length | 5 s warm-up + 20 s capture (1,200 frames at the fixed 60 fps) | A 1,200-frame median is stable; a short run keeps 128-run evaluations inside a few queue batches |

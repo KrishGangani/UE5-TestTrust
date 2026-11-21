@@ -3,7 +3,8 @@ rem P03 TestTrust - smoke test of the packaged Development build: load the defau
 rem Usage: smoke_packaged.bat [nullrhi|gpu]   nullrhi (default): no GPU; gpu: D3D12 on the real adapter, 960x540 windowed
 rem The packaged game writes its log to ..\Build\Windows\TestTrust\Saved\Logs\TestTrust.log
 setlocal
-set "EXE=%~dp0..\Build\Windows\TestTrust.exe"
+rem The real game, not the bootstrap Build\Windows\TestTrust.exe: launched directly, its exit code is the game's own.
+set "EXE=%~dp0..\Build\Windows\TestTrust\Binaries\Win64\TestTrust.exe"
 set "MODE=%~1"
 if "%MODE%"=="" set "MODE=nullrhi"
 if not exist "%EXE%" (

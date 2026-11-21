@@ -1,6 +1,6 @@
 # 07 · Common Mistakes: TestTrust
 
-**Rule:** for every module, the mistakes that are easy to make here, **how to spot them, how to prevent them and how to debug them**. Mistakes **actually caught in this project** are marked ⚠ caught; they make the best interview stories. (Current to S1.)
+**Rule:** for every module, the mistakes that are easy to make here, **how to spot them, how to prevent them and how to debug them**. Mistakes **actually caught in this project** are marked ⚠ caught; they make the best interview stories. (Current to S3 and S7.)
 
 ---
 
@@ -29,6 +29,17 @@
 | ⚠ caught (S7): **`git apply` inside another repository's ignored folder.** In a snapshot under `Tools\_work\`, `git apply` resolved the paths against this repository and changed nothing, with exit 0 | An "after" campaign whose score equals the "before" score | `GIT_CEILING_DIRECTORIES` = the snapshot's parent, and a check that every target changed (`tt_mutate.apply_patch`) | `tt_mutate.py selftest` (`patch_selftest`); hash a target before and after |
 | ⚠ caught (code review, S7): **a patch whose line endings differ from the files.** `git diff` ran inside this repository, whose `* text=auto` turned the CRLF test file into an LF patch | `git apply` reports "patch does not apply" | Apply with `--ignore-whitespace`; keep the patch's bytes with `*.patch -text`, so its recorded SHA-256 stays valid | Count CRLF and LF in the patch and in the target |
 | ⚠ caught (code review, S7): **an inherited `GIT_DIR`.** A git hook or wrapper that sets it redirects every git call of the runner to that repository | A snapshot or patch from the wrong repository | `main()` clears `GIT_DIR` and `GIT_WORK_TREE` | The self-test with `GIT_DIR` set |
+
+## Gate tools (Python: `run_bench.py`, `tt_gate.py`)
+
+| Mistake | How to spot it | How to prevent it | How to debug it |
+|---|---|---|---|
+| ⚠ caught (code review, S3): **a pass on too few runs.** `criteria()` printed SC5 PASS for 0 false positives in 8 unchanged runs; the criterion needs ≥ 30 | A one-batch evaluation reports SC5 met | SC5 needs ≥ 30 judged `X0` runs as well as the rate | The report prints the count next to every rate |
+| ⚠ caught (code review, S3): **rates with different denominators.** N1 and N3 skipped the runs before a batch's first `X0` (no reference yet), TT and N2 didn't, so "TT no worse than N1" compared different runs | Different totals in one column of the evaluation table | Every rule judges the same runs (`judge()`); before the first `X0`, N1 and N3 take the next `X0` | The selftest checks the totals |
+| ⚠ caught (code review, S3): **an injected run in a baseline.** A mixed manifest passed as `--stored` would raise the baseline's median | A stored baseline with configs other than `X0` | `baseline_runs()` refuses it | — |
+| ⚠ caught (code review, S3): **one crashed run stopping the batch.** A stub CSV made `csv_stats.analyse` raise | The batch ends early with a traceback | The run is kept as invalid (`capture unreadable`) | The manifest's `problems` list |
+| ⚠ caught (code review, S3): **an unpinned batch.** With no P-core mask (the processor query failed), the old guard skipped pinning silently | Two levels of `GameThreadTime` about 1.6× apart | Refuse to run without a mask | The environment record's `cpu_affinity` |
+| Two copies of the gate's command line | A batch measured under different arguments than the checks proved | One `GATE_ARGS` in `tt_common.py`, used by `run_checks.py` and `run_bench.py` (simplify pass, S3) | Diff the manifest's `common_args` against the check's `gate_args` |
 
 ## Probe plugin (`TestTrustProbe`)
 
@@ -79,3 +90,4 @@
 | Leaving the engine's `AndroidFileServer` plugin enabled | After the first editor run, `DefaultEngine.ini` has a new block with a random `SecurityToken` (`git diff` shows it) | `{ "Name": "AndroidFileServer", "Enabled": false }` in the `.uproject`; delete the block if it is already there |
 | Copying a command-line switch that nothing reads (`-ExitAfterSeconds=0`) | The run "works", for another reason (`quit`) | Grep the engine source for a switch before relying on it |
 | Expecting the Test configuration on the launcher engine | "Targets cannot be built in the Test configuration with this engine distribution" | Packaged Development for the gate; Development editor for mutants |
+| ⚠ caught (portfolio brief rule 12): **`call :step ... \|\| exit /b` in a batch chain.** Run as `cmd /c script.bat`, the chain stops at a failed step but exits with 0, so the queue reports "ok" | A queue job marked ok whose log shows a step's `exit=` other than 0 | `if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%` after every step |
