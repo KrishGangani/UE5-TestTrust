@@ -427,3 +427,26 @@ Two read-only audits against the code and the engine, then the fixes:
   - `tt_mutants.py`'s command line read files with universal newlines, so on a CRLF file it printed ids that differ from the campaign's. It now reads them as the runner does (`newline=""`); run on the P4-R snapshot, it prints the three reviewed ids.
   - Self-tests after the changes: `tt_mutants`, `tt_mutate`, `csv_stats` and `tt_gate` all ok.
 - **`08` written:** where every log is, how to read a mutant's fate from its logs, reproducing one mutant by hand, the gate's validity reasons and capture contents, profiling the workload (`stat unit`, Insights), and the runner's own failure modes.
+
+
+## Phase 7 · Edge cases and stability: the plan and the prediction (written before any run)
+
+**Code (commit `82f8901`):** the edge-case sample `TTSampleEdgeCases` and its two tests, the test that closes the Phase 4 gap (`Range.ExactlyAtLimit`), the runner's crash self-test and the `restore()` byte comparison (`05` B4, D4). Code check before any campaign: batch `2026-11-21_082400_s1check`, queue job ok: both builds **0 warnings**, **16 of 16 tests pass** (the 13 before plus `Edge.TotalPrice`, `Edge.TicksToDrain`, `Range.ExactlyAtLimit`), package ok, the two probe runs as in S1.
+
+**P7-1. Every fate on a real build, the closed gap, and interrupted batches** (`Tools\mutation\sample_p7.json`: both `.cpp` files of the sample module at `82f8901`, filter `StartsWith:TestTrust.Sample`, all six operators).
+
+| File | Mutants | Predicted |
+|---|---|---|
+| `TTSampleRules.cpp` (unchanged since `03771bf`, so the same 14 ids) | 14 | 12 killed: the 11 of P4-R, plus `62c038c366` (`<=` → `<` in `IsInRange`), now killed by `Range.ExactlyAtLimit`. 2 survived, `8125da701a` and `1c78e5d36c`: both reviewed as equivalent in P4-R |
+| `TTSampleEdgeCases.cpp` | 8 | 2 **stillborn** (`*` → `/`, `+` → `-` on `FTTSampleMoney`); 2 **timeout** (`-=` → `+=`, delete `Remaining -= Step;`); 4 killed (`>` → `>=`, `>` → `<=`, the inverted `while`, delete `++Ticks;`) |
+| **Total** | **22** | 16 killed, 2 timeout, 2 stillborn, 2 survived (equivalent), 0 crash, 0 error. M1 = 18/18 = **100%** after the review, 18/20 = 90% before it; M1-naive = 20/22 = 90.9% |
+
+How it is run, to test interruption and resumption on real builds:
+1. **Killed mid-campaign:** `tt_mutate.py batch` as a queue job with `--timeout 150`, so the queue's watchdog kills the whole process tree part-way through, which is the same as a crash or a power cut for the runner. Predicted: the manifest still loads; the killed batch has no stop reason; every mutant that finished has its fate; at most one target file is left mutated.
+2. **Resumed in short batches:** `tt_mutate.py queue --batch-seconds 240`. Predicted: several batches, each but the last stopping with "time budget reached"; the first of them restores the file the kill left mutated; the mutant that was running when the kill came is run again; the final fates match the table above.
+
+**P7-2. A target that doesn't build** (`edge_broken.json`: the edge file at `82f8901` plus `patches\edge_broken_build.patch`, which adds an `#error` line). Predicted: `batch` exits **3**, "baseline not green", **0 mutants run**, and every mutant keeps no fate.
+
+**P7-3. A suite that isn't green** (`edge_red_suite.json`: `patches\edge_red_suite.patch` changes one expected value to 851). Predicted: the baseline builds, 1 of its tests fails, `batch` exits **3**, 0 mutants run.
+
+**Without Unreal** (in `tt_mutate.py selftest`): crash recovery with a killed child process (`05` D4), the patch path, the snapshot safety test.

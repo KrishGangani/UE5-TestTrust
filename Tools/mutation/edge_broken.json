@@ -1,0 +1,28 @@
+{
+	"name": "edge-broken",
+	"repo_name": "UE5-TestTrust",
+	"repo": "D:/UNREAL PORTFOLIO/P03_TestTrust",
+	"commit": "82f8901",
+	"project_subdir": "TestTrust",
+	"uproject": "TestTrust.uproject",
+	"editor_target": "TestTrustEditor",
+	"mutate": [
+		"Source/TestTrustSample/Private/TTSampleEdgeCases.cpp"
+	],
+	"exclude": [
+		"*/Tests/*",
+		"*Module.cpp"
+	],
+	"test_filter": "StartsWith:TestTrust.Sample.Edge",
+	"operators": [
+		"ROR",
+		"AOR",
+		"LCR",
+		"COND",
+		"BOOL",
+		"SDL"
+	],
+	"patches": [
+		"patches/edge_broken_build.patch"
+	]
+}
